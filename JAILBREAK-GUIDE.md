@@ -50,9 +50,12 @@ If screen is not red, NOR was flashed successfully and device will reboot.
 * If there are no issues, the phone will reboot and automatically boot into iOS.
 
 
-### 3-second delays when using a phone jailbroken with alloc8
 
-alloc8 delays boot in the bootrom by about 3 seconds.
+
+
+### 3 second delay during boot when using a phone jailbroken with alloc8
+
+alloc8 exploit takes about 3 seconds to run.
 
 When your phone is off, to turn it on you will need to keep holding the Power button for at least 3 seconds, or your phone will not turn on. This might be because LLB protects against accidental presses of the Power button by shutting down the phone if the power button is not being held anymore. Without an exploit it takes less than a second before this check happens, but with alloc8 exploit it will happen after about 3 seconds. It might be possible to change this behavior by patching LLB.
 
