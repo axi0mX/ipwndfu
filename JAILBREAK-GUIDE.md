@@ -2,15 +2,15 @@
 
 ### Steps
 
-* Backup your data.
+1. Backup your data. Everything will be removed from your phone as it is a **full** restore.
 
-* Create a custom 24Kpwn IPSW for iPhone 3GS (old bootrom).
+2. [Generate a custom 24Kpwn IPSW for iPhone 3GS (old bootrom)](#how-to-create-a-24kpwn-ipsw).
 
-* Restore to this custom IPSW on your iPhone 3GS (new bootrom).
+3. [Restore to this custom IPSW on your iPhone 3GS (new bootrom)](#how-to-restore-to-a-custom-ipsw).
 
-* After restore is complete, your phone will connect back to your computer in DFU Mode. The screen will be black. This is expected. 24Kpwn exploit does not work on iPhone 3GS (new bootrom).
+4. After restore is complete, your phone will connect back to your computer in DFU Mode. The screen will be black. This is expected. 24Kpwn exploit does not work on iPhone 3GS (new bootrom).
 
-* Use ipwndfu to put your device into pwned DFU Mode:
+5. Use ipwndfu to put your device into pwned DFU Mode:
 
 ```
 $ ./ipwndfu -p
@@ -19,7 +19,7 @@ Found: CPID:8920 CPRV:15 CPFM:03 SCEP:03 BDID:00 ECID:XXXXXXXXXXXXXXXX SRTG:[iBo
 Device is now in pwned DFU Mode.
 ```
 
-* Once in pwned DFU Mode, use the -x flag to install the alloc8 exploit. This step will replace 24Kpwn exploit with alloc8.
+6. Once in pwned DFU Mode, use the -x flag to install the alloc8 exploit. This step will replace 24Kpwn exploit with alloc8.
 
 ```
 $ ./ipwndfu -x
@@ -37,9 +37,10 @@ Sending iBSS.
 Waiting for iBSS to enter Recovery Mode.
 Sending iBSS payload to flash NOR.
 Sending run command.
-If screen is not red, NOR was flashed succcesfully and device will reboot.
+If screen is not red, NOR was flashed successfully and device will reboot.
 ```
 
+#### Notes:
 * Installation takes about 30 seconds. Once NOR is being flashed, the screen will be green for about 10 seconds, and then your phone will reboot.
 
 * If there are any errors before the screen turned green, it is safe to try again.
@@ -69,48 +70,33 @@ https://ipsw.me/
 
 ### How to create a 24Kpwn IPSW
 
-Older versions of PwnageTool can be found here: https://github.com/axi0mX/PwnageTool-mirror
+| Version     | Tool                                                                                            | Success      |
+|-------------|-------------------------------------------------------------------------------------------------|--------------|
+| iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) | Worked       |
+| iOS 3.1.2/3 | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) | Worked       |
+| iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   | Worked       |
+| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Did not work |
+| iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
+| iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
+| iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
+| iOS 5.1.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
 
-#### PwnageTool 3.1.3
-
-iOS 3.1 (tested and worked)
-
-
-#### PwnageTool 3.1.5
-
-iOS 3.1.2 (tested and worked)
-
-iOS 3.1.3 (tested and worked)
-
-
-#### PwnageTool 4.01
-
-iOS 4.0 (tested and worked)
-
-
-#### redsn0w 0.9.15b3
+#### Notes on using redsn0w 0.9.15b3
 
 ```
-Q: 'Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?' 
+Q: 'Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?'
 A:  No [You must answer No to create a 24Kpwn IPSW using redsn0w]
 ```
 
-iOS 4.3.3 (tested and worked)
 
-iOS 5.0 (failed to restore)
-
-iOS 5.0.1 (tested and worked)
-
-iOS 5.1 (tested and worked)
-
-iOS 5.1.1 (tested and worked)
 
 
 ### How to restore to a custom IPSW
 
-* All versions of iTunes before 11.1 can be used to restore to a custom IPSW in pwned DFU Mode. You can download and install an old version of iTunes in a Windows virtual machine or use a very old Mac with an old version of iTunes. You can use any compatible tool to enter pwned DFU, but it probably won't work in a virtual machine. On a Mac, you can run ipwndfu -p in Terminal and then restore a custom IPSW in iTunes in a virtual machine.
+ All versions of iTunes before 11.1 can be used to restore to a custom IPSW in pwned DFU Mode. You can download and install an old version of iTunes in a Windows virtual machine or use a very old Mac with an old version of iTunes. You can use any compatible tool to enter pwned DFU, but it probably won't work in a virtual machine.
+ On a Mac, you can run `ipwndfu -p` in Terminal and then restore a custom IPSW in iTunes in a virtual machine.
 
-* Use idevicerestore from libimobiledevice. Because of limera1n exploit issues, this might not work in a virtual machine or on a Mac.
+**OR** If you are on Linux, use idevicerestore from libimobiledevice. Because of limera1n exploit issues, this might not work in a virtual machine or on a Mac.
 ```
 idevicerestore -c -e your_custom_IPSW.ipsw
 ```
