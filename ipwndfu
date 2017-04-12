@@ -2,7 +2,8 @@
 # ipwndfu: open-source jailbreaking tool for older iOS devices
 # Author: axi0mX
 
-import binascii, datetime, getopt, hashlib, struct, subprocess, sys, time, usb
+import binascii, datetime, getopt, hashlib, struct, subprocess, sys, time
+import usb # pyusb: use 'pip install pyusb' to install this module
 import dfu, recovery, limera1n
 
 EXEC_MAGIC = 'exec'[::-1]

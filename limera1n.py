@@ -1,4 +1,5 @@
-import array, ctypes, struct, sys, time, usb
+import array, ctypes, struct, sys, time
+import usb # pyusb: use 'pip install pyusb' to install this module
 import dfu
 
 # Must be global so garbage collector never frees it 
