@@ -38,7 +38,7 @@ def aes_decrypt(payload, iv, key):
                        stdin=subprocess.PIPE,
                        stderr=subprocess.PIPE)
   (stdoutdata, stderrdata) = p.communicate(input=payload)
-  
+
   if len(stderrdata) > 0:
     print 'ERROR: OpenSSL reported error: %s' % stderrdata
     sys.exit(1)
@@ -75,7 +75,7 @@ class Image3:
 		for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
 			bytes += struct.pack('4s2I', tagMagic, tagTotalSize, tagDataSize) + tagData
 		return bytes + '\x00' * (totalSize - len(bytes))
-		
+
 	def getTags(self, magic):
 		matches = []
 		for tag in self.tags:
@@ -129,7 +129,7 @@ class Image3:
 			decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
 			# Remove SHSH and CERT
 			shshTag = []
-			certTag = []			
+			certTag = []
 		return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
 
 class PwnedDeviceConfig:
@@ -147,16 +147,16 @@ class PwnedDeviceConfig:
 configs = [
 	PwnedDeviceConfig(
 		# S5L8920 (old bootrom)
-		version='359.3',   
-		cpid='8920',  
+		version='359.3',
+		cpid='8920',
 		aes_crypto_cmd=0x925,
-		memmove=0x83d4, 
+		memmove=0x83d4,
 		get_block_device=0x1351,
 		load_address=0x84000000,
 		rom_address=0xbf000000,
 		rom_size=0x10000,
 		rom_sha256='99fd16f919a506c7f0701620e132e18c0e6f4025a57a85807960ca092e5e3587'
-	), 
+	),
 	PwnedDeviceConfig(
 		# S5L8920 (new bootrom)
 		version='359.3.2',
@@ -167,7 +167,7 @@ configs = [
 		load_address=0x84000000,
 		rom_address=0xbf000000,
 		rom_size=0x10000,
-		rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'), 
+		rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'),
 	#PwnedDeviceConfig(
 	#	# S5L8922
 	#	version='359.5',
@@ -179,7 +179,7 @@ configs = [
 	#	rom_address=0xbf000000,
 	#	rom_size=0x10000,
 	#	rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
-	#), 
+	#),
 	#PwnedDeviceConfig(
 	#	# S5L8930
 	#	version='574.4',
@@ -201,7 +201,7 @@ class PwnedDFUDevice():
 		dfu.release_device(device)
 
 		if 'PWND:[' not in self.identifier:
- 			print 'ERROR: Device is not in pwned DFU Mode.'
+ 			print 'ERROR: Device is not in pwned DFU Mode. Try again'
  			sys.exit(1)
 
  		self.config = None
@@ -395,7 +395,7 @@ class PwnedDFUDevice():
 		dfu.release_device(device)
 
 		device = dfu.acquire_device()
-		assert self.identifier == device.serial_number 
+		assert self.identifier == device.serial_number
 		time.sleep(0.01)
 		data = dfu.send_data(device, patchediBSS)
 		dfu.request_image_validation(device)
@@ -424,7 +424,7 @@ class PwnedDFUDevice():
 			pass
 			#print 'Caught USBError; should still work.'
 		recovery.release_device(device)
-		print 'If screen is not red, NOR was flashed succcesfully and device will reboot.'
+		print 'If screen is not red, NOR was flashed successfully and device will reboot.'
 
 	def decrypt_keybag(self, keybag):
 		KEYBAG_LENGTH = 48
