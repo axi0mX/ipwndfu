@@ -107,7 +107,7 @@ class Image3:
 		typeTag = self.getTags('TYPE'[::-1])
 		assert len(typeTag) == 1
 		versTag = self.getTags('VERS'[::-1])
-		assert len(versTag) == 1
+		assert len(versTag) <= 1
 		dataTags = self.getTags('DATA'[::-1])
 		assert len(dataTags) == 1
 		sepoTag = self.getTags('SEPO'[::-1])
@@ -120,7 +120,12 @@ class Image3:
 		assert len(certTag) <= 1
 
 		(tagMagic, tagTotalSize, tagDataSize, tagData) = dataTags[0]
-		decrypted = self.getDecryptedPayload()
+
+		if self.getKeybag() == None:
+			# no KBAG, must not be encrypted
+			decrypted = tagData
+		else:
+			decrypted = self.getDecryptedPayload()
 		assert len(tagData) == len(decrypted)
 
 		# Fix first 20 bytes of 24kpwn LLB
@@ -333,7 +338,8 @@ class PwnedDFUDevice():
 			if img3_header[0] != 'Img3'[::-1]:
 				break
 			img3_data = nor_firmware[offset:offset + img3_header[1]]
-			new_nor_firmware += Image3(img3_data).newDecryptedImage3()
+			img3 = Image3(img3_data)
+			new_nor_firmware += img3.newDecryptedImage3()
 			offset += img3_header[1]
 			count += 1
 
@@ -507,6 +513,9 @@ if __name__ == '__main__':
 				sys.exit(1)
 
 			device = PwnedDFUDevice()
+			if device.config.cpid != '8920':
+				print 'This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.'
+				sys.exit(1)
 			device.nor_dump(saveBackup=True)
 			device.flash_nor(new_nor)
 
