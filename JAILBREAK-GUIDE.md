@@ -115,4 +115,4 @@ You can find the week and year of manufacture by looking at the serial number of
 
 2. Run exploit to put your phone into pwned DFU Mode. You can use `./ipwndfu -p`.
 
-3. Hold SHIFT and click Restore in iTunes. Choose your custom IPSW file. Any version of iTunes should work.
+3. Any version of iTunes should work. In iTunes, hold Option (or SHIFT if using Windows) and click Restore. You should be prompted to choose a file. Choose your custom IPSW.
