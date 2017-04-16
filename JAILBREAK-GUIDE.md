@@ -73,38 +73,40 @@ https://ipsw.me/
 
 ### How to create a 24Kpwn IPSW
 
-| Version     | Tool                                                                                            | Success      |
-|-------------|-------------------------------------------------------------------------------------------------|--------------|
-| iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) | Worked       |
-| iOS 3.1.2/3 | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) | Worked       |
-| iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   | Worked       |
-| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.1.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
+| iOS version | Tool                                                                                            |
+|-------------|-------------------------------------------------------------------------------------------------|
+| iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) |
+| iOS 3.1.2   | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) |
+| iOS 3.1.3   | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) |
+| iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   |
+| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.1.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
 
 #### Notes on using redsn0w 0.9.15b3
 
 ```
-Q: 'Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?'
-A:  No [You must answer No to create a 24Kpwn IPSW using redsn0w]
+Q: Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?
+A: No
 ```
+
+You must answer No to create a 24Kpwn IPSW using redsn0w. If you did this correctly, the name of the custom IPSW from redsn0w will start with ```NO_BB_OLDROM_iPhone2,1```.
 
 
 ### Compatibility with older iOS versions
 
 Newer phones might not support some older versions of iOS. You cannot brick your phone by attempting to restore an older version of iOS, so it might be worth it to try anyway. If iTunes restore fails with Error 28, the hardware of your phone is not compatible with that version of iOS.
 
-| Manufacture  | Error 28      | Success    |
-|--------------|---------------|------------|
-| Week 23 2011 | N/A           | 3.1.2+     |
-| Week 29 2011 | 3.x           | 4.0+       |
-| Week 36 2011 | 3.x           | 4.0+       |
-| Week 26 2012 | 3.x, 4.x      | 5.0+       |
+| Manufactured | Error 28   | Success    |
+|--------------|------------|------------|
+| Week 23 2011 | N/A        | 3.1.2+     |
+| Week 29 2011 | 3.x        | 4.0+       |
+| Week 36 2011 | 3.x        | 4.0+       |
+| Week 26 2012 | 3.x, 4.x   | 5.0+       |
 
 You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me what versions worked or didn't work.
-
 
 
 ### How to restore to a custom IPSW
