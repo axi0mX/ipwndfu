@@ -78,7 +78,7 @@ https://ipsw.me/
 | iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) | Worked       |
 | iOS 3.1.2/3 | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) | Worked       |
 | iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   | Worked       |
-| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Did not work |
+| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
 | iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
 | iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
 | iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
@@ -92,14 +92,25 @@ A:  No [You must answer No to create a 24Kpwn IPSW using redsn0w]
 ```
 
 
+### Compatibility with older iOS versions
+
+Newer phones might not support some older versions of iOS. You cannot brick your phone by attempting to restore an older version of iOS, so it might be worth it to try anyway. If iTunes restore fails with Error 28, the hardware of your phone is not compatible with that version of iOS.
+
+| Manufacture  | Error 28      | Success    |
+|--------------|---------------|------------|
+| Week 23 2011 | N/A           | 3.1.2+     |
+| Week 29 2011 | 3.x           | 4.0+       |
+| Week 36 2011 | 3.x           | 4.0+       |
+| Week 26 2012 | 3.x, 4.x      | 5.0+       |
+
+You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me what versions worked or didn't work.
+
 
 
 ### How to restore to a custom IPSW
 
- All versions of iTunes before 11.1 can be used to restore to a custom IPSW in pwned DFU Mode. You can download and install an old version of iTunes in a Windows virtual machine or use a very old Mac with an old version of iTunes. You can use any compatible tool to enter pwned DFU, but it probably won't work in a virtual machine.
- On a Mac, you can run `ipwndfu -p` in Terminal and then restore a custom IPSW in iTunes in a virtual machine.
+1. Enter DFU Mode: https://www.theiphonewiki.com/wiki/DFU_Mode
 
-**OR** If you are on Linux, use idevicerestore from libimobiledevice. Because of limera1n exploit issues, this might not work in a virtual machine or on a Mac.
-```
-idevicerestore -c -e your_custom_IPSW.ipsw
-```
+2. Run exploit to put your phone into pwned DFU Mode. You can use `./ipwndfu -p`.
+
+3. Hold SHIFT and click Restore in iTunes. Choose your custom IPSW file. Any version of iTunes should work.
