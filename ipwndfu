@@ -16,15 +16,15 @@ SECUREROM_FILENAME_FORMAT = 'SecureROM-%s-RELEASE.dump'
 SRTG_FORMAT = 'SRTG:[iBoot-%s]'
 
 def empty_img3_data(size):
-	assert size >= 20
-	return struct.pack('<4s3I4s', 'Img3'[::-1], size, 0, 0, 'zero'[::-1]) + '\x00' * (size - 20)
+    assert size >= 20
+    return struct.pack('<4s3I4s', 'Img3'[::-1], size, 0, 0, 'zero'[::-1]) + '\x00' * (size - 20)
 
 def apply_patches(file, patches):
-	# TODO: Should always be the same for decrypted IMG3s from this script, but don't hardcode this.
-	IMG3_DATA_OFFSET = 0x40
-	for (offset, data) in patches:
-		file = file[:IMG3_DATA_OFFSET + offset] + data + file[IMG3_DATA_OFFSET + offset + len(data):]
-	return file
+    # TODO: Should always be the same for decrypted IMG3s from this script, but don't hardcode this.
+    IMG3_DATA_OFFSET = 0x40
+    for (offset, data) in patches:
+        file = file[:IMG3_DATA_OFFSET + offset] + data + file[IMG3_DATA_OFFSET + offset + len(data):]
+    return file
 
 def aes_decrypt(payload, iv, key):
   if len(key) == 32:
@@ -46,509 +46,509 @@ def aes_decrypt(payload, iv, key):
   return stdoutdata
 
 class Image3:
-	def __init__(self, data):
-		(self.magic, self.totalSize, self.dataSize, self.signedSize, self.type) = struct.unpack('4s3I4s', data[0:20])
-		self.tags = []
-		pos = 20
-		while pos < 20 + self.dataSize:
-			(tagMagic, tagTotalSize, tagDataSize) = struct.unpack('4s2I', data[pos:pos+12])
-			self.tags.append((tagMagic, tagTotalSize, tagDataSize, data[pos+12:pos+tagTotalSize]))
-			pos += tagTotalSize
-			if tagTotalSize == 0:
-				break
+    def __init__(self, data):
+        (self.magic, self.totalSize, self.dataSize, self.signedSize, self.type) = struct.unpack('4s3I4s', data[0:20])
+        self.tags = []
+        pos = 20
+        while pos < 20 + self.dataSize:
+            (tagMagic, tagTotalSize, tagDataSize) = struct.unpack('4s2I', data[pos:pos+12])
+            self.tags.append((tagMagic, tagTotalSize, tagDataSize, data[pos+12:pos+tagTotalSize]))
+            pos += tagTotalSize
+            if tagTotalSize == 0:
+                break
 
-	@staticmethod
-	def createImage3FromTags(type, tags):
-		dataSize = 0
-		signedSize = 0
-		for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
-			dataSize += 12 + len(tagData)
-			if tagMagic[::-1] not in ['CERT', 'SHSH']:
-				signedSize += 12 + len(tagData)
+    @staticmethod
+    def createImage3FromTags(type, tags):
+        dataSize = 0
+        signedSize = 0
+        for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
+            dataSize += 12 + len(tagData)
+            if tagMagic[::-1] not in ['CERT', 'SHSH']:
+                signedSize += 12 + len(tagData)
 
-		# totalSize must be rounded up to 64-byte boundary
-		totalSize = 20 + dataSize
-		remainder = totalSize % 64
-		if remainder != 0:
-			totalSize += 64 - remainder
+        # totalSize must be rounded up to 64-byte boundary
+        totalSize = 20 + dataSize
+        remainder = totalSize % 64
+        if remainder != 0:
+            totalSize += 64 - remainder
 
-		bytes = struct.pack('4s3I4s', 'Img3'[::-1], totalSize, dataSize, signedSize, type)
-		for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
-			bytes += struct.pack('4s2I', tagMagic, tagTotalSize, tagDataSize) + tagData
-		return bytes + '\x00' * (totalSize - len(bytes))
+        bytes = struct.pack('4s3I4s', 'Img3'[::-1], totalSize, dataSize, signedSize, type)
+        for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
+            bytes += struct.pack('4s2I', tagMagic, tagTotalSize, tagDataSize) + tagData
+        return bytes + '\x00' * (totalSize - len(bytes))
 
-	def getTags(self, magic):
-		matches = []
-		for tag in self.tags:
-			if tag[0] == magic:
-				matches.append(tag)
-		return matches
+    def getTags(self, magic):
+        matches = []
+        for tag in self.tags:
+            if tag[0] == magic:
+                matches.append(tag)
+        return matches
 
-	def getKeybag(self):
-		keybags = self.getTags('KBAG'[::-1])
-		for (tagMagic, tagTotalSize, tagDataSize, tagData) in keybags:
-			(kbag_type, aes_type) = struct.unpack('<2I', tagData[:8])
-			if kbag_type == 1:
-				return tagData[8:8+48]
-		return None
+    def getKeybag(self):
+        keybags = self.getTags('KBAG'[::-1])
+        for (tagMagic, tagTotalSize, tagDataSize, tagData) in keybags:
+            (kbag_type, aes_type) = struct.unpack('<2I', tagData[:8])
+            if kbag_type == 1:
+                return tagData[8:8+48]
+        return None
 
-	def getPayload(self):
-		data = self.getTags('DATA'[::-1])
-		if len(data) == 1:
-			return data[0][3]
+    def getPayload(self):
+        data = self.getTags('DATA'[::-1])
+        if len(data) == 1:
+            return data[0][3]
 
-	def getDecryptedPayload(self):
-		keybag = self.getKeybag()
-		device = PwnedDFUDevice()
-		decrypted_keybag = device.decrypt_keybag(keybag)
-		return aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
+    def getDecryptedPayload(self):
+        keybag = self.getKeybag()
+        device = PwnedDFUDevice()
+        decrypted_keybag = device.decrypt_keybag(keybag)
+        return aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
 
-	def newDecryptedImage3(self):
-		typeTag = self.getTags('TYPE'[::-1])
-		assert len(typeTag) == 1
-		versTag = self.getTags('VERS'[::-1])
-		assert len(versTag) <= 1
-		dataTags = self.getTags('DATA'[::-1])
-		assert len(dataTags) == 1
-		sepoTag = self.getTags('SEPO'[::-1])
-		assert len(sepoTag) <= 2
-		bordTag = self.getTags('BORD'[::-1])
-		assert len(bordTag) <= 2
-		shshTag = self.getTags('SHSH'[::-1])
-		assert len(shshTag) <= 1
-		certTag = self.getTags('CERT'[::-1])
-		assert len(certTag) <= 1
+    def newDecryptedImage3(self):
+        typeTag = self.getTags('TYPE'[::-1])
+        assert len(typeTag) == 1
+        versTag = self.getTags('VERS'[::-1])
+        assert len(versTag) <= 1
+        dataTags = self.getTags('DATA'[::-1])
+        assert len(dataTags) == 1
+        sepoTag = self.getTags('SEPO'[::-1])
+        assert len(sepoTag) <= 2
+        bordTag = self.getTags('BORD'[::-1])
+        assert len(bordTag) <= 2
+        shshTag = self.getTags('SHSH'[::-1])
+        assert len(shshTag) <= 1
+        certTag = self.getTags('CERT'[::-1])
+        assert len(certTag) <= 1
 
-		(tagMagic, tagTotalSize, tagDataSize, tagData) = dataTags[0]
+        (tagMagic, tagTotalSize, tagDataSize, tagData) = dataTags[0]
 
-		if self.getKeybag() == None:
-			# no KBAG, must not be encrypted
-			decrypted = tagData
-		else:
-			decrypted = self.getDecryptedPayload()
-		assert len(tagData) == len(decrypted)
+        if self.getKeybag() == None:
+            # no KBAG, must not be encrypted
+            decrypted = tagData
+        else:
+            decrypted = self.getDecryptedPayload()
+        assert len(tagData) == len(decrypted)
 
-		# Fix first 20 bytes of 24kpwn LLB
-		if self.type == 'illb'[::-1] and self.totalSize >= 0x24000:
-			DWORD1 = 0xea00000e
-			DWORD2 = 0xe59ff018
-			decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
-			# Remove SHSH and CERT
-			shshTag = []
-			certTag = []
-		return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
+        # Fix first 20 bytes of 24kpwn LLB
+        if self.type == 'illb'[::-1] and self.totalSize >= 0x24000:
+            DWORD1 = 0xea00000e
+            DWORD2 = 0xe59ff018
+            decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
+            # Remove SHSH and CERT
+            shshTag = []
+            certTag = []
+        return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
 
 class PwnedDeviceConfig:
-	def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size, rom_sha256):
-		self.version = version
-		self.cpid = cpid
-		self.aes_crypto_cmd = aes_crypto_cmd
-		self.memmove = memmove
-		self.get_block_device = get_block_device
-		self.load_address = load_address
-		self.rom_address = rom_address
-		self.rom_size = rom_size
-		self.rom_sha256 = rom_sha256
+    def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size, rom_sha256):
+        self.version = version
+        self.cpid = cpid
+        self.aes_crypto_cmd = aes_crypto_cmd
+        self.memmove = memmove
+        self.get_block_device = get_block_device
+        self.load_address = load_address
+        self.rom_address = rom_address
+        self.rom_size = rom_size
+        self.rom_sha256 = rom_sha256
 
 configs = [
-	PwnedDeviceConfig(
-		# S5L8920 (old bootrom)
-		version='359.3',
-		cpid='8920',
-		aes_crypto_cmd=0x925,
-		memmove=0x83d4,
-		get_block_device=0x1351,
-		load_address=0x84000000,
-		rom_address=0xbf000000,
-		rom_size=0x10000,
-		rom_sha256='99fd16f919a506c7f0701620e132e18c0e6f4025a57a85807960ca092e5e3587'
-	),
-	PwnedDeviceConfig(
-		# S5L8920 (new bootrom)
-		version='359.3.2',
-		cpid='8920',
-		aes_crypto_cmd=0x925,
-		memmove=0x83dc,
-		get_block_device=0x1351,
-		load_address=0x84000000,
-		rom_address=0xbf000000,
-		rom_size=0x10000,
-		rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'),
-	#PwnedDeviceConfig(
-	#	# S5L8922
-	#	version='359.5',
-	#	cpid='8922',
-	#	aes_crypto_cmd=0x919,
-	#	memmove=0x8564,
-	#	get_block_device=0x1851,
-	#	load_address=0x84000000,
-	#	rom_address=0xbf000000,
-	#	rom_size=0x10000,
-	#	rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
-	#),
-	#PwnedDeviceConfig(
-	#	# S5L8930
-	#	version='574.4',
-	#	cpid='8930',
-	#	aes_crypto_cmd=0x686d,
-	#	memmove=0x84dc,
-	#	get_block_device=0x81d5,
-	#	load_address=0x84000000,
-	#	rom_address=0xbf000000,
-	#	rom_size=0x10000,
-	#	rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
-	#),
+    PwnedDeviceConfig(
+        # S5L8920 (old bootrom)
+        version='359.3',
+        cpid='8920',
+        aes_crypto_cmd=0x925,
+        memmove=0x83d4,
+        get_block_device=0x1351,
+        load_address=0x84000000,
+        rom_address=0xbf000000,
+        rom_size=0x10000,
+        rom_sha256='99fd16f919a506c7f0701620e132e18c0e6f4025a57a85807960ca092e5e3587'
+    ),
+    PwnedDeviceConfig(
+        # S5L8920 (new bootrom)
+        version='359.3.2',
+        cpid='8920',
+        aes_crypto_cmd=0x925,
+        memmove=0x83dc,
+        get_block_device=0x1351,
+        load_address=0x84000000,
+        rom_address=0xbf000000,
+        rom_size=0x10000,
+        rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'),
+    #PwnedDeviceConfig(
+    #   # S5L8922
+    #   version='359.5',
+    #   cpid='8922',
+    #   aes_crypto_cmd=0x919,
+    #   memmove=0x8564,
+    #   get_block_device=0x1851,
+    #   load_address=0x84000000,
+    #   rom_address=0xbf000000,
+    #   rom_size=0x10000,
+    #   rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
+    #),
+    #PwnedDeviceConfig(
+    #   # S5L8930
+    #   version='574.4',
+    #   cpid='8930',
+    #   aes_crypto_cmd=0x686d,
+    #   memmove=0x84dc,
+    #   get_block_device=0x81d5,
+    #   load_address=0x84000000,
+    #   rom_address=0xbf000000,
+    #   rom_size=0x10000,
+    #   rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
+    #),
 ]
 
 class PwnedDFUDevice():
-	def __init__(self):
-		device = dfu.acquire_device()
-		self.identifier = device.serial_number
-		dfu.release_device(device)
+    def __init__(self):
+        device = dfu.acquire_device()
+        self.identifier = device.serial_number
+        dfu.release_device(device)
 
-		if 'PWND:[' not in self.identifier:
-			print 'ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.'
- 			sys.exit(1)
+        if 'PWND:[' not in self.identifier:
+            print 'ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.'
+            sys.exit(1)
 
- 		self.config = None
- 		for config in configs:
- 			if SRTG_FORMAT % config.version in self.identifier:
- 				self.config = config
- 				break
- 		if self.config is None:
- 			print 'ERROR: Device seems to be in pwned DFU Mode, but a matching configuration was not found.'
- 			sys.exit(1)
+        self.config = None
+        for config in configs:
+            if SRTG_FORMAT % config.version in self.identifier:
+                self.config = config
+                break
+        if self.config is None:
+            print 'ERROR: Device seems to be in pwned DFU Mode, but a matching configuration was not found.'
+            sys.exit(1)
 
- 	def ecid_string(self):
- 		tokens = self.identifier.split()
- 		for token in tokens:
- 			if token.startswith('ECID:'):
- 				return token[5:]
- 		print 'ERROR: ECID is missing from USB serial number string.'
- 		sys.exit(1)
+    def ecid_string(self):
+        tokens = self.identifier.split()
+        for token in tokens:
+            if token.startswith('ECID:'):
+                return token[5:]
+        print 'ERROR: ECID is missing from USB serial number string.'
+        sys.exit(1)
 
-	def execute(self, cmd, receiveLength):
-		device = dfu.acquire_device()
-		assert self.identifier == device.serial_number
+    def execute(self, cmd, receiveLength):
+        device = dfu.acquire_device()
+        assert self.identifier == device.serial_number
 
-		dfu.reset_counters(device)
-		dfu.send_data(device, EXEC_MAGIC + cmd)
-		dfu.request_image_validation(device)
-		dfu.release_device(device)
+        dfu.reset_counters(device)
+        dfu.send_data(device, EXEC_MAGIC + cmd)
+        dfu.request_image_validation(device)
+        dfu.release_device(device)
 
-		time.sleep(0.1)
+        time.sleep(0.1)
 
-		device = dfu.acquire_device()
-		assert self.identifier == device.serial_number
+        device = dfu.acquire_device()
+        assert self.identifier == device.serial_number
 
-		requiredLength = 0x8 + receiveLength
-		requiredLength = requiredLength if requiredLength % 0x800 == 0 else requiredLength / 0x800 * 0x800 + 0x800
-		received = dfu.get_data(device, requiredLength)
-		dfu.release_device(device)
+        requiredLength = 0x8 + receiveLength
+        requiredLength = requiredLength if requiredLength % 0x800 == 0 else requiredLength / 0x800 * 0x800 + 0x800
+        received = dfu.get_data(device, requiredLength)
+        dfu.release_device(device)
 
-		(exec_cleared, retval) = struct.unpack('<2I', received[:8])
-		assert exec_cleared == 0
-		return (retval, received[8:8 + receiveLength])
+        (exec_cleared, retval) = struct.unpack('<2I', received[:8])
+        assert exec_cleared == 0
+        return (retval, received[8:8 + receiveLength])
 
-	def securerom_dump(self):
-		(retval, securerom) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 0x8, self.config.rom_address, self.config.rom_size), self.config.rom_size)
-		if hashlib.sha256(securerom).hexdigest() != self.config.rom_sha256:
-			print 'ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting.'
-			sys.exit(1)
-		return securerom
+    def securerom_dump(self):
+        (retval, securerom) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 0x8, self.config.rom_address, self.config.rom_size), self.config.rom_size)
+        if hashlib.sha256(securerom).hexdigest() != self.config.rom_sha256:
+            print 'ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting.'
+            sys.exit(1)
+        return securerom
 
-	def aes(self, data, action, key):
-		if len(data) % AES_BLOCK_SIZE != 0:
-			print 'ERROR: Length of data for AES encryption/decryption must be a multiple of %s.' % AES_BLOCK_SIZE
-			sys.exit(1)
+    def aes(self, data, action, key):
+        if len(data) % AES_BLOCK_SIZE != 0:
+            print 'ERROR: Length of data for AES encryption/decryption must be a multiple of %s.' % AES_BLOCK_SIZE
+            sys.exit(1)
 
-		cmd = struct.pack('<8I', self.config.aes_crypto_cmd, action, self.config.load_address + 36, self.config.load_address + 0x8, len(data), key, 0, 0)
-		(retval, received) = self.execute(cmd + data, len(data))
-		return received[:len(data)]
+        cmd = struct.pack('<8I', self.config.aes_crypto_cmd, action, self.config.load_address + 36, self.config.load_address + 0x8, len(data), key, 0, 0)
+        (retval, received) = self.execute(cmd + data, len(data))
+        return received[:len(data)]
 
-	def aes_hex(self, hex_data, action, key):
-		if len(hex_data) % 32 != 0:
-			print 'ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' % (2 * AES_BLOCK_SIZE)
-			sys.exit(1)
+    def aes_hex(self, hex_data, action, key):
+        if len(hex_data) % 32 != 0:
+            print 'ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' % (2 * AES_BLOCK_SIZE)
+            sys.exit(1)
 
-		return binascii.hexlify(self.aes(binascii.unhexlify(hex_data), action, key))
+        return binascii.hexlify(self.aes(binascii.unhexlify(hex_data), action, key))
 
-	def read_memory(self, address, length):
-		(retval, data) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
-		return data
+    def read_memory(self, address, length):
+        (retval, data) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
+        return data
 
-	def nor_dump(self, saveBackup):
-		(bdev, empty) = self.execute(struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
-		if bdev == 0:
-			print 'ERROR: Unable to dump NOR. Pointer to nor0 block device was NULL.'
-			sys.exit(1)
+    def nor_dump(self, saveBackup):
+        (bdev, empty) = self.execute(struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
+        if bdev == 0:
+            print 'ERROR: Unable to dump NOR. Pointer to nor0 block device was NULL.'
+            sys.exit(1)
 
-		data = self.read_memory(bdev + 28, 4)
-		(read,) = struct.unpack('<I', data)
-		if read == 0:
-			print 'ERROR: Unable to dump NOR. Function pointer for reading was NULL.'
-			sys.exit(1)
+        data = self.read_memory(bdev + 28, 4)
+        (read,) = struct.unpack('<I', data)
+        if read == 0:
+            print 'ERROR: Unable to dump NOR. Function pointer for reading was NULL.'
+            sys.exit(1)
 
-		NOR_PART_SIZE = 0x20000
-		NOR_PARTS = 8
-		nor = str()
-		for i in range(NOR_PARTS):
-			print 'Dumping NOR, part %s/%s.' % (i+1, NOR_PARTS)
-			(retval, received) = self.execute(struct.pack('<6I', read, bdev, self.config.load_address + 8, i * NOR_PART_SIZE, 0, NOR_PART_SIZE), NOR_PART_SIZE)
-			nor += received
+        NOR_PART_SIZE = 0x20000
+        NOR_PARTS = 8
+        nor = str()
+        for i in range(NOR_PARTS):
+            print 'Dumping NOR, part %s/%s.' % (i+1, NOR_PARTS)
+            (retval, received) = self.execute(struct.pack('<6I', read, bdev, self.config.load_address + 8, i * NOR_PART_SIZE, 0, NOR_PART_SIZE), NOR_PART_SIZE)
+            nor += received
 
-		if saveBackup:
-			date = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-			filename = 'nor-backups/nor-%s-%s.dump' % (self.ecid_string(), date)
-			f = open(filename, 'wb')
-			f.write(nor)
-			f.close()
-			print 'NOR backed up to file: %s' % filename
+        if saveBackup:
+            date = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+            filename = 'nor-backups/nor-%s-%s.dump' % (self.ecid_string(), date)
+            f = open(filename, 'wb')
+            f.write(nor)
+            f.close()
+            print 'NOR backed up to file: %s' % filename
 
-		return nor
+        return nor
 
-	def add_alloc8_exploit_to_nor(self, nor):
-		SHELLCODE_ADDRESS = 0x84026214
-		MAX_SHELLCODE_LENGTH = 460
-		REQUIRED_IMG3_COUNT = 714
-		NOR_READ_SIZE = 4096
+    def add_alloc8_exploit_to_nor(self, nor):
+        SHELLCODE_ADDRESS = 0x84026214
+        MAX_SHELLCODE_LENGTH = 460
+        REQUIRED_IMG3_COUNT = 714
+        NOR_READ_SIZE = 4096
 
-		(img2_magic, block_size, unused, firmware_block, firmware_block_count) = struct.unpack('<4s4I', nor[:20])
-		(img2_crc,) = struct.unpack('<I', nor[48:52])
-		assert img2_crc == binascii.crc32(nor[:48]) & 0xffffffff
+        (img2_magic, block_size, unused, firmware_block, firmware_block_count) = struct.unpack('<4s4I', nor[:20])
+        (img2_crc,) = struct.unpack('<I', nor[48:52])
+        assert img2_crc == binascii.crc32(nor[:48]) & 0xffffffff
 
-		firmware_offset = firmware_block * block_size
-		firmware_length = firmware_block_count * block_size
-		nor_firmware = nor[firmware_offset:firmware_offset + firmware_length]
+        firmware_offset = firmware_block * block_size
+        firmware_length = firmware_block_count * block_size
+        nor_firmware = nor[firmware_offset:firmware_offset + firmware_length]
 
-		f = open('bin/alloc8-shellcode.bin', 'rb')
-		shellcode = f.read()
-		f.close()
-		assert len(shellcode) <= MAX_SHELLCODE_LENGTH
-		for c in nor[52:52+MAX_SHELLCODE_LENGTH]:
-			if c != '\x00':
-				print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely already installed. Exiting.'
-				sys.exit(1)
+        f = open('bin/alloc8-shellcode.bin', 'rb')
+        shellcode = f.read()
+        f.close()
+        assert len(shellcode) <= MAX_SHELLCODE_LENGTH
+        for c in nor[52:52+MAX_SHELLCODE_LENGTH]:
+            if c != '\x00':
+                print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely already installed. Exiting.'
+                sys.exit(1)
 
-		new_nor_firmware = str()
-		offset = 0
-		count = 0
-		while 1:
-			img3_header = struct.unpack('<4s3I4s', nor_firmware[offset:offset+20])
-			if img3_header[0] != 'Img3'[::-1]:
-				break
-			img3_data = nor_firmware[offset:offset + img3_header[1]]
-			img3 = Image3(img3_data)
-			new_nor_firmware += img3.newDecryptedImage3()
-			offset += img3_header[1]
-			count += 1
+        new_nor_firmware = str()
+        offset = 0
+        count = 0
+        while 1:
+            img3_header = struct.unpack('<4s3I4s', nor_firmware[offset:offset+20])
+            if img3_header[0] != 'Img3'[::-1]:
+                break
+            img3_data = nor_firmware[offset:offset + img3_header[1]]
+            img3 = Image3(img3_data)
+            new_nor_firmware += img3.newDecryptedImage3()
+            offset += img3_header[1]
+            count += 1
 
-		# Add REQUIRED_IMG3_COUNT - count - 1 empty img3s
-		for i in range(REQUIRED_IMG3_COUNT - count - 1):
-			new_nor_firmware += empty_img3_data(block_size)
+        # Add REQUIRED_IMG3_COUNT - count - 1 empty img3s
+        for i in range(REQUIRED_IMG3_COUNT - count - 1):
+            new_nor_firmware += empty_img3_data(block_size)
 
-		# Final img3 must end at the end of the block.
-		final_offset = firmware_offset + len(new_nor_firmware)
-		final_size = NOR_READ_SIZE - final_offset % NOR_READ_SIZE
-		if final_size < 20:
-			final_size += NOR_READ_SIZE
-		assert final_size % block_size == 0
+        # Final img3 must end at the end of the block.
+        final_offset = firmware_offset + len(new_nor_firmware)
+        final_size = NOR_READ_SIZE - final_offset % NOR_READ_SIZE
+        if final_size < 20:
+            final_size += NOR_READ_SIZE
+        assert final_size % block_size == 0
 
-		new_nor_firmware += empty_img3_data(final_size)
+        new_nor_firmware += empty_img3_data(final_size)
 
-		# Only override data abort handler, keep the rest
-		securerom = self.securerom_dump()
-		securerom_block = securerom[8:8+NOR_READ_SIZE]
-		new_nor_firmware += securerom_block[:40] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom_block[44:]
-		new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
+        # Only override data abort handler, keep the rest
+        securerom = self.securerom_dump()
+        securerom_block = securerom[8:8+NOR_READ_SIZE]
+        new_nor_firmware += securerom_block[:40] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom_block[44:]
+        new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
 
-		new_nor = nor[0:52] + shellcode + '\x00' * (MAX_SHELLCODE_LENGTH - len(shellcode))
-		new_nor += nor[52+MAX_SHELLCODE_LENGTH:firmware_offset] + new_nor_firmware + nor[firmware_offset + firmware_length:]
-		assert len(nor) == len(new_nor)
-		return new_nor
+        new_nor = nor[0:52] + shellcode + '\x00' * (MAX_SHELLCODE_LENGTH - len(shellcode))
+        new_nor += nor[52+MAX_SHELLCODE_LENGTH:firmware_offset] + new_nor_firmware + nor[firmware_offset + firmware_length:]
+        assert len(nor) == len(new_nor)
+        return new_nor
 
-	def boot_ibss(self):
-		print 'Sending iBSS.'
-		if self.config.cpid != '8920':
-			print 'ERROR: Boot iBSS is currently only supported on iPhone 3GS.'
-			sys.exit(1)
+    def boot_ibss(self):
+        print 'Sending iBSS.'
+        if self.config.cpid != '8920':
+            print 'ERROR: Boot iBSS is currently only supported on iPhone 3GS.'
+            sys.exit(1)
 
-		try:
-			f = open('n88ap-iBSS-4.3.5.img3', 'rb')
-			data = f.read()
-			f.close()
-		except:
-			print 'ERROR: n88ap-iBSS-4.3.5.img3 is missing.'
-			print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
-			print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
-			sys.exit(1)
-		if hashlib.sha256(data).hexdigest() != 'b47816105ce97ef02637ec113acdefcdee32336a11e04eda0a6f4fc5e6617e61':
-			print 'ERROR: n88ap-iBSS-4.3.5.img3 is corrupted or wrong.'
-			print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
-			print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
-			sys.exit(1)
+        try:
+            f = open('n88ap-iBSS-4.3.5.img3', 'rb')
+            data = f.read()
+            f.close()
+        except:
+            print 'ERROR: n88ap-iBSS-4.3.5.img3 is missing.'
+            print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
+            print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
+            sys.exit(1)
+        if hashlib.sha256(data).hexdigest() != 'b47816105ce97ef02637ec113acdefcdee32336a11e04eda0a6f4fc5e6617e61':
+            print 'ERROR: n88ap-iBSS-4.3.5.img3 is corrupted or wrong.'
+            print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
+            print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
+            sys.exit(1)
 
-		iBSS = Image3(data)
-		decryptediBSS = iBSS.newDecryptedImage3()
-		n88ap_iBSS_435_patches = [
-			(0x14954,                     'run\x00'), # patch 'reset' command string to 'run'
-			(0x17654, struct.pack('<I', 0x41000001)), # patch 'reset' command handler to LOAD_ADDRESS + 1
-		]
-		patchediBSS = apply_patches(decryptediBSS, n88ap_iBSS_435_patches)
+        iBSS = Image3(data)
+        decryptediBSS = iBSS.newDecryptedImage3()
+        n88ap_iBSS_435_patches = [
+            (0x14954,                     'run\x00'), # patch 'reset' command string to 'run'
+            (0x17654, struct.pack('<I', 0x41000001)), # patch 'reset' command handler to LOAD_ADDRESS + 1
+        ]
+        patchediBSS = apply_patches(decryptediBSS, n88ap_iBSS_435_patches)
 
-		device = dfu.acquire_device()
-		assert self.identifier == device.serial_number
-		dfu.reset_counters(device)
-		dfu.request_image_validation(device)
-		dfu.release_device(device)
+        device = dfu.acquire_device()
+        assert self.identifier == device.serial_number
+        dfu.reset_counters(device)
+        dfu.request_image_validation(device)
+        dfu.release_device(device)
 
-		device = dfu.acquire_device()
-		assert self.identifier == device.serial_number
-		time.sleep(0.01)
-		data = dfu.send_data(device, patchediBSS)
-		dfu.request_image_validation(device)
-		dfu.release_device(device)
+        device = dfu.acquire_device()
+        assert self.identifier == device.serial_number
+        time.sleep(0.01)
+        data = dfu.send_data(device, patchediBSS)
+        dfu.request_image_validation(device)
+        dfu.release_device(device)
 
-		print 'Waiting for iBSS to enter Recovery Mode.'
-		device = recovery.acquire_device()
-		recovery.release_device(device)
+        print 'Waiting for iBSS to enter Recovery Mode.'
+        device = recovery.acquire_device()
+        recovery.release_device(device)
 
-	def flash_nor(self, nor):
-		self.boot_ibss()
-		print 'Sending iBSS payload to flash NOR.'
-		MAX_SHELLCODE_LENGTH = 128
-		payload = open('bin/ibss-flash-nor-shellcode.bin', 'rb').read()
-		assert len(payload) <= MAX_SHELLCODE_LENGTH
-		payload += '\x00' * (MAX_SHELLCODE_LENGTH - len(payload)) + nor
+    def flash_nor(self, nor):
+        self.boot_ibss()
+        print 'Sending iBSS payload to flash NOR.'
+        MAX_SHELLCODE_LENGTH = 128
+        payload = open('bin/ibss-flash-nor-shellcode.bin', 'rb').read()
+        assert len(payload) <= MAX_SHELLCODE_LENGTH
+        payload += '\x00' * (MAX_SHELLCODE_LENGTH - len(payload)) + nor
 
-		device = recovery.acquire_device()
-		assert 'CPID:8920' in device.serial_number
-		recovery.send_data(device, payload)
-		try:
-			print 'Sending run command.'
-			recovery.send_command(device, 'run')
-		except usb.core.USBError:
-			# OK
-			pass
-			#print 'Caught USBError; should still work.'
-		recovery.release_device(device)
-		print 'If screen is not red, NOR was flashed successfully and device will reboot.'
+        device = recovery.acquire_device()
+        assert 'CPID:8920' in device.serial_number
+        recovery.send_data(device, payload)
+        try:
+            print 'Sending run command.'
+            recovery.send_command(device, 'run')
+        except usb.core.USBError:
+            # OK
+            pass
+            #print 'Caught USBError; should still work.'
+        recovery.release_device(device)
+        print 'If screen is not red, NOR was flashed successfully and device will reboot.'
 
-	def decrypt_keybag(self, keybag):
-		KEYBAG_LENGTH = 48
-		assert len(keybag) == KEYBAG_LENGTH
+    def decrypt_keybag(self, keybag):
+        KEYBAG_LENGTH = 48
+        assert len(keybag) == KEYBAG_LENGTH
 
-		KEYBAG_FILENAME = 'aes-keys/S5L%s-firmware' % self.config.cpid
-		try:
-			f = open(KEYBAG_FILENAME, 'rb')
-			data = f.read()
-			f.close()
-		except IOError:
-			data = str()
-		assert len(data) % 2 * KEYBAG_LENGTH == 0
+        KEYBAG_FILENAME = 'aes-keys/S5L%s-firmware' % self.config.cpid
+        try:
+            f = open(KEYBAG_FILENAME, 'rb')
+            data = f.read()
+            f.close()
+        except IOError:
+            data = str()
+        assert len(data) % 2 * KEYBAG_LENGTH == 0
 
-		for i in range(0, len(data), 2 * KEYBAG_LENGTH):
-			if keybag == data[i:i+KEYBAG_LENGTH]:
-				return data[i+KEYBAG_LENGTH:i+2*KEYBAG_LENGTH]
+        for i in range(0, len(data), 2 * KEYBAG_LENGTH):
+            if keybag == data[i:i+KEYBAG_LENGTH]:
+                return data[i+KEYBAG_LENGTH:i+2*KEYBAG_LENGTH]
 
-		device = PwnedDFUDevice()
-		decrypted_keybag = device.aes(keybag, AES_DECRYPT, AES_GID_KEY)
+        device = PwnedDFUDevice()
+        decrypted_keybag = device.aes(keybag, AES_DECRYPT, AES_GID_KEY)
 
-		f = open(KEYBAG_FILENAME, 'a')
-		f.write(keybag + decrypted_keybag)
-		f.close()
+        f = open(KEYBAG_FILENAME, 'a')
+        f.write(keybag + decrypted_keybag)
+        f.close()
 
-		return decrypted_keybag
+        return decrypted_keybag
 
 def print_help():
-	print 'Help:'
-	print '%s -p\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
-	print '%s -r\t\t# dump SecureROM' % sys.argv[0]
-	print '%s -n <filename>\t# dump NOR to file' % sys.argv[0]
-	print '%s -f <NOR file>\t# flash NOR (header and firmware only) from file' % sys.argv[0]
-	print '%s -x\t\t# install alloc8 exploit to NOR' % sys.argv[0]
-	print '%s -g <hex data>\t# decrypt hex data with GID key' % sys.argv[0]
-	print '%s -G <hex data>\t# encrypt hex data with GID key' % sys.argv[0]
-	print '%s -u <hex data>\t# decrypt hex data with UID key' % sys.argv[0]
-	print '%s -U <hex data>\t# encrypt hex data with UID key' % sys.argv[0]
+    print 'Help:'
+    print '%s -p\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
+    print '%s -r\t\t# dump SecureROM' % sys.argv[0]
+    print '%s -n <filename>\t# dump NOR to file' % sys.argv[0]
+    print '%s -f <NOR file>\t# flash NOR (header and firmware only) from file' % sys.argv[0]
+    print '%s -x\t\t# install alloc8 exploit to NOR' % sys.argv[0]
+    print '%s -g <hex data>\t# decrypt hex data with GID key' % sys.argv[0]
+    print '%s -G <hex data>\t# encrypt hex data with GID key' % sys.argv[0]
+    print '%s -u <hex data>\t# decrypt hex data with UID key' % sys.argv[0]
+    print '%s -U <hex data>\t# encrypt hex data with UID key' % sys.argv[0]
 
 if __name__ == '__main__':
-	try:
-		opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', [])
-	except getopt.GetoptError:
-		print 'ERROR: Invalid arguments provided.'
-		print_help()
-		sys.exit(2)
-	if len(opts) == 0:
-		print 'ERROR: No arguments provided.'
-		print_help()
-		sys.exit(2)
-	for opt, arg in opts:
-		if opt == '-p':
-			limera1n.exploit()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', [])
+    except getopt.GetoptError:
+        print 'ERROR: Invalid arguments provided.'
+        print_help()
+        sys.exit(2)
+    if len(opts) == 0:
+        print 'ERROR: No arguments provided.'
+        print_help()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-p':
+            limera1n.exploit()
 
-		if opt == '-r':
-			device = PwnedDFUDevice()
-			securerom = device.securerom_dump()
-			filename = SECUREROM_FILENAME_FORMAT % device.config.version
-			f = open(filename, 'wb')
-			f.write(securerom)
-			f.close()
-			print 'SecureROM dumped to file:', filename
+        if opt == '-r':
+            device = PwnedDFUDevice()
+            securerom = device.securerom_dump()
+            filename = SECUREROM_FILENAME_FORMAT % device.config.version
+            f = open(filename, 'wb')
+            f.write(securerom)
+            f.close()
+            print 'SecureROM dumped to file:', filename
 
-		if opt == '-n':
-			device = PwnedDFUDevice()
-			nor = device.nor_dump(saveBackup=False)
-			f = open(arg, 'wb')
-			f.write(nor)
-			f.close()
-			print 'NOR dumped to file: %s' % arg
+        if opt == '-n':
+            device = PwnedDFUDevice()
+            nor = device.nor_dump(saveBackup=False)
+            f = open(arg, 'wb')
+            f.write(nor)
+            f.close()
+            print 'NOR dumped to file: %s' % arg
 
-		if opt == '-f':
-			print 'Flashing NOR from file:', arg
-			f = open(arg, 'rb')
-			new_nor = f.read()
-			f.close()
-			if new_nor[:4] != 'IMG2'[::-1]:
-				print 'ERROR: Bad IMG2 header magic. This is not a valid NOR. Exiting.'
-				sys.exit(1)
+        if opt == '-f':
+            print 'Flashing NOR from file:', arg
+            f = open(arg, 'rb')
+            new_nor = f.read()
+            f.close()
+            if new_nor[:4] != 'IMG2'[::-1]:
+                print 'ERROR: Bad IMG2 header magic. This is not a valid NOR. Exiting.'
+                sys.exit(1)
 
-			device = PwnedDFUDevice()
-			if device.config.cpid != '8920':
-				print 'This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.'
-				sys.exit(1)
-			device.nor_dump(saveBackup=True)
-			device.flash_nor(new_nor)
+            device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.'
+                sys.exit(1)
+            device.nor_dump(saveBackup=True)
+            device.flash_nor(new_nor)
 
-		if opt == '-x':
-			device = PwnedDFUDevice()
-			if device.config.cpid != '8920':
-				print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
-				sys.exit(1)
-			if device.config.version == '359.3':
-				print 'iPhone 3GS (old bootrom) was detected, but only iPhone 3GS (new bootrom) is currently supported.'
-				sys.exit(1)
-			print 'Installing alloc8 exploit to NOR.'
-			nor = device.nor_dump(saveBackup=True)
-			new_nor = device.add_alloc8_exploit_to_nor(nor)
-			device.flash_nor(new_nor)
+        if opt == '-x':
+            device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
+                sys.exit(1)
+            if device.config.version == '359.3':
+                print 'iPhone 3GS (old bootrom) was detected, but only iPhone 3GS (new bootrom) is currently supported.'
+                sys.exit(1)
+            print 'Installing alloc8 exploit to NOR.'
+            nor = device.nor_dump(saveBackup=True)
+            new_nor = device.add_alloc8_exploit_to_nor(nor)
+            device.flash_nor(new_nor)
 
-		if opt == '-g':
-			device = PwnedDFUDevice()
-			print 'Decrypting with S5L%s GID key.' % device.config.cpid
-			print device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
+        if opt == '-g':
+            device = PwnedDFUDevice()
+            print 'Decrypting with S5L%s GID key.' % device.config.cpid
+            print device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
 
-		if opt == '-G':
-			device = PwnedDFUDevice()
-			print 'Encrypting with S5L%s GID key.' % device.config.cpid
-			print device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
+        if opt == '-G':
+            device = PwnedDFUDevice()
+            print 'Encrypting with S5L%s GID key.' % device.config.cpid
+            print device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
 
-		if opt == '-u':
-			device = PwnedDFUDevice()
-			print 'Decrypting with device-specific UID key.'
-			print device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
+        if opt == '-u':
+            device = PwnedDFUDevice()
+            print 'Decrypting with device-specific UID key.'
+            print device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
 
-		if opt == '-U':
-			device = PwnedDFUDevice()
-			print 'Encrypting with device-specific UID key.'
-			print device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
+        if opt == '-U':
+            device = PwnedDFUDevice()
+            print 'Encrypting with device-specific UID key.'
+            print device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
