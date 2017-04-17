@@ -111,9 +111,9 @@ class Image3:
 		dataTags = self.getTags('DATA'[::-1])
 		assert len(dataTags) == 1
 		sepoTag = self.getTags('SEPO'[::-1])
-		assert len(sepoTag) < 3
+		assert len(sepoTag) <= 2
 		bordTag = self.getTags('BORD'[::-1])
-		assert len(bordTag) < 3
+		assert len(bordTag) <= 2
 		shshTag = self.getTags('SHSH'[::-1])
 		assert len(shshTag) <= 1
 		certTag = self.getTags('CERT'[::-1])
@@ -207,7 +207,7 @@ class PwnedDFUDevice():
 		dfu.release_device(device)
 
 		if 'PWND:[' not in self.identifier:
- 			print 'ERROR: Device is not in pwned DFU Mode. Try again'
+			print 'ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.'
  			sys.exit(1)
 
  		self.config = None
@@ -253,7 +253,7 @@ class PwnedDFUDevice():
 	def securerom_dump(self):
 		(retval, securerom) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 0x8, self.config.rom_address, self.config.rom_size), self.config.rom_size)
 		if hashlib.sha256(securerom).hexdigest() != self.config.rom_sha256:
-			print 'ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting'
+			print 'ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting.'
 			sys.exit(1)
 		return securerom
 
@@ -358,7 +358,8 @@ class PwnedDFUDevice():
 
 		# Only override data abort handler, keep the rest
 		securerom = self.securerom_dump()
-		new_nor_firmware += securerom[8:48] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom[52:52+NOR_READ_SIZE]
+		securerom_block = securerom[8:8+NOR_READ_SIZE]
+		new_nor_firmware += securerom_block[:40] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom_block[44:]
 		new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
 
 		new_nor = nor[0:52] + shellcode + '\x00' * (MAX_SHELLCODE_LENGTH - len(shellcode))
