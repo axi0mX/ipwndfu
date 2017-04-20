@@ -1,7 +1,7 @@
 import sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
 
-MAX_PACKET_SIZE = 0x8000
+MAX_PACKET_SIZE = 0x4000
 
 def acquire_device(timeout=10):
     #print 'Acquiring device handle',
