@@ -1,14 +1,15 @@
 ![](repo/ipwndfu.png)
-*Open-source jailbreaking tool for older iOS devices*
+# Open-source jailbreaking tool for older iOS devices
 
 
-**Please read the [disclaimer](#disclaimer) before using**
+**Read [disclaimer](#disclaimer) before using this software.*
+
 
 ## Features
 
-* Jailbreak iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
+* Jailbreak and downgrade iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
 
-* Pwned DFU Mode exploit for S5L8920 devices using limera1n exploit, and compatible with Yosemite, El Capitan, and Sierra.
+* Pwned DFU Mode exploit for S5L8920 devices using limera1n exploit.
 
 * Dump SecureROM on S5L8920 devices.
 
@@ -21,23 +22,20 @@
 
 ## Dependencies
 
-This tool should be compatible with Mac and Linux, and it was mostly tested on Yosemite and Sierra. It probably won't work in a virtual machine.
+This tool should be compatible with Mac and Linux. It won't work in a virtual machine.
 
+* [pip](https://pip.pypa.io/en/stable/installing/)
 * libusb, `brew install libusb`
 * pyusb, `pip install pyusb`
-* [pip](https://pip.pypa.io/en/stable/installing/)
 * [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
+* [libusb patch for El Capitan and Sierra](#patch)
 
-Download iPhone 3GS iOS 4.3.5 IPSW using a link found on https://ipsw.me/ and extract iBSS using the following command, then move the file to ipwndfu folder:
+## Patch
+**Only applicable to El Capitan and Sierra.**
 
-```
-unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
-```
+Technical explanation for USB issues in El Capitan and Sierra:
 
-## libusb Patch:
-**Only applicable on El Capitan and Sierra**
-
-[Source](https://www.belle-aurore.com/mike/2016/06/os-x-el-capitan-and-its-refusal-to-reset-usb-devices/)
+https://www.belle-aurore.com/mike/2016/06/os-x-el-capitan-and-its-refusal-to-reset-usb-devices/
 
 You should have libusb installed using brew. Make sure you are using 1.0.21 (latest version as of writing).
 
@@ -49,7 +47,7 @@ openssl sha1 /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib
 
 Currently supported hashes (original -> patched):
 ```
-libusb 1.0.21 on Sierra
+libusb 1.0.21 on macOS Sierra
 02da61201c8f67b723bca5fb44b35797d1021625 -> f356ee6052cd520b46ca50333b937ff2efe4477b
 ```
 
@@ -64,26 +62,33 @@ sudo bspatch /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib /usr/local/C
 
 ## Tutorial
 
-This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without SHSH blobs, as documented [here](https://github.com/axi0mX/ipwndfu/blob/master/JAILBREAK-GUIDE.md).
+This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without SHSH blobs, as documented in [JAILBREAK-GUIDE](https://github.com/axi0mX/ipwndfu/blob/master/JAILBREAK-GUIDE.md).
 
 
 
-## Official Write up
+## Exploit write-up
 
-The official write up for the alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8).
+Write-up for alloc8 exploit can be found here:
+
+https://github.com/axi0mX/alloc8
+
 
 ## iBSS
 
-Download iPhone 3GS iOS 4.3.5 IPSW using a link found on [ipsw.me](https://ipsw.me/) and extract iBSS using the following command, then move the file to ipwndfu folder:
+Download iPhone 3GS iOS 4.3.5 IPSW from Apple:
+
+http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw
+
+In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
 
 ```
 unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
 ```
 
 
-## Coming soon
+## Coming soon!
 
-* Reorganize and refactor code and fix issues with tabs/spaces.
+* Reorganize and refactor code.
 
 * Easier setup: remove requirement to patch libusb, download iBSS automatically using partial zip.
 
@@ -97,16 +102,16 @@ unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > 
 
 ## Disclaimer
 
-**Warning: This is BETA software**
+**This is BETA software.**
 
 Backup your data.
 
 This tool is currently in beta and could potentially brick your device. It will attempt to save a copy of data in NOR to nor-backups folder before flashing new data to NOR, and it will attempt to not overwrite critical data in NOR which your device requires to function. If something goes wrong, hopefully you will be able to restore to latest IPSW in iTunes and bring your device back to life, or use nor-backups to restore NOR to the original state, but I cannot provide any guarantees.
 
-**There is NO warranty provided**
+**There is NO warranty provided.**
 
 THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
 ## Credit
 
-*geohot for limera1n exploit*
+geohot for limera1n exploit
