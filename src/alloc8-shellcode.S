@@ -27,7 +27,6 @@
 
 .set gNorImg3List,                  0x84024020
 .set gLeakingDFUBuffer,             0x84024228
-.set gUSBSerialNumber,              0x84024820
 
 .set MAIN_STACK_ADDRESS,            0x84034000
 .set LOAD_ADDRESS,                  0x84000000
@@ -126,13 +125,12 @@ pwned_llb_boot:
 pwned_dfu:
     MOV R0, #1
     LDR R3, =usb_create_serial_number_string
-    BLX R3                                      @ usb_create_serial_number_string(1)
+    BLX R3                                      @ R0 = usb_create_serial_number_string(1)
 
-    LDR R0, =gUSBSerialNumber
     ADR R1, PWND_STRING
     MOV R2, #120
     LDR R3, =strlcat
-    BLX R3                                      @ strlcat(gUSBSerialNumber, PWND_STRING, 120)
+    BLX R3                                      @ strlcat(R0, PWND_STRING, 120)
 
 pwned_dfu_loop:
     LDR R0, =LOAD_ADDRESS
