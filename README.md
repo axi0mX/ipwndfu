@@ -66,7 +66,7 @@ libusb 1.0.21 on Sierra
 Available patches are in libusb-patches folder. Apply the patch matching your SHA1 hash using bspatch:
 
 ```
-sudo bspatch /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib libusb-02da61201c8f67b723bca5fb44b35797d1021625.patch
+sudo bspatch /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib libusb-1.0.21-02da61201c8f67b723bca5fb44b35797d1021625.patch
 ```
 
 

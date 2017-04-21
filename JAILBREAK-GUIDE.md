@@ -50,9 +50,12 @@ If screen is not red, NOR was flashed successfully and device will reboot.
 * If there are no issues, the phone will reboot and automatically boot into iOS.
 
 
-### 3-second delays when using a phone jailbroken with alloc8
 
-alloc8 delays boot in the bootrom by about 3 seconds.
+
+
+### 3 second delay during boot when using a phone jailbroken with alloc8
+
+alloc8 exploit takes about 3 seconds to run.
 
 When your phone is off, to turn it on you will need to keep holding the Power button for at least 3 seconds, or your phone will not turn on. This might be because LLB protects against accidental presses of the Power button by shutting down the phone if the power button is not being held anymore. Without an exploit it takes less than a second before this check happens, but with alloc8 exploit it will happen after about 3 seconds. It might be possible to change this behavior by patching LLB.
 
@@ -70,33 +73,46 @@ https://ipsw.me/
 
 ### How to create a 24Kpwn IPSW
 
-| Version     | Tool                                                                                            | Success      |
-|-------------|-------------------------------------------------------------------------------------------------|--------------|
-| iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) | Worked       |
-| iOS 3.1.2/3 | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) | Worked       |
-| iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   | Worked       |
-| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Did not work |
-| iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
-| iOS 5.1.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            | Worked       |
+| iOS version | Tool                                                                                            |
+|-------------|-------------------------------------------------------------------------------------------------|
+| iOS 3.1     | [PwnageTool 3.1.3](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.3.dmg) |
+| iOS 3.1.2   | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) |
+| iOS 3.1.3   | [PwnageTool 3.1.5](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_3.1.5.dmg) |
+| iOS 4.0     | [PwnageTool 4.01](https://github.com/axi0mX/PwnageTool-mirror/raw/master/PwnageTool_4.01.dmg)   |
+| iOS 4.3.3   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.0     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.0.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.1     | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
+| iOS 5.1.1   | [redsn0w 0.9.15 beta 3](http://www.iphonehacks.com/download-redsn0w)                            |
 
 #### Notes on using redsn0w 0.9.15b3
 
 ```
-Q: 'Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?'
-A:  No [You must answer No to create a 24Kpwn IPSW using redsn0w]
+Q: Will this custom IPSW be used on a newer (fixed) version of the iPhone3GS?
+A: No
 ```
 
+You must answer No to create a 24Kpwn IPSW using redsn0w. If you did this correctly, the name of the custom IPSW from redsn0w will start with ```NO_BB_OLDROM_iPhone2,1```.
 
+
+### Compatibility with older iOS versions
+
+Newer phones might not support some older versions of iOS. You cannot brick your phone by attempting to restore an older version of iOS, so it might be worth it to try anyway. If iTunes restore fails with Error 28, the hardware of your phone is not compatible with that version of iOS.
+
+| Manufactured | Error 28   | Success    |
+|--------------|------------|------------|
+| Week 23 2011 | N/A        | 3.1.2+     |
+| Week 29 2011 | 3.x        | 4.0+       |
+| Week 36 2011 | 3.x        | 4.0+       |
+| Week 26 2012 | 3.x, 4.x   | 5.0+       |
+
+You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me what versions worked or didn't work.
 
 
 ### How to restore to a custom IPSW
 
- All versions of iTunes before 11.1 can be used to restore to a custom IPSW in pwned DFU Mode. You can download and install an old version of iTunes in a Windows virtual machine or use a very old Mac with an old version of iTunes. You can use any compatible tool to enter pwned DFU, but it probably won't work in a virtual machine.
- On a Mac, you can run `ipwndfu -p` in Terminal and then restore a custom IPSW in iTunes in a virtual machine.
+1. Enter DFU Mode: https://www.theiphonewiki.com/wiki/DFU_Mode
 
-**OR** If you are on Linux, use idevicerestore from libimobiledevice. Because of limera1n exploit issues, this might not work in a virtual machine or on a Mac.
-```
-idevicerestore -c -e your_custom_IPSW.ipsw
-```
+2. Run exploit to put your phone into pwned DFU Mode. You can use `./ipwndfu -p`.
+
+3. Any version of iTunes should work. In iTunes, hold Option (or SHIFT if using Windows) and click Restore. You should be prompted to choose a file. Choose your custom IPSW.
