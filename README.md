@@ -2,7 +2,7 @@
 *Open-source jailbreaking tool for older iOS devices*
 
 
-**Please read the [disclaimer](#Disclaimer) before using**
+**Please read the [disclaimer](#disclaimer) before using**
 
 ## Features
 
@@ -26,7 +26,7 @@ This tool should be compatible with Mac and Linux, and it was mostly tested on Y
 * libusb, `brew install libusb`
 * pyusb, `pip install pyusb`
 * [pip](https://pip.pypa.io/en/stable/installing/)
-* [iPhone 3GS iOS 4.3.5 iBSS](#iBSS)
+* [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
 
 Download iPhone 3GS iOS 4.3.5 IPSW using a link found on https://ipsw.me/ and extract iBSS using the following command, then move the file to ipwndfu folder:
 
@@ -64,17 +64,17 @@ sudo bspatch /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib /usr/local/C
 
 ## Tutorial
 
-This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without SHSH blobs:
+This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without SHSH blobs, as documented [here](https://github.com/axi0mX/ipwndfu/blob/master/JAILBREAK-GUIDE.md).
 
-https://github.com/axi0mX/ipwndfu/blob/master/JAILBREAK-GUIDE.md
+
 
 ## Official Write up
 
-The official write up for the alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8)
+The official write up for the alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8).
 
 ## iBSS
 
-Download iPhone 3GS iOS 4.3.5 IPSW using a link found on https://ipsw.me/ and extract iBSS using the following command, then move the file to ipwndfu folder:
+Download iPhone 3GS iOS 4.3.5 IPSW using a link found on [ipsw.me](https://ipsw.me/) and extract iBSS using the following command, then move the file to ipwndfu folder:
 
 ```
 unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
@@ -105,8 +105,7 @@ This tool is currently in beta and could potentially brick your device. It will 
 
 **There is NO warranty provided**
 
-THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
-ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
 ## Credit
 
