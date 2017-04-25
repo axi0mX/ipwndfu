@@ -373,19 +373,26 @@ class PwnedDFUDevice():
             print 'ERROR: Boot iBSS is currently only supported on iPhone 3GS.'
             sys.exit(1)
 
+        help1 = 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
+        help2 = 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
         try:
             f = open('n88ap-iBSS-4.3.5.img3', 'rb')
             data = f.read()
             f.close()
         except:
             print 'ERROR: n88ap-iBSS-4.3.5.img3 is missing.'
-            print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
-            print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
+            print help1
+            print help2
+            sys.exit(1)
+        if len(data) == 0:
+            print 'ERROR: n88ap-iBSS-4.3.5.img3 exists, but is empty (size: 0 bytes).'
+            print help1
+            print help2
             sys.exit(1)
         if hashlib.sha256(data).hexdigest() != 'b47816105ce97ef02637ec113acdefcdee32336a11e04eda0a6f4fc5e6617e61':
-            print 'ERROR: n88ap-iBSS-4.3.5.img3 is corrupted or wrong.'
-            print 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
-            print 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
+            print 'ERROR: n88ap-iBSS-4.3.5.img3 exists, but is from the wrong IPSW or corrupted.'
+            print help1
+            print help2
             sys.exit(1)
 
         iBSS = Image3(data)
