@@ -24,9 +24,7 @@
 
 This tool should be compatible with Mac and Linux. It won't work in a virtual machine.
 
-* [pip](https://pip.pypa.io/en/stable/installing/)
 * libusb, `brew install libusb`
-* pyusb, `pip install pyusb`
 * [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
 * [libusb patch for El Capitan and Sierra](#patch)
 
@@ -115,3 +113,5 @@ THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 ## Credit
 
 geohot for limera1n exploit
+
+walac for pyusb
