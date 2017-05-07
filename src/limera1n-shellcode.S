@@ -10,9 +10,9 @@
 .set free,                          0xBAD0000d
 .set memz_create,                   0xBAD0000f
 .set memz_destroy,                  0xBAD00011
-.set image3_create_struct,          0xBAD00012
-.set image3_load_continue,          0xBAD00013
-.set image3_load_fail,              0xBAD00014
+.set image3_create_struct,          0xBAD00014
+.set image3_load_continue,          0xBAD00015
+.set image3_load_fail,              0xBAD00016
 .set usb_wait_for_image,            0xBAD00009
 .set jump_to,                       0xBAD00010
 .set nor_power_on,                  0xBAD00005
@@ -29,6 +29,8 @@
 .set LOAD_ADDRESS,                  0xBAD0000a
 .set MAX_SIZE,                      0xBAD0000b
 .set EXEC_MAGIC,                    0xBAD0000e
+.set IMAGE3_LOAD_SP_OFFSET,         0xBAD00012
+.set IMAGE3_LOAD_STRUCT_OFFSET,     0xBAD00013
 
 .global _start
 
@@ -182,12 +184,21 @@ image3_load_no_signature_check:
     PUSH {R4-R6}
 
     ADD R7, SP, #0x18
-    SUB SP, SP, #0x60
+    LDR R4, =IMAGE3_LOAD_SP_OFFSET
+    MOV R5, SP
+    SUB R5, R5, R4
+    MOV SP, R5
 
     STR R2, [SP, #0x10]
+    STR R1, [SP, #0x14]
 
     MOVS R3, #0
-    STR R3, [SP, #0x50]
+    LDR R4, =IMAGE3_LOAD_STRUCT_OFFSET
+    ADD R4, R5, R4
+    STR R3, [R4]
+
+    MOV R11, R3
+    STR R3, [SP, #0x18]
 
     LDR R6, [R1]
     MOV R10, R1
@@ -200,7 +211,7 @@ image3_load_no_signature_check:
     CMP R0, R1
     BGT img3_bad_size
 
-    ADD R0, SP, #0x50
+    MOV R0, R4
     MOVS R1, R6
     MOV R2, R8
     MOVS R3, #0

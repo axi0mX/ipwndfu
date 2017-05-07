@@ -9,9 +9,9 @@
 
 * Jailbreak and downgrade iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
 
-* Pwned DFU Mode exploit for S5L8920 devices using limera1n exploit.
+* Pwned DFU Mode with limera1n exploit for S5L8920/S5L8922/S5L8930 devices.
 
-* Dump SecureROM on S5L8920 devices.
+* Dump SecureROM on S5L8920/S5L8922/S5L8930 devices.
 
 * Dump NOR on S5L8920 devices.
 
@@ -90,9 +90,9 @@ unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > 
 
 * Easier setup: remove requirement to patch libusb, download iBSS automatically using partial zip.
 
-* Pwned DFU Mode exploit for S5L8720/S5L8922/S5L8930 devices compatible with Yosemite, El Capitan, and Sierra.
+* Pwned DFU Mode with steaks4uce exploit for S5L8720 devices.
 
-* Dump SecureROM on S5L8720/S5L8922/S5L8930 devices.
+* Dump SecureROM on S5L8720 devices.
 
 * Install custom boot logos on devices jailbroken with 24Kpwn and alloc8.
 

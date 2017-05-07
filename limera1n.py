@@ -6,7 +6,7 @@ import dfu
 request = None
 transfer_ptr = None
 
-constants359_3 = [
+constants_359_3 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
            512, #  2 - RELOCATE_SHELLCODE_SIZE
         0x83d4, #  3 - memmove
@@ -24,12 +24,14 @@ constants359_3 = [
         0x1f79, # 15 - memz_create
         0x3969, # 16 - jump_to
         0x1fa1, # 17 - memz_destroy
-        0x1fe5, # 18 - image3_create_struct
-        0x2655, # 19 - image3_load_continue
-        0x277b, # 20 - image3_load_fail
+          0x60, # 18 - IMAGE3_LOAD_SP_OFFSET
+          0x50, # 19 - IMAGE3_LOAD_STRUCT_OFFSET
+        0x1fe5, # 20 - image3_create_struct
+        0x2655, # 21 - image3_load_continue
+        0x277b, # 22 - image3_load_fail
 ]
 
-constants359_3_2 = [
+constants_359_3_2 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
            512, #  2 - RELOCATE_SHELLCODE_SIZE
         0x83dc, #  3 - memmove
@@ -47,12 +49,14 @@ constants359_3_2 = [
         0x1f81, # 15 - memz_create
         0x3971, # 16 - jump_to
         0x1fa9, # 17 - memz_destroy
-        0x1fed, # 18 - image3_create_struct
-        0x265d, # 19 - image3_load_continue
-        0x2783, # 20 - image3_load_fail
+          0x60, # 18 - IMAGE3_LOAD_SP_OFFSET
+          0x50, # 19 - IMAGE3_LOAD_STRUCT_OFFSET
+        0x1fed, # 20 - image3_create_struct
+        0x265d, # 21 - image3_load_continue
+        0x2783, # 22 - image3_load_fail
 ]
 
-constants359_5 = [
+constants_359_5 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
            512, #  2 - RELOCATE_SHELLCODE_SIZE
         0x8564, #  3 - memmove
@@ -70,12 +74,14 @@ constants359_5 = [
         0x1f25, # 15 - memz_create
         0x39dd, # 16 - jump_to
         0x1f0d, # 17 - memz_destroy
-        0x2113, # 18 - image3_create_struct
-    0xffffffff, # 19 - image3_load_continue
-    0xffffffff, # 20 - image3_load_fail
+          0x64, # 18 - IMAGE3_LOAD_SP_OFFSET
+          0x60, # 19 - IMAGE3_LOAD_STRUCT_OFFSET
+        0x2113, # 20 - image3_create_struct
+        0x2665, # 21 - image3_load_continue
+        0x276d, # 22 - image3_load_fail
 ]
 
-constants574_4 = [
+constants_574_4 = [
     0x84039800, #  1 - RELOCATE_SHELLCODE_ADDRESS
            512, #  2 - RELOCATE_SHELLCODE_SIZE
         0x84dc, #  3 - memmove
@@ -93,9 +99,11 @@ constants574_4 = [
         0x7469, # 15 - memz_create
         0x5a5d, # 16 - jump_to
         0x7451, # 17 - memz_destroy
-        0x412d, # 18 - image3_create_struct
-    0xffffffff, # 19 - image3_load_continue
-    0xffffffff, # 20 - image3_load_fail
+          0x68, # 18 - IMAGE3_LOAD_SP_OFFSET
+          0x64, # 19 - IMAGE3_LOAD_STRUCT_OFFSET
+        0x412d, # 20 - image3_create_struct
+        0x46db, # 21 - image3_load_continue
+        0x47db, # 22 - image3_load_fail
 ]
 
 SRTG_FORMAT = 'SRTG:[iBoot-%s]'
@@ -110,10 +118,10 @@ class DeviceConfig:
         self.constants = constants
 
 configs = [
-    DeviceConfig('359.3',   '8920', 0x84033FA4, 0x24000, constants359_3),   # S5L8920 (old bootrom)
-    DeviceConfig('359.3.2', '8920', 0x84033FA4, 0x24000, constants359_3_2), # S5L8920 (new bootrom)
-    #DeviceConfig('359.5',   '8922', 0x84033F98, 0x24000, constants359_5),   # S5L8922
-    #DeviceConfig('574.4',   '8930', 0x8403BF9C, 0x2C000, constants574_4),   # S5L8930
+    DeviceConfig('359.3',   '8920', 0x84033FA4, 0x24000, constants_359_3),   # S5L8920 (old bootrom)
+    DeviceConfig('359.3.2', '8920', 0x84033FA4, 0x24000, constants_359_3_2), # S5L8920 (new bootrom)
+    DeviceConfig('359.5',   '8922', 0x84033F98, 0x24000, constants_359_5),   # S5L8922
+    DeviceConfig('574.4',   '8930', 0x8403BF9C, 0x2C000, constants_574_4),   # S5L8930
 ]
 
 def create_control_transfer(device, request, timeout):

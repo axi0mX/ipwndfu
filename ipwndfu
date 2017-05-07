@@ -174,30 +174,30 @@ configs = [
         rom_address=0xbf000000,
         rom_size=0x10000,
         rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'),
-    #PwnedDeviceConfig(
-    #   # S5L8922
-    #   version='359.5',
-    #   cpid='8922',
-    #   aes_crypto_cmd=0x919,
-    #   memmove=0x8564,
-    #   get_block_device=0x1851,
-    #   load_address=0x84000000,
-    #   rom_address=0xbf000000,
-    #   rom_size=0x10000,
-    #   rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
-    #),
-    #PwnedDeviceConfig(
-    #   # S5L8930
-    #   version='574.4',
-    #   cpid='8930',
-    #   aes_crypto_cmd=0x686d,
-    #   memmove=0x84dc,
-    #   get_block_device=0x81d5,
-    #   load_address=0x84000000,
-    #   rom_address=0xbf000000,
-    #   rom_size=0x10000,
-    #   rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
-    #),
+    PwnedDeviceConfig(
+       # S5L8922
+       version='359.5',
+       cpid='8922',
+       aes_crypto_cmd=0x919,
+       memmove=0x8564,
+       get_block_device=0x1851,
+       load_address=0x84000000,
+       rom_address=0xbf000000,
+       rom_size=0x10000,
+       rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
+    ),
+    PwnedDeviceConfig(
+       # S5L8930
+       version='574.4',
+       cpid='8930',
+       aes_crypto_cmd=0x686d,
+       memmove=0x84dc,
+       get_block_device=0x81d5,
+       load_address=0x84000000,
+       rom_address=0xbf000000,
+       rom_size=0x10000,
+       rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
+    ),
 ]
 
 class PwnedDFUDevice():
@@ -505,6 +505,9 @@ if __name__ == '__main__':
 
         if opt == '-n':
             device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. Dumping NOR is only supported on iPhone 3GS.'
+                sys.exit(1)
             nor = device.nor_dump(saveBackup=False)
             f = open(arg, 'wb')
             f.write(nor)
