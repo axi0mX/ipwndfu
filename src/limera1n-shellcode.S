@@ -176,62 +176,63 @@ load_failed:
     B pwned_dfu_loop                            @ goto pwned_dfu_loop
 
 image3_load_no_signature_check:
-    PUSH {R4-R7, LR}                            /* TODO: Rewrite this ugly mess. */
+    PUSH {R4-R7, LR}                            @ push_registers(R4, R5, R6, R7, LR)
 
     MOV R6, R11
     MOV R5, R10
     MOV R4, R8
-    PUSH {R4-R6}
+    PUSH {R4-R6}                                @ push_registers(R8, R10, R11)
 
-    ADD R7, SP, #0x18
+    ADD R7, SP, #0x18                           @ R7 = SP - 0x18
+
     LDR R4, =IMAGE3_LOAD_SP_OFFSET
     MOV R5, SP
     SUB R5, R5, R4
-    MOV SP, R5
+    MOV SP, R5                                  @ SP = SP - IMAGE3_LOAD_SP_OFFSET
 
-    STR R2, [SP, #0x10]
-    STR R1, [SP, #0x14]
-
-    MOVS R3, #0
+    MOV R3, #0
     LDR R4, =IMAGE3_LOAD_STRUCT_OFFSET
     ADD R4, R5, R4
-    STR R3, [R4]
+    STR R3, [R4]                                @ *(SP + IMAGE3_LOAD_STRUCT_OFFSET) = 0
 
-    MOV R11, R3
-    STR R3, [SP, #0x18]
+    STR R2, [SP, #0x10]                         @ SP[4] = R2
 
-    LDR R6, [R1]
-    MOV R10, R1
-    MOVS R5, R0
+    STR R1, [SP, #0x14]                         @ SP[5] = R1
 
-    LDR R0, [R5, #4]
-    MOV R8, R0
+    STR R3, [SP, #0x18]                         @ SP[6] = 0
+
+    LDR R6, [R1]                                @ R6 = *R1
+
+    MOV R10, R1                                 @ R10 = R1
+
+    MOV R11, R3                                 @ R11 = 0
 
     LDR R1, =MAX_SIZE
-    CMP R0, R1
-    BGT img3_bad_size
+    MOV R8, R1                                  @ R8 = MAX_SIZE
+
+    LDR R2, [R0, #4]
+    CMP R2, R1
+    BGT img3_fail                               @ if (R0[1] > MAX_SIZE) goto img3_fail
+
+    MOV R8, R2                                  @ R8 = R0[1]
 
     MOV R0, R4
-    MOVS R1, R6
-    MOV R2, R8
-    MOVS R3, #0
+    MOV R1, R6
     LDR R4, =image3_create_struct
     BLX R4
+    MOV R4, R0                                  @ R4 = image3_create_struct(SP + IMAGE3_LOAD_STRUCT_OFFSET, R6, R8, 0)
 
-    MOV R4, R0
+    LDR R3, =image3_load_continue               @ R3 = image3_load_continue
 
-    CBNZ R4, img3_fail
-
-    LDR R3, =image3_load_continue
-    BX R3
-
-img3_bad_size:
-    MOV R8, R1
+    CBZ R4, img3_branch_R3                      @ if (R4 == 0) goto img3_branch_R3
 
 img3_fail:
-    MOV R4, #1
-    LDR R3, =image3_load_fail
-    BX R3
+    MOV R4, #1                                  @ R4 = 1
+
+    LDR R3, =image3_load_fail                   @ R3 = image3_load_fail
+
+img3_branch_R3:
+    BX R3                                       @ goto R3
 
 .align 2
 
