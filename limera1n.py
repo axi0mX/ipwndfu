@@ -196,7 +196,7 @@ def exploit():
                 print 'ERROR: CPID is compatible, but serial number string does not match.'
                 print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
                 sys.exit(1)
-        print 'ERROR: Not a compatible device. This exploit is for S5L8920 devices only. Exiting.'
+        print 'ERROR: Not a compatible device. This exploit is for S5L8920/S5L8922/S5L8930 devices only. Exiting.'
         sys.exit(1)
     
     dfu.send_data(device, generate_payload(chosenConfig))
