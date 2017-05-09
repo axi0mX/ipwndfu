@@ -213,7 +213,8 @@ def exploit():
         print 'ERROR: This request succeeded, but it should have raised an exception. Exiting.'
         sys.exit(1)
     except usb.core.USBError:
-        pass # OK: This request should have raised USBError.
+        # OK: This request should have raised USBError.
+        pass
 
     dfu.usb_reset(device)
     dfu.release_device(device)
@@ -231,5 +232,5 @@ def exploit():
     if failed:
         print 'ERROR: Exploit failed. Device did not enter pwned DFU Mode.'
         sys.exit(1)
-    else:
-        print 'Device is now in pwned DFU Mode.'
+
+    print 'Device is now in pwned DFU Mode.'
