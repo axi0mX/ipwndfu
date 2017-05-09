@@ -8,33 +8,33 @@
 .text
  
 .pool
-.set free,                              0x1ccd
-.set get_nor_image,                     0x1f77
-.set memz_create,                       0x1f81
-.set memz_destroy,                      0x1fa9
-.set image3_create_struct,              0x1fed
-.set image3_load_continue,              0x265d
-.set image3_load_fail,                  0x2783
-.set usb_wait_for_image,                0x34a5
-.set usb_create_serial_number_string,   0x38a9
-.set jump_to,                           0x3971
-.set exit_critical_section,             0x3ca9
-.set cable_connected,                   0x44e9
-.set power_button_pressed,              0x4515
-.set home_button_pressed,               0x4525
-.set handle_data_abort,                 0x560c
-.set strlcat,                           0x8e85
+.set free,                              0xBAD00004
+.set get_nor_image,                     0xBAD0000a
+.set memz_create,                       0xBAD00013
+.set memz_destroy,                      0xBAD00014
+.set image3_create_struct,              0xBAD00017
+.set image3_load_continue,              0xBAD00018
+.set image3_load_fail,                  0xBAD00019
+.set usb_wait_for_image,                0xBAD00010
+.set usb_create_serial_number_string,   0xBAD0000e
+.set jump_to,                           0xBAD0000d
+.set exit_critical_section,             0xBAD00005
+.set cable_connected,                   0xBAD00008
+.set power_button_pressed,              0xBAD00007
+.set home_button_pressed,               0xBAD00006
+.set handle_data_abort,                 0xBAD00002
+.set strlcat,                           0xBAD0000f
 
-.set gNorImg3List,                  0x84024020
-.set gLeakingDFUBuffer,             0x84024228
+.set gNorImg3List,                      0xBAD00003
+.set gLeakingDFUBuffer,                 0xBAD00011
 
-.set MAIN_STACK_ADDRESS,            0x84034000
-.set LOAD_ADDRESS,                  0x84000000
-.set MAX_SIZE,                         0x24000
-.set ILLB_MAGIC,                    0x696c6c62
-.set MEMZ_STRUCT_MAGIC,             0x4d656d7a
-.set IMG3_STRUCT_MAGIC,             0x696d6733
-.set EXEC_MAGIC,                    0x65786563
+.set MAIN_STACK_ADDRESS,                0xBAD00001
+.set LOAD_ADDRESS,                      0xBAD0000b
+.set MAX_SIZE,                          0xBAD0000c
+.set ILLB_MAGIC,                        0xBAD00009
+.set MEMZ_STRUCT_MAGIC,                 0xBAD00016
+.set IMG3_STRUCT_MAGIC,                 0xBAD00015
+.set EXEC_MAGIC,                        0xBAD00012
 
 .global _start
 
