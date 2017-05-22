@@ -24,44 +24,13 @@
 
 This tool should be compatible with Mac and Linux. It won't work in a virtual machine.
 
-* libusb, `brew install libusb`
+* libusb, `If you are using Linux: install libusb using your package manager.`
 * [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
-* [libusb patch for El Capitan and Sierra](#patch)
-
-## Patch
-**Only applicable to El Capitan and Sierra.**
-
-Technical explanation for USB issues in El Capitan and Sierra:
-
-https://www.belle-aurore.com/mike/2016/06/os-x-el-capitan-and-its-refusal-to-reset-usb-devices/
-
-You should have libusb installed using brew. Make sure you are using 1.0.21 (latest version as of writing).
-
-Calculate the SHA1 hash:
-
-```
-openssl sha1 /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib
-```
-
-Currently supported hashes (original -> patched):
-```
-libusb 1.0.21 on macOS Sierra
-02da61201c8f67b723bca5fb44b35797d1021625 -> f356ee6052cd520b46ca50333b937ff2efe4477b
-```
-
-Available patches are in libusb-patches folder. Apply the patch matching your SHA1 hash using bspatch:
-
-```
-sudo bspatch /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib /usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.0.dylib libusb-1.0.21-02da61201c8f67b723bca5fb44b35797d1021625.patch
-```
-
-
 
 
 ## Tutorial
 
 This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without SHSH blobs, as documented in [JAILBREAK-GUIDE](https://github.com/axi0mX/ipwndfu/blob/master/JAILBREAK-GUIDE.md).
-
 
 
 ## Exploit write-up
@@ -88,7 +57,7 @@ unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > 
 
 * Reorganize and refactor code.
 
-* Easier setup: remove requirement to patch libusb, download iBSS automatically using partial zip.
+* Easier setup: download iBSS automatically using partial zip.
 
 * Pwned DFU Mode with steaks4uce exploit for S5L8720 devices.
 

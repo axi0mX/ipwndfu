@@ -1,14 +1,17 @@
 import sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
+import usb.backend.libusb1
+import libusbfinder
 
 MAX_PACKET_SIZE = 0x800
 
 def acquire_device(timeout=1.0):
+    backend = usb.backend.libusb1.get_backend(find_library=lambda x:libusbfinder.libusb1_path())
     #print 'Acquiring device handle.'
     start = time.time()
     # Keep retrying for up to timeout seconds if device is not found.
     while time.time() - start < timeout:
-        device = usb.core.find(idVendor=0x5AC, idProduct=0x1227)
+        device = usb.core.find(idVendor=0x5AC, idProduct=0x1227, backend=backend)
         if device is not None:
             return device
         time.sleep(0.1)
