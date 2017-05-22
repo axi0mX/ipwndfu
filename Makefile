@@ -3,6 +3,10 @@ all:
 		arm-none-eabi-objcopy -O binary bin/limera1n-shellcode.o bin/limera1n-shellcode.bin
 		rm bin/limera1n-shellcode.o
 
+		arm-none-eabi-as -mthumb --fatal-warnings -o bin/SHAtter-shellcode.o src/SHAtter-shellcode.S
+		arm-none-eabi-objcopy -O binary bin/SHAtter-shellcode.o bin/SHAtter-shellcode.bin
+		rm bin/SHAtter-shellcode.o
+
 		arm-none-eabi-as -mthumb --fatal-warnings -o bin/alloc8-shellcode.o src/alloc8-shellcode.S
 		arm-none-eabi-objcopy -O binary bin/alloc8-shellcode.o bin/alloc8-shellcode.bin
 		rm bin/alloc8-shellcode.o

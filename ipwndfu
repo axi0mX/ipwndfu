@@ -4,7 +4,7 @@
 
 import binascii, datetime, getopt, hashlib, struct, subprocess, sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
-import dfu, recovery, limera1n
+import dfu, recovery, limera1n, SHAtter
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16
@@ -575,7 +575,7 @@ if __name__ == '__main__':
             elif 'CPID:8922' in serial_number:
                 limera1n.exploit()
             elif 'CPID:8930' in serial_number:
-                limera1n.exploit()
+                SHAtter.exploit()
             else:
                 print 'Found:', serial_number
                 print 'ERROR: This device is not supported.'
