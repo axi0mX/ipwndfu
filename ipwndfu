@@ -566,7 +566,20 @@ if __name__ == '__main__':
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-p':
-            limera1n.exploit()
+            device = dfu.acquire_device()
+            serial_number = device.serial_number
+            dfu.release_device(device)
+
+            if 'CPID:8920' in serial_number:
+                limera1n.exploit()
+            elif 'CPID:8922' in serial_number:
+                limera1n.exploit()
+            elif 'CPID:8930' in serial_number:
+                limera1n.exploit()
+            else:
+                print 'Found:', serial_number
+                print 'ERROR: This device is not supported.'
+                sys.exit(1)
 
         if opt == '-r':
             device = PwnedDFUDevice()
@@ -611,7 +624,7 @@ if __name__ == '__main__':
                 sys.exit(1)
             if device.config.version == '359.3':
                 print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots. alloc8 exploit is supported for testing purposes only.'
-                time.sleep(15)
+                raw_input("Press ENTER to continue.")
             print 'Installing alloc8 exploit to NOR.'
             nor = device.nor_dump(saveBackup=True)
             new_nor = device.add_alloc8_exploit_to_nor(nor)
