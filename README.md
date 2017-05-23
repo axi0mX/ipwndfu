@@ -83,4 +83,6 @@ THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 
 geohot for limera1n exploit
 
+posixninja and pod2g for SHAtter exploit
+
 walac for pyusb
