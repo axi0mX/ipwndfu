@@ -85,4 +85,6 @@ geohot for limera1n exploit
 
 posixninja and pod2g for SHAtter exploit
 
+iPhone Dev Team for 24Kpwn exploit
+
 walac for pyusb

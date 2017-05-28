@@ -7,6 +7,10 @@ all:
 		arm-none-eabi-objcopy -O binary bin/SHAtter-shellcode.o bin/SHAtter-shellcode.bin
 		rm bin/SHAtter-shellcode.o
 
+		arm-none-eabi-as -mthumb --fatal-warnings -o bin/24Kpwn-shellcode.o src/24Kpwn-shellcode.S
+		arm-none-eabi-objcopy -O binary bin/24Kpwn-shellcode.o bin/24Kpwn-shellcode.bin
+		rm bin/24Kpwn-shellcode.o
+
 		arm-none-eabi-as -mthumb --fatal-warnings -o bin/alloc8-shellcode.o src/alloc8-shellcode.S
 		arm-none-eabi-objcopy -O binary bin/alloc8-shellcode.o bin/alloc8-shellcode.bin
 		rm bin/alloc8-shellcode.o
