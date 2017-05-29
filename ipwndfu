@@ -358,6 +358,10 @@ class PwnedDFUDevice():
         (retval, data) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
         return data
 
+    def write_memory(self, address, data):
+        (retval, data) = self.execute(struct.pack('<4I%ss' % len(data), self.config.memmove, address, self.config.load_address + 20, len(data), data), 0)
+        return data
+
     def nor_dump(self, saveBackup):
         (bdev, empty) = self.execute(struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
         if bdev == 0:
