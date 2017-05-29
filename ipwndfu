@@ -623,7 +623,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', ['24kpwn'])
+        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', ['24kpwn', 'dump=', 'hexdump='])
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
         print_help()
@@ -648,6 +648,29 @@ if __name__ == '__main__':
                 print 'Found:', serial_number
                 print 'ERROR: This device is not supported.'
                 sys.exit(1)
+
+        if opt == '--dump':
+            if arg.count(',') != 1:
+                print 'ERROR: You must provide exactly 2 comma separated values: address,length'
+                sys.exit(1)
+            raw_address, raw_length = arg.split(',')
+            address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
+            length = int(raw_length, 16) if raw_length.startswith('0x') else int(raw_length, 10)
+
+            device = PwnedDFUDevice()
+            print device.read_memory(address, length)
+
+        if opt == '--hexdump':
+            if arg.count(',') != 1:
+                print 'ERROR: You must provide exactly 2 comma separated values: address,length'
+                sys.exit(1)
+            raw_address, raw_length = arg.split(',')
+            address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
+            length = int(raw_length, 16) if raw_length.startswith('0x') else int(raw_length, 10)
+
+            device = PwnedDFUDevice()
+            dump = device.read_memory(address, length)
+            subprocess.Popen(['xxd', '-o', str(address)], stdin=subprocess.PIPE).communicate(input=dump)
 
         if opt == '-r':
             device = PwnedDFUDevice()
