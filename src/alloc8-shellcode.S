@@ -38,11 +38,7 @@
 
 .global _start
 
-_start: 
-.code 32
-    ADD LR, PC, #1
-    MOVS PC, LR                                 /* Return and change mode: ARM -> Thumb */
-
+_start:
 .code 16
     LDR R0, =MAIN_STACK_ADDRESS
     MOV SP, R0                                  @ SP = MAIN_STACK_ADDRESS

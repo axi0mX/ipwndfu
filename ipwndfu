@@ -432,7 +432,7 @@ class PwnedDFUDevice():
         return new_nor
 
     def add_alloc8_exploit_to_nor(self, nor):
-        SHELLCODE_ADDRESS = 0x84026214
+        SHELLCODE_ADDRESS = 0x84026214 + 1
         MAX_SHELLCODE_LENGTH = 460
         REQUIRED_IMG3_COUNT = 714
         NOR_READ_SIZE = 4096
