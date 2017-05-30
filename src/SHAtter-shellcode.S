@@ -40,11 +40,6 @@
 
 _start: .global _start
 
-.code 32
-    MOV R0, PC
-    ADD R0, R0, #5
-    BX R0                                       /* ARM -> Thumb trampoline */
-
 .code 16
     MOV R0, #0
     LDR R1, =SECUREROM_ADDRESS
