@@ -610,20 +610,25 @@ class PwnedDFUDevice():
         return decrypted_keybag
 
 def print_help():
-    print 'Help:'
-    print '%s -p\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
-    print '%s -r\t\t# dump SecureROM' % sys.argv[0]
-    print '%s -n <filename>\t# dump NOR to file' % sys.argv[0]
-    print '%s -f <NOR file>\t# flash NOR (header and firmware only) from file' % sys.argv[0]
-    print '%s -x\t\t# install alloc8 exploit to NOR' % sys.argv[0]
-    print '%s -g <hex data>\t# decrypt hex data with GID key' % sys.argv[0]
-    print '%s -G <hex data>\t# encrypt hex data with GID key' % sys.argv[0]
-    print '%s -u <hex data>\t# decrypt hex data with UID key' % sys.argv[0]
-    print '%s -U <hex data>\t# encrypt hex data with UID key' % sys.argv[0]
+    print 'Basic commands:'
+    print '%s -p\t\t\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
+    print '%s -x\t\t\t\t# install alloc8 exploit to NOR' % sys.argv[0]
+    print 'Advanced commands:'
+    print '%s --dump=[address,length]\t# dump memory to stdout' % sys.argv[0]
+    print '%s --hexdump=[address,length]\t# hexdump memory to stdout' % sys.argv[0]
+    print '%s --dump-rom\t\t\t# dump SecureROM' % sys.argv[0]
+    print '%s --dump-nor=[filename]\t\t# dump NOR to file' % sys.argv[0]
+    print '%s --flash-nor=[filename]\t# flash NOR (header and firmware only) from file' % sys.argv[0]
+    print '%s --24kpwn\t\t\t# install 24Kpwn exploit to NOR' % sys.argv[0]
+    print '%s --decrypt-gid=[hexdata]\t# AES decrypt with GID key' % sys.argv[0]
+    print '%s --encrypt-gid=[hexdata]\t# AES encrypt with GID key' % sys.argv[0]
+    print '%s --decrypt-uid=[hexdata]\t# AES decrypt with UID key' % sys.argv[0]
+    print '%s --encrypt-uid=[hexdata]\t# AES encrypt with UID key' % sys.argv[0]
 
 if __name__ == '__main__':
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'prn:f:xg:G:u:U:', ['24kpwn', 'dump=', 'hexdump='])
+        advanced = ['dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
+        opts, args = getopt.getopt(sys.argv[1:], 'px', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
         print_help()
@@ -649,6 +654,19 @@ if __name__ == '__main__':
                 print 'ERROR: This device is not supported.'
                 sys.exit(1)
 
+        if opt == '-x':
+            device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
+                sys.exit(1)
+            if device.config.version == '359.3':
+                print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots. alloc8 exploit is supported for testing purposes only.'
+                raw_input("Press ENTER to continue.")
+            print 'Installing alloc8 exploit to NOR.'
+            nor = device.nor_dump(saveBackup=True)
+            new_nor = device.add_alloc8_exploit_to_nor(nor)
+            device.flash_nor(new_nor)
+
         if opt == '--dump':
             if arg.count(',') != 1:
                 print 'ERROR: You must provide exactly 2 comma separated values: address,length'
@@ -672,7 +690,7 @@ if __name__ == '__main__':
             dump = device.read_memory(address, length)
             subprocess.Popen(['xxd', '-o', str(address)], stdin=subprocess.PIPE).communicate(input=dump)
 
-        if opt == '-r':
+        if opt == '--dump-rom':
             device = PwnedDFUDevice()
             securerom = device.securerom_dump()
             filename = SECUREROM_FILENAME_FORMAT % device.config.version
@@ -681,7 +699,7 @@ if __name__ == '__main__':
             f.close()
             print 'SecureROM dumped to file:', filename
 
-        if opt == '-n':
+        if opt == '--dump-nor':
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
                 print 'This is not a compatible device. Dumping NOR is only supported on iPhone 3GS.'
@@ -692,7 +710,7 @@ if __name__ == '__main__':
             f.close()
             print 'NOR dumped to file: %s' % arg
 
-        if opt == '-f':
+        if opt == '--flash-nor':
             print 'Flashing NOR from file:', arg
             f = open(arg, 'rb')
             new_nor = f.read()
@@ -719,35 +737,22 @@ if __name__ == '__main__':
             new_nor = device.add_24Kpwn_exploit_to_nor(nor)
             device.flash_nor(new_nor)
 
-        if opt == '-x':
-            device = PwnedDFUDevice()
-            if device.config.cpid != '8920':
-                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
-                sys.exit(1)
-            if device.config.version == '359.3':
-                print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots. alloc8 exploit is supported for testing purposes only.'
-                raw_input("Press ENTER to continue.")
-            print 'Installing alloc8 exploit to NOR.'
-            nor = device.nor_dump(saveBackup=True)
-            new_nor = device.add_alloc8_exploit_to_nor(nor)
-            device.flash_nor(new_nor)
-
-        if opt == '-g':
+        if opt == '--decrypt-gid':
             device = PwnedDFUDevice()
             print 'Decrypting with S5L%s GID key.' % device.config.cpid
             print device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
 
-        if opt == '-G':
+        if opt == '--encrypt-gid':
             device = PwnedDFUDevice()
             print 'Encrypting with S5L%s GID key.' % device.config.cpid
             print device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
 
-        if opt == '-u':
+        if opt == '--decrypt-uid':
             device = PwnedDFUDevice()
             print 'Decrypting with device-specific UID key.'
             print device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
 
-        if opt == '-U':
+        if opt == '--encrypt-uid':
             device = PwnedDFUDevice()
             print 'Encrypting with device-specific UID key.'
             print device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
