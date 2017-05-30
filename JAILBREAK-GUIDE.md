@@ -101,6 +101,8 @@ Newer phones might not support some older versions of iOS. You cannot brick your
 
 | Manufactured | Error 28   | Success    |
 |--------------|------------|------------|
+| Week 48 2010 | N/A        | 3.1+       |
+| Week  3 2011 | 3.x        | 4.3.3+     |
 | Week 23 2011 | N/A        | 3.1.2+     |
 | Week 29 2011 | 3.x        | 4.0+       |
 | Week 36 2011 | 3.x        | 4.0+       |
