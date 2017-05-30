@@ -614,6 +614,7 @@ def print_help():
     print '%s -p\t\t\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
     print '%s -x\t\t\t\t# install alloc8 exploit to NOR' % sys.argv[0]
     print 'Advanced commands:'
+    print '%s --send=[filename]\t\t# send file to device in DFU Mode' % sys.argv[0]
     print '%s --dump=[address,length]\t# dump memory to stdout' % sys.argv[0]
     print '%s --hexdump=[address,length]\t# hexdump memory to stdout' % sys.argv[0]
     print '%s --dump-rom\t\t\t# dump SecureROM' % sys.argv[0]
@@ -627,7 +628,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
+        advanced = ['send=', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
         opts, args = getopt.getopt(sys.argv[1:], 'px', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -666,6 +667,20 @@ if __name__ == '__main__':
             nor = device.nor_dump(saveBackup=True)
             new_nor = device.add_alloc8_exploit_to_nor(nor)
             device.flash_nor(new_nor)
+
+        if opt == '--send':
+            try:
+                with open(arg, 'rb') as f:
+                    data = f.read()
+            except IOError:
+                print 'ERROR: Could not read file:', arg
+                sys.exit(1)
+
+            device = dfu.acquire_device()
+            dfu.reset_counters(device)
+            dfu.send_data(device, data)
+            dfu.request_image_validation(device)
+            dfu.release_device(device)
 
         if opt == '--dump':
             if arg.count(',') != 1:
