@@ -1,3 +1,5 @@
+# Credit: This file is based on SHAtter exploit (segment overflow) by posixninja and pod2g.
+
 import struct, sys, time
 import dfu
 

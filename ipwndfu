@@ -4,7 +4,7 @@
 
 import binascii, datetime, getopt, hashlib, struct, subprocess, sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
-import dfu, recovery, limera1n, SHAtter
+import dfu, recovery, steaks4uce, limera1n, SHAtter
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16
@@ -176,6 +176,30 @@ class PwnedDeviceConfig:
         self.rom_sha256 = rom_sha256
 
 configs = [
+    #PwnedDeviceConfig(
+    #    # S5L8720 (old bootrom)
+    #    version='240.4',
+    #    cpid='8720',
+    #    aes_crypto_cmd=0x899,
+    #    memmove=0x795c,
+    #    get_block_device=0x1091,
+    #    load_address=0x22000000,
+    #    rom_address=0x20000000,
+    #    rom_size=0x10000,
+    #    rom_sha256='55f4d8ea2791ba51dd89934168f38f0fb21ce8762ff614c1e742407c0d3ca054'
+    #),
+    #PwnedDeviceConfig(
+    #    # S5L8720 (new bootrom)
+    #    version='240.5.1',
+    #    cpid='8720',
+    #    aes_crypto_cmd=0x899,
+    #    memmove=0x7964,
+    #    get_block_device=0x1091,
+    #    load_address=0x22000000,
+    #    rom_address=0x20000000,
+    #    rom_size=0x10000,
+    #    rom_sha256='f15ae522dc9e645fcf997f6cec978ed3ce1811915e84938c68203fb95d80d300'
+    #),
     PwnedDeviceConfig(
         # S5L8920 (old bootrom)
         version='359.3',
@@ -289,6 +313,10 @@ class PwnedDFUDevice():
 
         if 'PWND:[' not in self.identifier:
             print 'ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.'
+            sys.exit(1)
+
+        if 'CPID:8720' in self.identifier:
+            print 'ERROR: This feature is not supported on iPod Touch (2nd generation).'
             sys.exit(1)
 
         self.config = None
@@ -644,7 +672,9 @@ if __name__ == '__main__':
             serial_number = device.serial_number
             dfu.release_device(device)
 
-            if 'CPID:8920' in serial_number:
+            if 'CPID:8720' in serial_number:
+                steaks4uce.exploit()
+            elif 'CPID:8920' in serial_number:
                 limera1n.exploit()
             elif 'CPID:8922' in serial_number:
                 limera1n.exploit()

@@ -1,3 +1,5 @@
+# Credit: This file is based on limera1n exploit (heap overflow) by geohot.
+
 import array, ctypes, struct, sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
 import dfu
