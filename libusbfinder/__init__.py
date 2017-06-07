@@ -46,10 +46,10 @@ BOTTLE_PATH_FORMAT = os.path.join(dir, 'bottles', '%s.tar.gz')
 DYLIB_PATH_FORMAT = os.path.join(dir, '%s.dylib')
 DYLIB_NAME = 'libusb-1.0.0.dylib'
 
-def apply_patches(file, patches):
+def apply_patches(binary, patches):
     for (offset, data) in patches:
-        file = file[:offset] + data + file[offset + len(data):]
-    return file
+        binary = binary[:offset] + data + binary[offset + len(data):]
+    return binary
 
 def libusb1_path_internal():
     version = platform.mac_ver()[0]

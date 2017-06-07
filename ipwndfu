@@ -2,9 +2,9 @@
 # ipwndfu: open-source jailbreaking tool for older iOS devices
 # Author: axi0mX
 
-import binascii, datetime, getopt, hashlib, struct, subprocess, sys, time
+import binascii, datetime, getopt, hashlib, struct, sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
-import dfu, recovery, steaks4uce, limera1n, SHAtter
+import dfu, recovery, steaks4uce, limera1n, SHAtter, utilities
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16
@@ -12,38 +12,10 @@ AES_GID_KEY = 0x20000200
 AES_UID_KEY = 0x20000201
 AES_ENCRYPT = 16
 AES_DECRYPT = 17
-SECUREROM_FILENAME_FORMAT = 'SecureROM-%s-RELEASE.dump'
-SRTG_FORMAT = 'SRTG:[iBoot-%s]'
 
 def empty_img3_data(size):
     assert size >= 20
     return struct.pack('<4s3I4s', 'Img3'[::-1], size, 0, 0, 'zero'[::-1]) + '\x00' * (size - 20)
-
-def apply_patches(file, patches):
-    # TODO: Should always be the same for decrypted IMG3s from this script, but don't hardcode this.
-    IMG3_DATA_OFFSET = 0x40
-    for (offset, data) in patches:
-        file = file[:IMG3_DATA_OFFSET + offset] + data + file[IMG3_DATA_OFFSET + offset + len(data):]
-    return file
-
-def aes_decrypt(payload, iv, key):
-  if len(key) == 32:
-    aesType = 128
-  elif len(key) == 64:
-    aesType = 256
-  else:
-    print 'ERROR: Bad AES key given to aes_decrypt. Exiting.'
-    sys.exit(1)
-  p = subprocess.Popen(['openssl', 'enc', '-aes-%s-cbc' % aesType, '-d', '-nopad', '-iv', iv, '-K', key],
-                       stdout=subprocess.PIPE,
-                       stdin=subprocess.PIPE,
-                       stderr=subprocess.PIPE)
-  (stdoutdata, stderrdata) = p.communicate(input=payload)
-
-  if len(stderrdata) > 0:
-    print 'ERROR: OpenSSL reported error: %s' % stderrdata
-    sys.exit(1)
-  return stdoutdata
 
 class Image3:
     def __init__(self, data):
@@ -101,7 +73,7 @@ class Image3:
         keybag = self.getKeybag()
         device = PwnedDFUDevice()
         decrypted_keybag = device.decrypt_keybag(keybag)
-        return aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
+        return utilities.aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
 
     def newDecryptedImage3(self):
         typeTag = self.getTags('TYPE'[::-1])
@@ -321,7 +293,7 @@ class PwnedDFUDevice():
 
         self.config = None
         for config in configs:
-            if SRTG_FORMAT % config.version in self.identifier:
+            if 'SRTG:[iBoot-%s]' % config.version in self.identifier:
                 self.config = config
                 break
         if self.config is None:
@@ -571,7 +543,7 @@ class PwnedDFUDevice():
             (0x14954,                     'run\x00'), # patch 'reset' command string to 'run'
             (0x17654, struct.pack('<I', 0x41000001)), # patch 'reset' command handler to LOAD_ADDRESS + 1
         ]
-        patchediBSS = apply_patches(decryptediBSS, n88ap_iBSS_435_patches)
+        patchediBSS = decryptediBSS[:64] + utilities.apply_patches(decryptediBSS[64:], n88ap_iBSS_435_patches)
 
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
@@ -733,12 +705,12 @@ if __name__ == '__main__':
 
             device = PwnedDFUDevice()
             dump = device.read_memory(address, length)
-            subprocess.Popen(['xxd', '-o', str(address)], stdin=subprocess.PIPE).communicate(input=dump)
+            print utilities.hex_dump(dump, address),
 
         if opt == '--dump-rom':
             device = PwnedDFUDevice()
             securerom = device.securerom_dump()
-            filename = SECUREROM_FILENAME_FORMAT % device.config.version
+            filename = 'SecureROM-%s-RELEASE.dump' % device.config.version
             f = open(filename, 'wb')
             f.write(securerom)
             f.close()
