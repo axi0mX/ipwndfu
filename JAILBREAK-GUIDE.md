@@ -103,12 +103,25 @@ Newer phones might not support some older versions of iOS. You cannot brick your
 |--------------|------------|------------|
 | Week 48 2010 | N/A        | 3.1+       |
 | Week  3 2011 | 3.x        | 4.3.3+     |
+| Week 14 2011 | 3.x        | 4.0+       |
 | Week 23 2011 | N/A        | 3.1.2+     |
 | Week 29 2011 | 3.x        | 4.0+       |
 | Week 36 2011 | 3.x        | 4.0+       |
 | Week 26 2012 | 3.x, 4.x   | 5.0+       |
 
 You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me what versions worked or didn't work.
+
+
+### Decoding iPhone 3GS serial number
+
+```
+Serial number: AABCCDDDEE
+AA = Device ID
+B = 2009=9, 2010=0, 2011=1, 2012=2
+CC = Week of production
+DDD = Unique ID
+EE = Color
+```
 
 
 ### How to restore to a custom IPSW
