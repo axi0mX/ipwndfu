@@ -215,7 +215,7 @@ def exploit():
     dfu.request_image_validation(device)
     dfu.release_device(device)
 
-    time.sleep(0.01)
+    time.sleep(0.5)
 
     device = dfu.acquire_device()
     failed = 'PWND:[limera1n]' not in device.serial_number

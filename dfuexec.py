@@ -195,7 +195,7 @@ class PwnedDFUDevice():
         dfu.request_image_validation(device)
         dfu.release_device(device)
 
-        time.sleep(0.1)
+        time.sleep(0.5)
 
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
@@ -429,12 +429,15 @@ class PwnedDFUDevice():
         dfu.request_image_validation(device)
         dfu.release_device(device)
 
+        time.sleep(0.5)
+
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
-        time.sleep(0.01)
         data = dfu.send_data(device, patchediBSS)
         dfu.request_image_validation(device)
         dfu.release_device(device)
+
+        time.sleep(0.5)
 
         print 'Waiting for iBSS to enter Recovery Mode.'
         device = recovery.acquire_device()
