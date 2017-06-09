@@ -64,9 +64,17 @@ if __name__ == '__main__':
             if device.config.version == '359.3':
                 print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots. alloc8 exploit is supported for testing purposes only.'
                 raw_input("Press ENTER to continue.")
+
             print 'Installing alloc8 exploit to NOR.'
+
+            print 'Dumping SecureROM.'
+            securerom = device.securerom_dump()
+
             nor = device.nor_dump(saveBackup=True)
-            new_nor = device.add_alloc8_exploit_to_nor(nor)
+
+            print 'Preparing modified NOR with alloc8 exploit.'
+            new_nor = device.add_alloc8_exploit_to_nor(nor, securerom)
+
             device.flash_nor(new_nor)
 
         if opt == '--send':

