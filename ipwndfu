@@ -7,33 +7,34 @@ import dfu, steaks4uce, limera1n, SHAtter, utilities
 from dfuexec import *
 
 def print_help():
-    print 'Basic commands:'
-    print '%s -p\t\t\t\t# exploit for pwned DFU Mode (must be in DFU Mode)' % sys.argv[0]
-    print '%s -x\t\t\t\t# install alloc8 exploit to NOR' % sys.argv[0]
-    print 'Advanced commands:'
-    print '%s --send=[filename]\t\t# send file to device in DFU Mode' % sys.argv[0]
-    print '%s --dump=[address,length]\t# dump memory to stdout' % sys.argv[0]
-    print '%s --hexdump=[address,length]\t# hexdump memory to stdout' % sys.argv[0]
-    print '%s --dump-rom\t\t\t# dump SecureROM' % sys.argv[0]
-    print '%s --dump-nor=[filename]\t\t# dump NOR to file' % sys.argv[0]
-    print '%s --flash-nor=[filename]\t# flash NOR (header and firmware only) from file' % sys.argv[0]
-    print '%s --24kpwn\t\t\t# install 24Kpwn exploit to NOR' % sys.argv[0]
-    print '%s --decrypt-gid=[hexdata]\t# AES decrypt with GID key' % sys.argv[0]
-    print '%s --encrypt-gid=[hexdata]\t# AES encrypt with GID key' % sys.argv[0]
-    print '%s --decrypt-uid=[hexdata]\t# AES decrypt with UID key' % sys.argv[0]
-    print '%s --encrypt-uid=[hexdata]\t# AES encrypt with UID key' % sys.argv[0]
+    print 'USAGE: ipwndfu [options]'
+    print 'Interact with an iOS device in DFU Mode.\n'
+    print 'Basic options:'
+    print '  -p\t\t\t\tUSB exploit for pwned DFU Mode'
+    print '  -x\t\t\t\tinstall alloc8 exploit to NOR'
+    print '  -f file\t\t\tsend file to device in DFU Mode'
+    print 'Advanced options:'
+    print '  --dump=address,length\t\tdump memory to stdout'
+    print '  --hexdump=address,length\thexdump memory to stdout'
+    print '  --dump-rom\t\t\tdump SecureROM'
+    print '  --dump-nor=file\t\tdump NOR to file'
+    print '  --flash-nor=file\t\tflash NOR (header and firmware only) from file'
+    print '  --24kpwn\t\t\tinstall 24Kpwn exploit to NOR'
+    print '  --decrypt-gid=hexdata\t\tAES decrypt with GID key'
+    print '  --encrypt-gid=hexdata\t\tAES encrypt with GID key'
+    print '  --decrypt-uid=hexdata\t\tAES decrypt with UID key'
+    print '  --encrypt-uid=hexdata\t\tAES encrypt with UID key'
 
 if __name__ == '__main__':
     try:
-        advanced = ['send=', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
-        opts, args = getopt.getopt(sys.argv[1:], 'px', advanced)
+        advanced = ['dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
+        opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
         print_help()
         sys.exit(2)
 
     if len(opts) == 0:
-        print 'ERROR: No arguments provided.'
         print_help()
         sys.exit(2)
 
@@ -74,7 +75,7 @@ if __name__ == '__main__':
 
             device.flash_nor(new_nor)
 
-        if opt == '--send':
+        if opt == '-f':
             try:
                 with open(arg, 'rb') as f:
                     data = f.read()
