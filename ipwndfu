@@ -67,13 +67,10 @@ if __name__ == '__main__':
 
             print 'Installing alloc8 exploit to NOR.'
 
-            print 'Dumping SecureROM.'
-            securerom = device.securerom_dump()
-
             nor = device.nor_dump(saveBackup=True)
 
             print 'Preparing modified NOR with alloc8 exploit.'
-            new_nor = device.add_alloc8_exploit_to_nor(nor, securerom)
+            new_nor = device.add_alloc8_exploit_to_nor(nor)
 
             device.flash_nor(new_nor)
 

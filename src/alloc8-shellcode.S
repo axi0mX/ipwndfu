@@ -22,7 +22,7 @@
 .set cable_connected,                   0xBAD00008
 .set power_button_pressed,              0xBAD00007
 .set home_button_pressed,               0xBAD00006
-.set handle_data_abort,                 0xBAD00002
+.set clean_invalidate_data_cache,       0xBAD00002
 .set strlcat,                           0xBAD0000f
 
 .set gNorImg3List,                      0xBAD00003
@@ -43,9 +43,8 @@ _start:
     LDR R0, =MAIN_STACK_ADDRESS
     MOV SP, R0                                  @ SP = MAIN_STACK_ADDRESS
 
-    MOV R0, #0x30                       
-    LDR R1, =handle_data_abort
-    STR R1, [R0]                                @ *(0x30) = handle_data_abort
+    LDR R0, =clean_invalidate_data_cache
+    BLX R0                                      @ clean_invalidate_data_cache()
 
     LDR R4, =gNorImg3List                       @ R4 = &gNorImg3List
 

