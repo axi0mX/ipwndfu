@@ -13,11 +13,12 @@ def print_help():
     print '  -c cmd\t\t\trun command on device'
     print '  -f file\t\t\tsend file to device in Recovery Mode'
     print 'Advanced options:'
+    print '  --enable-uart\t\t\tset debug-uarts to 3 and reboot device'
     print '  --exit-recovery-loop\t\tenable auto-boot and reboot device'
 
 if __name__ == '__main__':
     try:
-        advanced = ['exit-recovery-loop']
+        advanced = ['exit-recovery-loop', 'enable-uart']
         opts, args = getopt.getopt(sys.argv[1:], 'c:f:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -63,3 +64,16 @@ if __name__ == '__main__':
 
             recovery.release_device(device)
 
+        if opt == '--enable-uart':
+            device = recovery.acquire_device()
+
+            # TODO: getenv debug-uarts first and fail if it is already 3.
+            recovery.send_command(device, 'setenv debug-uarts 3')
+            recovery.send_command(device, 'saveenv')
+            try:
+                recovery.send_command(device, 'reboot')
+            except usb.core.USBError:
+                # OK: this is expected when rebooting
+                pass
+
+            recovery.release_device(device)
