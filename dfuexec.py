@@ -1,6 +1,6 @@
 import binascii, datetime, hashlib, struct, sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
-import dfu, recovery, image3, utilities
+import dfu, recovery, image3, image3_24Kpwn, utilities
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16
@@ -296,11 +296,10 @@ class PwnedDFUDevice():
             if img3_header[0] != 'Img3'[::-1]:
                 break
             img3_data = nor_firmware[offset:offset + img3_header[1]]
-            img3 = image3.Image3(img3_data)
+            img3 = image3.Image3(img3_data).newDecryptedImage3()
             if img3_header[4] == 'illb'[::-1]:
-                new_nor_firmware += img3.newDecrypted24KpwnLLB(self.securerom_dump())
-            else:
-                new_nor_firmware += img3.newDecryptedImage3()
+                img3 = image3_24Kpwn.exploit(img3, self.securerom_dump())
+            new_nor_firmware += img3
             offset += img3_header[1]
             count += 1
 
