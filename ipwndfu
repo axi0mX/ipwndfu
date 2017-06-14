@@ -3,7 +3,8 @@
 # Author: axi0mX
 
 import binascii, datetime, getopt, hashlib, struct, sys, time
-import dfu, steaks4uce, limera1n, SHAtter, utilities
+import dfu, nor, utilities
+import alloc8, image3_24Kpwn, limera1n, SHAtter, steaks4uce
 from dfuexec import *
 
 def print_help():
@@ -62,18 +63,30 @@ if __name__ == '__main__':
             if device.config.cpid != '8920':
                 print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
                 sys.exit(1)
+
             if device.config.version == '359.3':
-                print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots. alloc8 exploit is supported for testing purposes only.'
+                print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots, alloc8 exploit is for testing purposes only.'
                 raw_input("Press ENTER to continue.")
 
             print 'Installing alloc8 exploit to NOR.'
 
-            nor = device.nor_dump(saveBackup=True)
+            dump = device.nor_dump(saveBackup=True)
+
+            nor = nor.NorData(dump)
+
+            for byte in nor.parts[1]:
+                if byte != '\x00':
+                    print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.'
+                    sys.exit(1)
+            if len(nor.images) == 0 or len(nor.images[0]) < 0x24000:
+                print 'ERROR: 24Kpwn LLB was not found. You must restore a custom 24Kpwn IPSW before using this exploit.'
+                sys.exit(1)
 
             print 'Preparing modified NOR with alloc8 exploit.'
-            new_nor = device.add_alloc8_exploit_to_nor(nor)
-
-            device.flash_nor(new_nor)
+            # Decrypt LLB and remove 24Kpwn first.
+            nor.images[0] = image3.Image3(nor.images[0]).newDecryptedImage3()
+            new_nor = alloc8.exploit(nor, device.config.version)
+            device.flash_nor(new_nor.dump())
 
         if opt == '-f':
             try:
@@ -149,15 +162,31 @@ if __name__ == '__main__':
             device.flash_nor(new_nor)
 
         if opt == '--24kpwn':
+            print '*** based on 24Kpwn exploit (segment overflow) by the iPhone Dev Team ***'
+
             device = PwnedDFUDevice()
             if device.config.version != '359.3':
                 print 'Only iPhone 3GS (old bootrom) is supported.'
                 sys.exit(1)
-            print '*** based on 24Kpwn exploit (segment overflow) by the iPhone Dev Team ***'
-            print 'Installing 24Kpwn exploit to NOR.'
-            nor = device.nor_dump(saveBackup=True)
-            new_nor = device.add_24Kpwn_exploit_to_nor(nor)
-            device.flash_nor(new_nor)
+
+            dump = device.nor_dump(saveBackup=True)
+
+            print 'Preparing modified NOR with 24Kpwn exploit.'
+            nor = nor.NorData(dump)
+            for byte in nor.parts[1]:
+                if byte != '\x00':
+                    print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.'
+                    sys.exit(1)
+            if len(nor.images) == 0:
+                print 'ERROR: 24Kpwn exploit cannot be installed, because NOR has no valid LLB. Exiting.'
+                sys.exit(1)
+
+            if len(nor.images[0]) >= 0x24000:
+                # Decrypt LLB and remove previous 24Kpwn exploit.
+                nor.images[0] = image3.Image3(nor.images[0]).newDecryptedImage3()
+
+            nor.images[0] = image3_24Kpwn.exploit(nor.images[0], device.securerom_dump())
+            device.flash_nor(nor.dump())
 
         if opt == '--decrypt-gid':
             device = PwnedDFUDevice()
