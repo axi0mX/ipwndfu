@@ -59,38 +59,40 @@ class Image3:
         decrypted_keybag = device.decrypt_keybag(keybag)
         return utilities.aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
 
-    def newDecryptedImage3(self):
+    def shrink24KpwnCertificate(self):
+        for i in range(len(self.tags)):
+            tag = self.tags[i]
+            if tag[0] == 'CERT'[::-1] and len(tag[3]) >= 3072:
+                data = tag[3][:3072]
+                assert data[-1] == '\x00'
+                data = data.rstrip('\x00')
+                self.tags[i] = ('CERT'[::-1], 12 + len(data), len(data), data)
+                break
+
+    def newImage3(self, decrypted=True):
         typeTag = self.getTags('TYPE'[::-1])
         assert len(typeTag) == 1
         versTag = self.getTags('VERS'[::-1])
         assert len(versTag) <= 1
-        dataTags = self.getTags('DATA'[::-1])
-        assert len(dataTags) == 1
+        dataTag = self.getTags('DATA'[::-1])
+        assert len(dataTag) == 1
         sepoTag = self.getTags('SEPO'[::-1])
         assert len(sepoTag) <= 2
         bordTag = self.getTags('BORD'[::-1])
         assert len(bordTag) <= 2
+        kbagTag = self.getTags('KBAG'[::-1])
+        assert len(kbagTag) <= 2
         shshTag = self.getTags('SHSH'[::-1])
         assert len(shshTag) <= 1
         certTag = self.getTags('CERT'[::-1])
         assert len(certTag) <= 1
 
-        (tagMagic, tagTotalSize, tagDataSize, tagData) = dataTags[0]
-
-        if self.getKeybag() == None:
-            # no KBAG, must not be encrypted
-            decrypted = tagData
+        (tagMagic, tagTotalSize, tagDataSize, tagData) = dataTag[0]
+        if len(kbagTag) > 0 and decrypted:
+          newTagData = self.getDecryptedPayload()
+          kbagTag = []
         else:
-            decrypted = self.getDecryptedPayload()
-        assert len(tagData) == len(decrypted)
+          newTagData =  tagData
+        assert len(tagData) == len(newTagData)
 
-        # Fix first 20 bytes of 24kpwn LLB
-        if self.type == 'illb'[::-1] and self.totalSize >= 0x24000:
-            # TODO: Check that DATA tag was in the correct location before decryption.
-            DWORD1 = 0xea00000e
-            DWORD2 = 0xe59ff018
-            decrypted = struct.pack('<5I', DWORD1, DWORD2, DWORD2, DWORD2, DWORD2) + decrypted[20:]
-            # Add empty SHSH and CERT
-            shshTag = [('SHSH'[::-1], 12, 0, '')]
-            certTag = [('CERT'[::-1], 12, 0, '')]
-        return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, decrypted)] + versTag + bordTag + shshTag + certTag)
+        return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize, newTagData)] + versTag + sepoTag + bordTag + kbagTag + shshTag + certTag)

@@ -106,3 +106,20 @@ def exploit(nor, version):
 	new_nor.images.append(empty_img3(52)[:40] + struct.pack('<4I', SHELLCODE_ADDRESS, 0, *exceptions))
 
 	return new_nor
+
+def remove_exploit(nor):
+    assert len(nor.images) >= 700
+
+    new_nor = copy.deepcopy(nor)
+
+    new_images = []
+    for image in new_nor.images:
+        assert len(image) >= 20
+        if image[16:20] != 'zero'[::-1]:
+            new_images.append(image)
+    assert len(new_images) < 32
+
+    new_nor.images = new_images
+    new_nor.parts[1] = '\x00' * 460
+
+    return new_nor

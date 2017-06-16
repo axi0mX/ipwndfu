@@ -21,6 +21,8 @@ def print_help():
     print '  --dump-nor=file\t\tdump NOR to file'
     print '  --flash-nor=file\t\tflash NOR (header and firmware only) from file'
     print '  --24kpwn\t\t\tinstall 24Kpwn exploit to NOR'
+    print '  --remove-24kpwn\t\tremove 24Kpwn exploit from NOR'
+    print '  --remove-alloc8\t\tremove alloc8 exploit from NOR'
     print '  --decrypt-gid=hexdata\t\tAES decrypt with GID key'
     print '  --encrypt-gid=hexdata\t\tAES encrypt with GID key'
     print '  --decrypt-uid=hexdata\t\tAES decrypt with UID key'
@@ -28,7 +30,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
+        advanced = ['dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'decrypt-gid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -83,8 +85,8 @@ if __name__ == '__main__':
                 sys.exit(1)
 
             print 'Preparing modified NOR with alloc8 exploit.'
-            # Decrypt LLB and remove 24Kpwn first.
-            nor.images[0] = image3.Image3(nor.images[0]).newDecryptedImage3()
+            # Remove 24Kpwn first.
+            nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
             new_nor = alloc8.exploit(nor, device.config.version)
             device.flash_nor(new_nor.dump())
 
@@ -181,12 +183,56 @@ if __name__ == '__main__':
                 print 'ERROR: 24Kpwn exploit cannot be installed, because NOR has no valid LLB. Exiting.'
                 sys.exit(1)
 
-            if len(nor.images[0]) >= 0x24000:
-                # Decrypt LLB and remove previous 24Kpwn exploit.
-                nor.images[0] = image3.Image3(nor.images[0]).newDecryptedImage3()
-
+            # Remove existing 24Kpwn exploit.
+            if len(nor.images[0]) > 0x24000:
+                nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
             nor.images[0] = image3_24Kpwn.exploit(nor.images[0], device.securerom_dump())
             device.flash_nor(nor.dump())
+
+        if opt == '--remove-24kpwn':
+            device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. 24Kpwn exploit is only supported on iPhone 3GS.'
+                sys.exit(1)
+
+            print 'WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.'
+            raw_input("Press ENTER to continue.")
+
+            dump = device.nor_dump(saveBackup=True)
+
+            nor = nor.NorData(dump)
+
+            if len(nor.images) == 0:
+                print 'ERROR: NOR has no valid LLB. It seems that 24Kpwn exploit is not installed. Exiting.'
+                sys.exit(1)
+            if len(nor.images[0]) <= 0x24000:
+                print 'ERROR: LLB is not oversized. It seems that 24Kpwn exploit is not installed. Exiting.'
+                sys.exit(1)
+
+            print 'Preparing modified NOR without 24Kpwn exploit.'
+            nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
+            device.flash_nor(nor.dump())
+
+        if opt == '--remove-alloc8':
+            device = PwnedDFUDevice()
+            if device.config.cpid != '8920':
+                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
+                sys.exit(1)
+
+            print 'WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.'
+            raw_input("Press ENTER to continue.")
+
+            dump = device.nor_dump(saveBackup=True)
+
+            nor = nor.NorData(dump)
+
+            if len(nor.images) < 700:
+                print 'ERROR: It seems that alloc8 exploit is not installed. There are less than 700 images in NOR. Exiting.'
+                sys.exit(1)
+
+            print 'Preparing modified NOR without alloc8 exploit.'
+            new_nor = alloc8.remove_exploit(nor)
+            device.flash_nor(new_nor.dump())
 
         if opt == '--decrypt-gid':
             device = PwnedDFUDevice()

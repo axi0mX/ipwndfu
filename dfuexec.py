@@ -239,7 +239,7 @@ class PwnedDFUDevice():
             sys.exit(1)
 
         iBSS = image3.Image3(data)
-        decryptediBSS = iBSS.newDecryptedImage3()
+        decryptediBSS = iBSS.newImage3(decrypted=True)
         n88ap_iBSS_435_patches = [
             (0x14954,                     'run\x00'), # patch 'reset' command string to 'run'
             (0x17654, struct.pack('<I', 0x41000001)), # patch 'reset' command handler to LOAD_ADDRESS + 1
