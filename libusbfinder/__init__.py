@@ -56,6 +56,9 @@ def libusb1_path_internal():
     if version == '':
         # We're not running on a Mac.
         return None
+    if version.startswith('10.13'):
+        # HACK: Use macOS Sierra libusb bottle on macOS High Sierra.
+        version = '10.12'
 
     for config in configs:
         if version.startswith(config.version):
