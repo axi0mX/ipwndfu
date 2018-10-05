@@ -41,10 +41,10 @@ configs = [
         dylib_sha256='8e89265251d119f3422a760cf3472ecc46b7c3d22598600905dd5595a1ec146a'),
     VersionConfig(
         version='10.9',
-        bottle='libusb-1.0.20.mavericks.bottle',
-        bottle_sha256='a156b5968853363f5465d7a281cdc536d03d77f26fd98ed7196363b0af41bbb0',
+        bottle='libusb-1.0.20.mavericks.bottle.1',
+        bottle_sha256='5a475e2ca93886e51b994d1ea323e915c91d8463e5b23b45203acb69edf69981',
         dylib_patches=[],
-        dylib_sha256='8a92a030d4552cb4cd1d8df171389ca174ab9aa6f0a0b7b19a80bfb3042ee11a'),
+        dylib_sha256='8f21fc0af0c7b04e7db988e1fc66ea9dbc31289096c68416140152d70138c316'),
     VersionConfig(
         version='10.8',
         bottle='libusb-1.0.19.mountain_lion.bottle.1',
