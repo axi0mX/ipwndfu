@@ -10,17 +10,29 @@ class VersionConfig:
 
 configs = [
     VersionConfig(
+        version='10.14',
+        bottle='libusb-1.0.22.mojave.bottle',
+        bottle_sha256='6accd1dfe6e66c30aac825ad674e9c7a48b752bcf84561e9e2d397ce188504ff',
+        dylib_patches=[(0x8fd1, 'E985000000'.decode('hex'))],
+        dylib_sha256='34d4c0ca821a31f83f3860575f9683cdb8fc5cbd4167383eedfb8b2ba7f7d9d5'),
+    VersionConfig(
+        version='10.13',
+        bottle='libusb-1.0.22.high_sierra.bottle',
+        bottle_sha256='7b1fd86a5129620d1bbf048c68c7742ecad450de138b8186bf8e985a752b2302',
+        dylib_patches=[(0x98fb, 'E97F000000'.decode('hex'))],
+        dylib_sha256='7bd48a3a9955fc20752433f944f61d58d5ec9b68d25dcfab1671f3c82339c4f8'),
+    VersionConfig(
         version='10.12',
-        bottle='libusb-1.0.21.sierra.bottle',
-        bottle_sha256='e42e21cc9b7cd4223eb8050680ada895bdfcaf9c7e33534002cd21af2f84baf8',
-        dylib_patches=[(0x9ae9, '\xe9\x56\x01\x00\x00')],
-        dylib_sha256='5041490ac354a8b98fc7a80fcd227e2e9ff725a4a263230d120d4a85aa5eed0d'),
+        bottle='libusb-1.0.22.sierra.bottle',
+        bottle_sha256='7f2b65d09525c432a86e46699a1448bab36503f45f16d6e0d8f42be6b1ef55cf',
+        dylib_patches=[(0x98fb, 'E97F000000'.decode('hex'))],
+        dylib_sha256='0d386845a96fa0457cb6c200f956c9b0d5f236729ef1e2cff34cd312f8cfc7ba'),
     VersionConfig(
         version='10.11',
-        bottle='libusb-1.0.21.el_capitan.bottle',
-        bottle_sha256='e4902b528d0ea0df0d433e349709d3708a9e08191fd2f3c6d5f5ab2989766b9f',
-        dylib_patches=[(0x9adb, '\xe9\x56\x01\x00\x00')],
-        dylib_sha256='c8149efd998a364eaa27f94d53ad2e873ebb431c4cfe181c9b15f0b40bc972cf'),
+        bottle='libusb-1.0.22.el_capitan.bottle',
+        bottle_sha256='33575c9f56bc0d57bf985a21e40be019d5c269b432939416be8f24c5921bbb28',
+        dylib_patches=[(0x9917, 'E956010000'.decode('hex'))],
+        dylib_sha256='7ae848e0e8730bf8de48bb534a8ee42eb301a2f6ba6cc188228ce8bf79a6ba07'),
     VersionConfig(
         version='10.10',
         bottle='libusb-1.0.21.yosemite.bottle',
@@ -56,9 +68,6 @@ def libusb1_path_internal():
     if version == '':
         # We're not running on a Mac.
         return None
-    if version.startswith('10.13') or version.startswith('10.14'):
-        # HACK: Use macOS Sierra libusb bottle on macOS High Sierra and Mojave.
-        version = '10.12'
 
     for config in configs:
         if version.startswith(config.version):
