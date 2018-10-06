@@ -81,6 +81,16 @@ This tool is currently in beta and could potentially brick your device. It will 
 
 THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
+## Toolchain
+
+You will not need to use `make` or compile anything to use ipwndfu. However, if you wish to make changes to assembly code in `src/*`, you will need to use an ARM toolchain and assemble the source files by running `make`.
+
+If you are using macOS with Homebrew, you can use gcc-arm-embedded. You can install it with this command:
+
+```
+brew cask install gcc-arm-embedded
+```
+
 ## Credit
 
 geohot for limera1n exploit
