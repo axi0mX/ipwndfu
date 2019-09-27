@@ -22,7 +22,7 @@
 
 ## Quick start guide for checkm8
 
-1. Use a cable to connect device to your Mac. Hold buttons are required to enter DFU Mode.
+1. Use a cable to connect device to your Mac. Hold buttons as needed to enter DFU Mode.
 
 2. First run ```./ipwndfu -p``` to exploit the device. Repeat the process if it fails, it is not reliable.
 
