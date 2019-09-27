@@ -1,4 +1,4 @@
-# Credit: This file is based on 24Kpwn exploit (segment overflow) by the iPhone Dev Team.
+# Credit: This file is based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al.
 
 import struct
 import image3

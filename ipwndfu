@@ -245,7 +245,7 @@ if __name__ == '__main__':
             device.flash_nor(new_nor)
 
         if opt == '--24kpwn':
-            print '*** based on 24Kpwn exploit (segment overflow) by the iPhone Dev Team ***'
+            print '*** based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al. ***'
 
             device = PwnedDFUDevice()
             if device.config.version != '359.3':
