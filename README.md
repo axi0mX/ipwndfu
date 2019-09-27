@@ -85,10 +85,11 @@ THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
 
 You will not need to use `make` or compile anything to use ipwndfu. However, if you wish to make changes to assembly code in `src/*`, you will need to use an ARM toolchain and assemble the source files by running `make`.
 
-If you are using macOS with Homebrew, you can use gcc-arm-embedded. You can install it with this command:
+If you are using macOS with Homebrew, you can use binutils and gcc-arm-embedded. You can install them with these commands:
 
 ```
-brew cask install gcc-arm-embedded
+brew install binutils
+brew cask install https://raw.githubusercontent.com/Homebrew/homebrew-cask/b88346667547cc85f8f2cacb3dfe7b754c8afc8a/Casks/gcc-arm-embedded.rb
 ```
 
 ## Credit
