@@ -26,8 +26,8 @@ class DevicePlatform:
       self.recovery_load_base  = 0x80000000
     if self.cpid == 0x8960:
       self.dfu_image_base      = 0x180380000
-      self.dfu_load_base       = 0x180000000 # varies (HACK: test purposes)
-      self.recovery_image_base = 0x83D7F7000 # varies
+      self.dfu_load_base       = 0x83D37B000 # varies (HACK: test purposes)
+      self.recovery_image_base = 0x180380000 # varies
       self.recovery_load_base  = 0x800000000
     if self.cpid in [0x8002, 0x8004]:
       self.dfu_image_base      = 0x48818000
