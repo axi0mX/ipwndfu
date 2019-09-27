@@ -1,5 +1,5 @@
 ![](repo/ipwndfu.png)
-# Open-source jailbreaking tool for older iOS devices
+# Open-source jailbreaking tool for many iOS devices
 
 
 **Read [disclaimer](#disclaimer) before using this software.*
