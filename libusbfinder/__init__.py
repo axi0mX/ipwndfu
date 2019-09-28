@@ -65,6 +65,9 @@ def apply_patches(binary, patches):
 
 def libusb1_path_internal():
     version = platform.mac_ver()[0]
+    # HACK to support macOS 10.15
+    if version == '10.15':
+        version = '10.14'
     if version == '':
         # We're not running on a Mac.
         return None
