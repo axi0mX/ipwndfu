@@ -1,4 +1,6 @@
 ///Sourced from https://www.theiphonewiki.com/wiki/Packet_Filter_Kernel_Exploit
+///And https://stackoverflow.com/questions/8728728/compiling-multiple-c-files-in-a-program
+#include "systemversion.h" 
 int main() {
     unsigned int target_addr = CONFIG_TARGET_ADDR;
     unsigned int target_addr_real = target_addr & ~1;
