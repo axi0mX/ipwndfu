@@ -1,6 +1,19 @@
 ///Sourced from https://www.theiphonewiki.com/wiki/Packet_Filter_Kernel_Exploit
 ///And https://stackoverflow.com/questions/8728728/compiling-multiple-c-files-in-a-program
+///And https://www.programiz.com/c-programming/c-if-else-statement
+///And https://www.cprogramming.com/tutorial/c/lesson2.html
+///And https://www.geeksforgeeks.org/goto-statement-in-c-cpp/
+
 #include "systemversion.h" 
+if (sv <= 4.2.1)
+    compatible_state == yes
+    if compatible_state == yes
+      goto exploit
+    else
+      printf("Error Code 003 Occured\n"); exit(0);
+else
+    printf("Error Code 004 Occured\n"); exit(0);
+exploit:
 int main() {
     unsigned int target_addr = CONFIG_TARGET_ADDR;
     unsigned int target_addr_real = target_addr & ~1;
