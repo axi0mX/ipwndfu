@@ -7,7 +7,7 @@
 #include "systemversion.h"
 
 static PyObject * pfke(PyObject * self) {
-    if (sv <= 4.2 .1)
+    if (sv <= 4.2.1)
       compatible_state == yes
     if compatible_state == yes
     goto exploit
