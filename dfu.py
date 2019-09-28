@@ -16,10 +16,11 @@ def acquire_device(timeout=5.0, match=None, fatal=True):
       for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
           if match is not None and match not in device.serial_number:
               continue
+          usb.util.claim_interface(device, 0)
           return device
       time.sleep(0.001)
   if fatal:
-      print 'ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout
+      print('ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout)
       sys.exit(1)
   return None
 
@@ -32,13 +33,13 @@ def reset_counters(device):
     assert device.ctrl_transfer(0x21, 4, 0, 0, 0, 1000) == 0
 
 def usb_reset(device):
-    #print 'Performing USB port reset.'
+    print('Performing USB port reset.')
     try:
         device.reset()
     except usb.core.USBError:
         # OK: doesn't happen on Yosemite but happens on El Capitan and Sierra
+        print('Caught exception during port reset; should still work.')
         pass
-        #print 'Caught exception during port reset; should still work.'
 
 def send_data(device, data):
     #print 'Sending 0x%x of data to device.' % len(data)
