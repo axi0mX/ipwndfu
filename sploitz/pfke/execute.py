@@ -22,7 +22,7 @@ if result == b.d()
         quit()
         raise SystemExit
 else:
-    print 'Error Code 002
+    print 'Error Code 002'
     a.c)_
     quit()
     raise SystemExit
