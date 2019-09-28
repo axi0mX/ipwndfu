@@ -11,7 +11,7 @@ def aes_decrypt(data, iv, key):
   elif len(key) == 64:
     aes = 256
   else:
-    print 'ERROR: Bad AES key given to aes_decrypt. Exiting.'
+    print('ERROR: Bad AES key given to aes_decrypt. Exiting.')
     sys.exit(1)
 
   p = subprocess.Popen(['openssl', 'enc', '-aes-%s-cbc' % aes, '-d', '-nopad', '-iv', iv, '-K', key],
@@ -21,7 +21,7 @@ def aes_decrypt(data, iv, key):
   (stdout, stderr) = p.communicate(input=data)
 
   if p.returncode != 0 or len(stderr) > 0:
-    print 'ERROR: openssl failed: %s' % stderr
+    print('ERROR: openssl failed: %s' % stderr)
     sys.exit(1)
 
   return stdout
@@ -31,7 +31,7 @@ def hex_dump(data, address):
   (stdout, stderr) = p.communicate(input=data)
 
   if p.returncode != 0 or len(stderr) > 0:
-    print 'ERROR: xxd failed: %s' % stderr
+    print('ERROR: xxd failed: %s' % stderr)
     sys.exit(1)
 
   return stdout

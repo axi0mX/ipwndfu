@@ -68,7 +68,7 @@ def exploit(nor, version):
 	    constants = alloc8_constants_359_3_2
 	    exceptions = [0x5628, 0x5638]
 	else:
-	    print 'ERROR: SecureROM version %s is not supported by alloc8.' % version
+	    print('ERROR: SecureROM version %s is not supported by alloc8.' % version)
 	    sys.exit(1)
 
 	for c in nor.parts[1]:

@@ -8,33 +8,33 @@ import alloc8, checkm8, image3_24Kpwn, limera1n, SHAtter, steaks4uce, usbexec
 from dfuexec import *
 
 def print_help():
-    print 'USAGE: ipwndfu [options]'
-    print 'Interact with an iOS device in DFU Mode.\n'
-    print 'Basic options:'
-    print '  -p\t\t\t\tUSB exploit for pwned DFU Mode'
-    print '  -x\t\t\t\tinstall alloc8 exploit to NOR'
-    print '  -f file\t\t\tsend file to device in DFU Mode'
-    print 'Advanced options:'
-    print '  --demote\t\t\tdemote device to enable JTAG'
-    print '  --dump=address,length\t\tdump memory to stdout'
-    print '  --hexdump=address,length\thexdump memory to stdout'
-    print '  --dump-rom\t\t\tdump SecureROM'
-    print '  --dump-nor=file\t\tdump NOR to file'
-    print '  --flash-nor=file\t\tflash NOR (header and firmware only) from file'
-    print '  --24kpwn\t\t\tinstall 24Kpwn exploit to NOR'
-    print '  --remove-24kpwn\t\tremove 24Kpwn exploit from NOR'
-    print '  --remove-alloc8\t\tremove alloc8 exploit from NOR'
-    print '  --decrypt-gid=hexdata\t\tAES decrypt with GID key'
-    print '  --encrypt-gid=hexdata\t\tAES encrypt with GID key'
-    print '  --decrypt-uid=hexdata\t\tAES decrypt with UID key'
-    print '  --encrypt-uid=hexdata\t\tAES encrypt with UID key'
+    print('USAGE: ipwndfu [options]')
+    print('Interact with an iOS device in DFU Mode.\n')
+    print('Basic options:')
+    print('  -p\t\t\t\tUSB exploit for pwned DFU Mode')
+    print('  -x\t\t\t\tinstall alloc8 exploit to NOR')
+    print('  -f file\t\t\tsend file to device in DFU Mode')
+    print('Advanced options:')
+    print('  --demote\t\t\tdemote device to enable JTAG')
+    print('  --dump=address,length\t\tdump memory to stdout')
+    print('  --hexdump=address,length\thexdump memory to stdout')
+    print('  --dump-rom\t\t\tdump SecureROM')
+    print('  --dump-nor=file\t\tdump NOR to file')
+    print('  --flash-nor=file\t\tflash NOR (header and firmware only) from file')
+    print('  --24kpwn\t\t\tinstall 24Kpwn exploit to NOR')
+    print('  --remove-24kpwn\t\tremove 24Kpwn exploit from NOR')
+    print('  --remove-alloc8\t\tremove alloc8 exploit from NOR')
+    print('  --decrypt-gid=hexdata\t\tAES decrypt with GID key')
+    print('  --encrypt-gid=hexdata\t\tAES encrypt with GID key')
+    print('  --decrypt-uid=hexdata\t\tAES decrypt with UID key')
+    print('  --encrypt-uid=hexdata\t\tAES encrypt with UID key')
 
 if __name__ == '__main__':
     try:
         advanced = ['demote', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
-        print 'ERROR: Invalid arguments provided.'
+        print('ERROR: Invalid arguments provided.')
         print_help()
         sys.exit(2)
 
@@ -75,21 +75,21 @@ if __name__ == '__main__':
             elif 'CPID:8015' in serial_number:
                 checkm8.exploit()
             else:
-                print 'Found:', serial_number
-                print 'ERROR: This device is not supported.'
+                print('Found:', serial_number)
+                print('ERROR: This device is not supported.')
                 sys.exit(1)
 
         if opt == '-x':
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
-                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
+                print('This is not a compatible device. alloc8 exploit is for iPhone 3GS only.')
                 sys.exit(1)
 
             if device.config.version == '359.3':
-                print 'WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots, alloc8 exploit is for testing purposes only.'
-                raw_input("Press ENTER to continue.")
+                print('WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots, alloc8 exploit is for testing purposes only.')
+                input("Press ENTER to continue.")
 
-            print 'Installing alloc8 exploit to NOR.'
+            print('Installing alloc8 exploit to NOR.')
 
             dump = device.nor_dump(saveBackup=True)
 
@@ -97,13 +97,13 @@ if __name__ == '__main__':
 
             for byte in nor.parts[1]:
                 if byte != '\x00':
-                    print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.'
+                    print('ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.')
                     sys.exit(1)
             if len(nor.images) == 0 or len(nor.images[0]) < 0x24000:
-                print 'ERROR: 24Kpwn LLB was not found. You must restore a custom 24Kpwn IPSW before using this exploit.'
+                print('ERROR: 24Kpwn LLB was not found. You must restore a custom 24Kpwn IPSW before using this exploit.')
                 sys.exit(1)
 
-            print 'Preparing modified NOR with alloc8 exploit.'
+            print('Preparing modified NOR with alloc8 exploit.')
             # Remove 24Kpwn first.
             nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
             new_nor = alloc8.exploit(nor, device.config.version)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
                 with open(arg, 'rb') as f:
                     data = f.read()
             except IOError:
-                print 'ERROR: Could not read file:', arg
+                print('ERROR: Could not read file:', arg)
                 sys.exit(1)
 
             device = dfu.acquire_device()
@@ -131,25 +131,25 @@ if __name__ == '__main__':
             if 'PWND:[checkm8]' in serial_number:
                 pwned = usbexec.PwnedUSBDevice()
                 old_value = pwned.read_memory_uint32(pwned.platform.demotion_reg)
-                print 'Demotion register: 0x%x' % old_value
+                print('Demotion register: 0x%x' % old_value)
                 if old_value & 1:
-                    print 'Attempting to demote device.'
+                    print('Attempting to demote device.')
                     pwned.write_memory_uint32(pwned.platform.demotion_reg, old_value & 0xFFFFFFFE)
                     new_value = pwned.read_memory_uint32(pwned.platform.demotion_reg)
-                    print 'Demotion register: 0x%x' % new_value
+                    print('Demotion register: 0x%x' % new_value)
                     if old_value != new_value:
-                        print 'Success!'
+                        print('Success!')
                     else:
-                        print 'Failed.'
+                        print('Failed.')
                 else:
-                    print 'WARNING: Device is already demoted.'
+                    print('WARNING: Device is already demoted.')
             else:
-                print 'ERROR: Demotion is only supported on devices pwned with checkm8 exploit.'
+                print('ERROR: Demotion is only supported on devices pwned with checkm8 exploit.')
                 sys.exit(1)
 
         if opt == '--dump':
             if arg.count(',') != 1:
-                print 'ERROR: You must provide exactly 2 comma separated values: address,length'
+                print('ERROR: You must provide exactly 2 comma separated values: address,length')
                 sys.exit(1)
             raw_address, raw_length = arg.split(',')
             address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
@@ -164,11 +164,11 @@ if __name__ == '__main__':
                 sys.stdout.write(device.read_memory(address, length))
             else:
                 device = PwnedDFUDevice()
-                print device.read_memory(address, length)
+                print(device.read_memory(address, length))
 
         if opt == '--hexdump':
             if arg.count(',') != 1:
-                print 'ERROR: You must provide exactly 2 comma separated values: address,length'
+                print('ERROR: You must provide exactly 2 comma separated values: address,length')
                 sys.exit(1)
             raw_address, raw_length = arg.split(',')
             address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
@@ -182,12 +182,12 @@ if __name__ == '__main__':
                 device = usbexec.PwnedUSBDevice()
                 dump = device.read_memory(address, length)
                 for line in utilities.hex_dump(dump, address).splitlines():
-                    print '%x: %s' % (address, line[10:])
+                    print('%x: %s' % (address, line[10:]))
                     address += 16
             else:
                 device = PwnedDFUDevice()
                 dump = device.read_memory(address, length)
-                print utilities.hex_dump(dump, address),
+                print(utilities.hex_dump(dump, address), end=' ')
 
         if opt == '--dump-rom':
             device = dfu.acquire_device()
@@ -198,8 +198,8 @@ if __name__ == '__main__':
                 pwned = usbexec.PwnedUSBDevice()
                 securerom = pwned.read_memory(pwned.platform.rom_base, pwned.platform.rom_size)
                 if hashlib.sha1(securerom).hexdigest() != pwned.platform.rom_sha1:
-                    print hashlib.sha1(securerom).hexdigest()
-                    print 'ERROR: SecureROM was dumped, but the SHA1 hash does not match. Exiting.'
+                    print(hashlib.sha1(securerom).hexdigest())
+                    print('ERROR: SecureROM was dumped, but the SHA1 hash does not match. Exiting.')
                     sys.exit(1)
                 chip    = securerom[0x200:0x240].split(' ')[2][:-1]
                 kind    = securerom[0x240:0x280].split('\0')[0]
@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 filename = 'SecureROM-%s-%s-%s.dump' % (chip, version, kind)
                 with open(filename, 'wb') as f:
                     f.write(securerom)
-                print 'Saved:', filename
+                print('Saved:', filename)
             else:
                 device = PwnedDFUDevice()
                 securerom = device.securerom_dump()
@@ -215,53 +215,53 @@ if __name__ == '__main__':
                 f = open(filename, 'wb')
                 f.write(securerom)
                 f.close()
-                print 'SecureROM dumped to file:', filename
+                print('SecureROM dumped to file:', filename)
 
         if opt == '--dump-nor':
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
-                print 'This is not a compatible device. Dumping NOR is only supported on iPhone 3GS.'
+                print('This is not a compatible device. Dumping NOR is only supported on iPhone 3GS.')
                 sys.exit(1)
             nor = device.nor_dump(saveBackup=False)
             f = open(arg, 'wb')
             f.write(nor)
             f.close()
-            print 'NOR dumped to file: %s' % arg
+            print('NOR dumped to file: %s' % arg)
 
         if opt == '--flash-nor':
-            print 'Flashing NOR from file:', arg
+            print('Flashing NOR from file:', arg)
             f = open(arg, 'rb')
             new_nor = f.read()
             f.close()
             if new_nor[:4] != 'IMG2'[::-1]:
-                print 'ERROR: Bad IMG2 header magic. This is not a valid NOR. Exiting.'
+                print('ERROR: Bad IMG2 header magic. This is not a valid NOR. Exiting.')
                 sys.exit(1)
 
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
-                print 'This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.'
+                print('This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.')
                 sys.exit(1)
             device.nor_dump(saveBackup=True)
             device.flash_nor(new_nor)
 
         if opt == '--24kpwn':
-            print '*** based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al. ***'
+            print('*** based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al. ***')
 
             device = PwnedDFUDevice()
             if device.config.version != '359.3':
-                print 'Only iPhone 3GS (old bootrom) is supported.'
+                print('Only iPhone 3GS (old bootrom) is supported.')
                 sys.exit(1)
 
             dump = device.nor_dump(saveBackup=True)
 
-            print 'Preparing modified NOR with 24Kpwn exploit.'
+            print('Preparing modified NOR with 24Kpwn exploit.')
             nor = nor.NorData(dump)
             for byte in nor.parts[1]:
                 if byte != '\x00':
-                    print 'ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.'
+                    print('ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.')
                     sys.exit(1)
             if len(nor.images) == 0:
-                print 'ERROR: 24Kpwn exploit cannot be installed, because NOR has no valid LLB. Exiting.'
+                print('ERROR: 24Kpwn exploit cannot be installed, because NOR has no valid LLB. Exiting.')
                 sys.exit(1)
 
             # Remove existing 24Kpwn exploit.
@@ -273,45 +273,45 @@ if __name__ == '__main__':
         if opt == '--remove-24kpwn':
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
-                print 'This is not a compatible device. 24Kpwn exploit is only supported on iPhone 3GS.'
+                print('This is not a compatible device. 24Kpwn exploit is only supported on iPhone 3GS.')
                 sys.exit(1)
 
-            print 'WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.'
-            raw_input("Press ENTER to continue.")
+            print('WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.')
+            input("Press ENTER to continue.")
 
             dump = device.nor_dump(saveBackup=True)
 
             nor = nor.NorData(dump)
 
             if len(nor.images) == 0:
-                print 'ERROR: NOR has no valid LLB. It seems that 24Kpwn exploit is not installed. Exiting.'
+                print('ERROR: NOR has no valid LLB. It seems that 24Kpwn exploit is not installed. Exiting.')
                 sys.exit(1)
             if len(nor.images[0]) <= 0x24000:
-                print 'ERROR: LLB is not oversized. It seems that 24Kpwn exploit is not installed. Exiting.'
+                print('ERROR: LLB is not oversized. It seems that 24Kpwn exploit is not installed. Exiting.')
                 sys.exit(1)
 
-            print 'Preparing modified NOR without 24Kpwn exploit.'
+            print('Preparing modified NOR without 24Kpwn exploit.')
             nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
             device.flash_nor(nor.dump())
 
         if opt == '--remove-alloc8':
             device = PwnedDFUDevice()
             if device.config.cpid != '8920':
-                print 'This is not a compatible device. alloc8 exploit is for iPhone 3GS only.'
+                print('This is not a compatible device. alloc8 exploit is for iPhone 3GS only.')
                 sys.exit(1)
 
-            print 'WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.'
-            raw_input("Press ENTER to continue.")
+            print('WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.')
+            input("Press ENTER to continue.")
 
             dump = device.nor_dump(saveBackup=True)
 
             nor = nor.NorData(dump)
 
             if len(nor.images) < 700:
-                print 'ERROR: It seems that alloc8 exploit is not installed. There are less than 700 images in NOR. Exiting.'
+                print('ERROR: It seems that alloc8 exploit is not installed. There are less than 700 images in NOR. Exiting.')
                 sys.exit(1)
 
-            print 'Preparing modified NOR without alloc8 exploit.'
+            print('Preparing modified NOR without alloc8 exploit.')
             new_nor = alloc8.remove_exploit(nor)
             device.flash_nor(new_nor.dump())
 
@@ -322,12 +322,12 @@ if __name__ == '__main__':
 
             if 'PWND:[checkm8]' in serial_number:
                 pwned = usbexec.PwnedUSBDevice()
-                print 'Decrypting with %s GID key.' % pwned.platform.name()
-                print pwned.aes(arg.decode('hex'), usbexec.AES_DECRYPT, usbexec.AES_GID_KEY).encode('hex')
+                print('Decrypting with %s GID key.' % pwned.platform.name())
+                print(pwned.aes(arg.decode('hex'), usbexec.AES_DECRYPT, usbexec.AES_GID_KEY).encode('hex'))
             else:
                 device = PwnedDFUDevice()
-                print 'Decrypting with S5L%s GID key.' % device.config.cpid
-                print device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
+                print('Decrypting with S5L%s GID key.' % device.config.cpid)
+                print(device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY))
 
         if opt == '--encrypt-gid':
             device = dfu.acquire_device()
@@ -336,12 +336,12 @@ if __name__ == '__main__':
 
             if 'PWND:[checkm8]' in serial_number:
                 pwned = usbexec.PwnedUSBDevice()
-                print 'Encrypting with %s GID key.' % pwned.platform.name()
-                print pwned.aes(arg.decode('hex'), usbexec.AES_ENCRYPT, usbexec.AES_GID_KEY).encode('hex')
+                print('Encrypting with %s GID key.' % pwned.platform.name())
+                print(pwned.aes(arg.decode('hex'), usbexec.AES_ENCRYPT, usbexec.AES_GID_KEY).encode('hex'))
             else:
                 device = PwnedDFUDevice()
-                print 'Encrypting with S5L%s GID key.' % device.config.cpid
-                print device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
+                print('Encrypting with S5L%s GID key.' % device.config.cpid)
+                print(device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY))
 
         if opt == '--decrypt-uid':
             device = dfu.acquire_device()
@@ -350,12 +350,12 @@ if __name__ == '__main__':
 
             if 'PWND:[checkm8]' in serial_number:
                 pwned = usbexec.PwnedUSBDevice()
-                print 'Decrypting with %s device-specific UID key.' % pwned.platform.name()
-                print pwned.aes(arg.decode('hex'), usbexec.AES_DECRYPT, usbexec.AES_UID_KEY).encode('hex')
+                print('Decrypting with %s device-specific UID key.' % pwned.platform.name())
+                print(pwned.aes(arg.decode('hex'), usbexec.AES_DECRYPT, usbexec.AES_UID_KEY).encode('hex'))
             else:
                 device = PwnedDFUDevice()
-                print 'Decrypting with device-specific UID key.'
-                print device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
+                print('Decrypting with device-specific UID key.')
+                print(device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY))
 
         if opt == '--encrypt-uid':
             device = dfu.acquire_device()
@@ -364,9 +364,9 @@ if __name__ == '__main__':
 
             if 'PWND:[checkm8]' in serial_number:
                 pwned = usbexec.PwnedUSBDevice()
-                print 'Encrypting with %s device-specific UID key.' % pwned.platform.name()
-                print pwned.aes(arg.decode('hex'), usbexec.AES_ENCRYPT, usbexec.AES_UID_KEY).encode('hex')
+                print('Encrypting with %s device-specific UID key.' % pwned.platform.name())
+                print(pwned.aes(arg.decode('hex'), usbexec.AES_ENCRYPT, usbexec.AES_UID_KEY).encode('hex'))
             else:
                 device = PwnedDFUDevice()
-                print 'Encrypting with device-specific UID key.'
-                print device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
+                print('Encrypting with device-specific UID key.')
+                print(device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY))

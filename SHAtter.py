@@ -14,22 +14,22 @@ def generate_payload():
     return header + tags + shellcode
 
 def exploit():
-    print '*** based on SHAtter exploit (segment overflow) by posixninja and pod2g ***'
+    print('*** based on SHAtter exploit (segment overflow) by posixninja and pod2g ***')
 
     device = dfu.acquire_device()
-    print 'Found:', device.serial_number
+    print('Found:', device.serial_number)
 
     if 'PWND:[' in device.serial_number:
-        print 'Device is already in pwned DFU Mode. Not executing exploit.'
+        print('Device is already in pwned DFU Mode. Not executing exploit.')
         return
 
     if 'CPID:8930' not in device.serial_number:
-        print 'ERROR: Not a compatible device. This exploit is for S5L8930 devices only. Exiting.'
+        print('ERROR: Not a compatible device. This exploit is for S5L8930 devices only. Exiting.')
         sys.exit(1)
 
     if 'SRTG:[iBoot-574.4]' not in device.serial_number:
-        print 'ERROR: CPID is compatible, but serial number string does not match.'
-        print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
+        print('ERROR: CPID is compatible, but serial number string does not match.')
+        print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
         sys.exit(1)
 
     dfu.reset_counters(device)
@@ -69,7 +69,7 @@ def exploit():
     dfu.release_device(device)
 
     if failed:
-        print 'ERROR: Exploit failed. Device did not enter pwned DFU Mode.'
+        print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
         sys.exit(1)
 
-    print 'Device is now in pwned DFU Mode.'
+    print('Device is now in pwned DFU Mode.')
