@@ -201,10 +201,10 @@ if __name__ == '__main__':
                     print(hashlib.sha1(securerom).hexdigest())
                     print('ERROR: SecureROM was dumped, but the SHA1 hash does not match. Exiting.')
                     sys.exit(1)
-                chip    = securerom[0x200:0x240].split(' ')[2][:-1]
-                kind    = securerom[0x240:0x280].split('\0')[0]
-                version = securerom[0x280:0x2C0].split('\0')[0][6:]
-                filename = 'SecureROM-%s-%s-%s.dump' % (chip, version, kind)
+                chip    = securerom[0x200:0x240].split(b' ')[2][:-1]
+                kind    = securerom[0x240:0x280].split(b'\0')[0]
+                version = securerom[0x280:0x2C0].split(b'\0')[0][6:]
+                filename = b'SecureROM-%s-%s-%s.dump' % (chip, version, kind)
                 with open(filename, 'wb') as f:
                     f.write(securerom)
                 print('Saved:', filename)
