@@ -21,11 +21,11 @@ configs = [
   ExecConfig(('SecureROM for t8015si, Copyright 2007-2016, Apple Inc.', 'ROMRELEASE',  'iBoot-3332.0.0.1.23'),   aes_crypto_cmd=0x100009E9C),
 ]
 
-EXEC_MAGIC = 'execexec'[::-1]
-DONE_MAGIC = 'donedone'[::-1]
-MEMC_MAGIC = 'memcmemc'[::-1]
-MEMS_MAGIC = 'memsmems'[::-1]
-USB_READ_LIMIT  = 0xFFFF # why does that panic T8015 ROM?
+EXEC_MAGIC = b'execexec'[::-1]
+DONE_MAGIC = b'donedone'[::-1]
+MEMC_MAGIC = b'memcmemc'[::-1]
+MEMS_MAGIC = b'memsmems'[::-1]
+USB_READ_LIMIT  = 0xFFF # why does that panic T8015 ROM?
 CMD_TIMEOUT     = 5000
 AES_BLOCK_SIZE  = 16
 AES_ENCRYPT     = 16
@@ -80,7 +80,7 @@ class PwnedUSBDevice():
     assert len(data) % AES_BLOCK_SIZE == 0
     (retval, received) = self.execute(len(data), self.config.aes_crypto_cmd, action, self.cmd_data_address(7), self.cmd_data_address(0), len(data), key, 0, 0, data)
     assert retval & 0xFFFFFFFF == 0
-    return received[:len(data)]      
+    return received[:len(data)]
 
   def read_memory(self, address, length):
     data = str()
@@ -134,7 +134,7 @@ class PwnedUSBDevice():
     device = dfu.acquire_device()
     self.serial_number = device.serial_number
     dfu.release_device(device)
- 
+
     for dp in device_platform.all_platforms:
       if self.serial_number.startswith('CPID:%04x CPRV:%02x ' % (dp.cpid, dp.cprv)):
         self.platform = dp
