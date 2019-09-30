@@ -112,7 +112,7 @@ class PwnedUSBDevice():
 
   def execute(self, response_length, *args):
     cmd = str()
-    for i in range(len(args)):
+    for i in enumerate(args):
       if isinstance(args[i], (int, long)):
         cmd += struct.pack('<%s' % self.cmd_arg_type(), args[i])
       elif isinstance(args[i], basestring) and i == len(args) - 1:
