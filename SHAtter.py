@@ -30,8 +30,8 @@ def exploit():
         sys.exit('ERROR: Not a compatible device. This exploit is for S5L8930 devices only. Exiting.')
 
     if 'SRTG:[iBoot-574.4]' not in device.serial_number:
-        print 'ERROR: CPID is compatible, but serial number string does not match.'
-        sys.exit('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
+        sys.exit('ERROR: CPID is compatible, but serial number string does not match.\n'
+                 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
 
     dfu.reset_counters(device)
     dfu.get_data(device, 0x40)
