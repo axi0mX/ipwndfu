@@ -13,9 +13,29 @@
 
 * allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
 
-* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t8002, t8004, t8010, t8011, t8015
+* current SoC support: 
+    - s5l8947x
+    - s5l8950x
+    - s5l8955x
+    - s5l8960x
+    - t8002
+    - t8004
+    - t8010
+    - t8011
+    - t8015
 
-* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7000, t7001, s7002, s8000, s8001, s8003, t8012
+* future SoC support:
+    - s5l8940x
+    - s5l8942x
+    - s5l8945x
+    - s5l8747x 
+    - t7000
+    - t7001
+    - s7002
+    - s8000
+    - s8001
+    - s8003
+    - t8012
 
 * full jailbreak with Cydia on latest iOS version is possible, but requires additional work
 
