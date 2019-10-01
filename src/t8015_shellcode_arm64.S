@@ -1,0 +1,17 @@
+.text
+
+.pool
+.set JUMP_BACK,   0x180018004
+.set WRITE_ADDR,  0x180033538
+.set WRITE_VALUE,  0x9100C484
+
+.globl _main
+_main:
+  MSR DAIFSET, #0xF
+
+  LDR X5, =WRITE_ADDR
+  LDR W6, =WRITE_VALUE
+  STR W6, [X5]
+
+  LDR X5, =JUMP_BACK
+  BR  X5

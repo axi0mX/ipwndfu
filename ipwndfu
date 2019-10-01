@@ -16,6 +16,7 @@ def print_help():
     print '  -f file\t\t\tsend file to device in DFU Mode'
     print 'Advanced options:'
     print '  --demote\t\t\tdemote device to enable JTAG'
+    print '  --boot\t\t\tboot device'
     print '  --dump=address,length\t\tdump memory to stdout'
     print '  --hexdump=address,length\thexdump memory to stdout'
     print '  --dump-rom\t\t\tdump SecureROM'
@@ -31,7 +32,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['demote', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
+        advanced = ['demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -370,3 +371,45 @@ if __name__ == '__main__':
                 device = PwnedDFUDevice()
                 print 'Encrypting with device-specific UID key.'
                 print device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
+
+        if opt == '--boot':
+            device = dfu.acquire_device()
+            serial_number = device.serial_number
+            dfu.release_device(device)
+
+            if 'CPID:8015' not in serial_number or 'PWND:[checkm8]' not in serial_number:
+                print serial_number
+                print 'ERROR: Option --boot is currently only supported on iPhone X pwned with checkm8.'
+            else:
+                HEAP_BASE         = 0x1801E8000
+                HEAP_WRITE_OFFSET = 0x5000
+                HEAP_WRITE_HASH   = 0x10000D4EC
+                HEAP_CHECK_ALL    = 0x10000DB98
+                HEAP_STATE        = 0x1800086A0
+                NAND_BOOT_JUMP    = 0x10000188C
+                BOOTSTRAP_TASK_LR = 0x180015F88
+                DFU_BOOL          = 0x1800085B0
+                DFU_NOTIFY        = 0x1000098B4
+                DFU_STATE         = 0x1800085E0
+                TRAMPOLINE        = 0x180018000
+                block1 = struct.pack('<8Q', 0, 0, 0, HEAP_STATE, 2, 132, 128, 0)
+                block2 = struct.pack('<8Q', 0, 0, 0, HEAP_STATE, 2,   8, 128, 0)
+                device = usbexec.PwnedUSBDevice()
+                device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET        , block1)
+                device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET +  0x80, block2)
+                device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET + 0x100, block2)
+                device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET + 0x180, block2)
+                device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET        )
+                device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET +  0x80)
+                device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET + 0x100)
+                device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET + 0x180)
+                device.execute(0, HEAP_CHECK_ALL)
+                print 'Heap repaired.'
+
+                device.write_memory(TRAMPOLINE, checkm8.asm_arm64_branch(TRAMPOLINE, TRAMPOLINE + 0x400))
+                device.write_memory(TRAMPOLINE + 0x400, open('bin/t8015_shellcode_arm64.bin').read())
+
+                device.write_memory_ptr(BOOTSTRAP_TASK_LR, NAND_BOOT_JUMP)
+                device.write_memory(DFU_BOOL, '\x01')
+                device.execute(0, DFU_NOTIFY, DFU_STATE)
+                print 'Booted.'
