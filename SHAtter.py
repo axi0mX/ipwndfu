@@ -14,7 +14,7 @@ def generate_payload():
     return header + tags + shellcode
 
 def exploit():
-    print '*** based on SHAtter exploit (segment overflow) by posixninja and pod2g ***'
+    print '***** based on SHAtter exploit (segment overflow) by posixninja and pod2g *****'
 
     device = dfu.acquire_device()
     print 'Found:', device.serial_number
