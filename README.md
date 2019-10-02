@@ -32,7 +32,8 @@
     - s8001
     - s8003
     - t8012
-(more support information in [Detailed Support](#Detailed-Support)
+
+*(more support information in [Detailed Support](#Detailed-Support))*
 
 *Full (Cydia-inclusive) jailbreak on any iOS version is possible, but requires additional work*
 
