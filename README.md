@@ -56,18 +56,18 @@ This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. I
 
 
 ## Detailed Support
-| SoC             | CPUID  | Name        | Supported Devices                                                      |
-|-----------------|--------|-------------|------------------------------------------------------------------------|
-| S5L8930         | 0x8930 | A4          | * iPad * iPhone 4 * iPod Touch (4th Gen) * Apple TV (2nd Gen)          |
-| S5L8947         | 0x8947 | A5 (rev. B) | * Apple TV (3rd Gen)                                                   |
-| S5L8950         | 0x8950 | A6          | * iPhone 5 * iPhone 5c                                                 |
-| S5L8955         | 0x8955 | A6X         | * iPad (4th Gen)                                                       |
-| S5L8950/S5L8965 | 0x8960 | A7          | * iPhone 5S * iPad mini 2 * iPad mini 3 * iPad Air                     |
-| T8002           | 0x8002 | S1P S2 T1   | * Apple Watch S1 * Apple Watch S2 * T1 iBridge                         |
-| T8004           | 0x8004 | S3          | * Apple Watch S3                                                       |
-| T8010           | 0x8010 | A10 Fusion  | * iPad (6th Gen) * iPad (7th Gen) * iPhone 7/7+ * iPod Touch (7th Gen) |
-| T8011           | 0x8011 | A10X Fusion | * iPad Pro (2nd Gen) * Apple TV 4K                                     |
-| T8015           | 0x8015 | A11 Bionic  | * iPhone 8/8+ * iPhone X                                               |
+| SoC                | CPUID  | Name        | Supported Devices                                                                  |
+|--------------------|--------|-------------|------------------------------------------------------------------------------------|
+| S5L8930            | 0x8930 | A4          | * iPad <br>* iPhone 4 <br>* iPod Touch (4th Gen) <br>* Apple TV (2nd Gen)          |
+| S5L8947            | 0x8947 | A5 (rev. B) | * Apple TV (3rd Gen)                                                               |
+| S5L8950            | 0x8950 | A6          | * iPhone 5 <br>* iPhone 5c                                                         |
+| S5L8955            | 0x8955 | A6X         | * iPad (4th Gen)                                                                   |
+| S5L8950<br>S5L8965 | 0x8960 | A7          | * iPhone 5S <br>* iPad mini 2 <br>* iPad mini 3 <br>* iPad Air                     |
+| T8002              | 0x8002 | S1P S2 T1   | * Apple Watch S1 <br>* Apple Watch S2 <br>* T1 iBridge                             |
+| T8004              | 0x8004 | S3          | * Apple Watch S3                                                                   |
+| T8010              | 0x8010 | A10 Fusion  | * iPad (6th Gen) <br>* iPad (7th Gen) <br>* iPhone 7/7+ <br>* iPod Touch (7th Gen) |
+| T8011              | 0x8011 | A10X Fusion | * iPad Pro (2nd Gen) <br>* Apple TV 4K                                             |
+| T8015              | 0x8015 | A11 Bionic  | * iPhone 8/8+ <br>* iPhone X                                                       |
 
 **If your device is not on this list, it is _NOT SUPPORTED_**
 Future device support is being worked on, please be patient.
