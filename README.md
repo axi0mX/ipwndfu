@@ -36,6 +36,15 @@
 *Full (Cydia-inclusive) jailbreak on any iOS version is possible, but requires additional work*
 
 
+## Dependencies
+
+This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. It won't work in a virtual machine.
+
+* libusb `If you are using Linux: install libusb using your package manager.`
+* Python 2.7 `Python 3 is NOT backwards compatible`
+* [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
+
+
 ## Quick start guide for checkm8
 
 1. Use a cable to connect device to your Mac or Linux machine. Hold buttons as needed to enter DFU Mode.
@@ -55,15 +64,6 @@
 * Dump NOR on S5L8920 devices.
 * Flash NOR on S5L8920 devices.
 * Encrypt or decrypt hex data on a connected device in pwned DFU Mode using its GID or UID key.
-
-
-## Dependencies
-
-This tool should be compatible with Mac and Linux. It won't work in a virtual machine.
-
-* libusb `If you are using Linux: install libusb using your package manager.`
-* Python 2.7 `Python 3 is NOT backwards compatible`
-* [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
 
 
 ## Tutorial
