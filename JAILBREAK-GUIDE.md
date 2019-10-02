@@ -97,7 +97,7 @@ You must answer No to create a 24Kpwn IPSW using redsn0w. If you did this correc
 
 ### Compatibility with older iOS versions
 
-Newer phones might not support some older versions of iOS. You cannot brick your phone by attempting to restore an older version of iOS, so it might be worth it to try anyway. If iTunes restore fails with Error 28, the hardware of your phone is not compatible with that version of iOS.
+Newer iPhones might not support some older versions of iOS. You cannot brick your phone by attempting to restore an older version of iOS, so it might be worth it to try anyway. If iTunes restore fails with Error 28, the hardware of your phone is not compatible with that version of iOS.
 
 | Manufactured | Error 28   | Success    |
 |--------------|------------|------------|
@@ -110,7 +110,7 @@ Newer phones might not support some older versions of iOS. You cannot brick your
 | Week 36 2011 | 3.x        | 4.0+       |
 | Week 26 2012 | 3.x, 4.x   | 5.0+       |
 
-You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me what versions worked or didn't work.
+You can find the week and year of manufacture by looking at the serial number of your phone. If your phone is from 2011 or 2012, help me expand this list and let me know what versions worked or didn't work.
 
 
 ### Decoding iPhone 3GS serial number

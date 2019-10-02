@@ -7,57 +7,86 @@
 
 ## checkm8
 
-* permanent unpatchable bootrom exploit for hundreds of millions of iOS devices
+* Permanent, unpatchable bootrom exploit for hundreds of millions of iOS devices
+* Meant for researchers, **this is not a jailbreak with Cydia yet** (see below)
+* Allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
+* current SoC support: 
+    - s5l8947x
+    - s5l8950x
+    - s5l8955x
+    - s5l8960x
+    - t8002
+    - t8004
+    - t8010
+    - t8011
+    - t8015
+* future SoC support:
+    - s5l8940x
+    - s5l8942x
+    - s5l8945x
+    - s5l8747x 
+    - t7000
+    - t7001
+    - s7002
+    - s8000
+    - s8001
+    - s8003
+    - t8012
 
-* meant for researchers, this is not a jailbreak with Cydia yet
+*(more support information in [Detailed Support](#Detailed-Support))*
 
-* allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
-
-* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t8002, t8004, t8010, t8011, t8015
-
-* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7000, t7001, s7002, s8000, s8001, s8003, t8012
-
-* full jailbreak with Cydia on latest iOS version is possible, but requires additional work
-
-
-## Quick start guide for checkm8
-
-1. Use a cable to connect device to your Mac. Hold buttons as needed to enter DFU Mode.
-
-2. First run ```./ipwndfu -p``` to exploit the device. Repeat the process if it fails, it is not reliable.
-
-3. Run ```./ipwndfu --dump-rom``` to get a dump of SecureROM.
-
-4. Run ```./ipwndfu --decrypt-gid KEYBAG``` to decrypt a keybag.
-
-5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
-
-
-## Features
-
-* Jailbreak and downgrade iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
-
-* Pwned DFU Mode with steaks4uce exploit for S5L8720 devices.
-
-* Pwned DFU Mode with limera1n exploit for S5L8920/S5L8922 devices.
-
-* Pwned DFU Mode with SHAtter exploit for S5L8930 devices.
-
-* Dump SecureROM on S5L8920/S5L8922/S5L8930 devices.
-
-* Dump NOR on S5L8920 devices.
-
-* Flash NOR on S5L8920 devices.
-
-* Encrypt or decrypt hex data on a connected device in pwned DFU Mode using its GID or UID key.
+*Full (Cydia-inclusive) jailbreak on any iOS version is possible, but requires additional work*
 
 
 ## Dependencies
 
-This tool should be compatible with Mac and Linux. It won't work in a virtual machine.
+This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. It won't work in a virtual machine.
 
-* libusb, `If you are using Linux: install libusb using your package manager.`
+* libusb `If you are using Linux: install libusb using your package manager.`
+* Python 2.7 `Python 3 is NOT backwards compatible`
 * [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
+
+
+## Quick start guide for checkm8
+
+1. Use a cable to connect device to your Mac or Linux machine. Hold buttons as needed to enter DFU Mode.
+2. First run ```./ipwndfu -p``` to exploit the device. Repeat the process if it fails, **it is not reliable**.
+3. Run ```./ipwndfu --dump-rom``` to get a dump of SecureROM.
+4. Run ```./ipwndfu --decrypt-gid KEYBAG``` to decrypt a keybag.
+5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
+
+
+## Detailed-Support
+
+This table lists all currently supported devices for the checkm8 exploit:
+
+| SoC                | CPUID  | Name        | Supported Devices                                                                  |
+|--------------------|--------|-------------|------------------------------------------------------------------------------------|
+| S5L8930            | 0x8930 | A4          | * iPad <br>* iPhone 4 <br>* iPod Touch (4th Gen) <br>* Apple TV (2nd Gen)          |
+| S5L8947            | 0x8947 | A5 (rev. B) | * Apple TV (3rd Gen)                                                               |
+| S5L8950            | 0x8950 | A6          | * iPhone 5 <br>* iPhone 5c                                                         |
+| S5L8955            | 0x8955 | A6X         | * iPad (4th Gen)                                                                   |
+| S5L8950<br>S5L8965 | 0x8960 | A7          | * iPhone 5S <br>* iPad mini 2 <br>* iPad mini 3 <br>* iPad Air                     |
+| T8002              | 0x8002 | S1P S2 T1   | * Apple Watch S1 <br>* Apple Watch S2 <br>* T1 iBridge                             |
+| T8004              | 0x8004 | S3          | * Apple Watch S3                                                                   |
+| T8010              | 0x8010 | A10 Fusion  | * iPad (6th Gen) <br>* iPad (7th Gen) <br>* iPhone 7/7+ <br>* iPod Touch (7th Gen) |
+| T8011              | 0x8011 | A10X Fusion | * iPad Pro (2nd Gen) <br>* Apple TV 4K                                             |
+| T8015              | 0x8015 | A11 Bionic  | * iPhone 8/8+ <br>* iPhone X                                                       |
+
+**If your device is not on this list, it is _NOT SUPPORTED_**
+Future device support is being worked on, please be patient. 
+If you have a device older than the iPhone 3GS (the iPhone 3G or original) or newer than the iPhone X (all A12 and A13 devices), this tool will *not* support your device. Not now, most likely not ever.
+
+## Features
+
+* Jailbreak and downgrade iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
+* Pwned DFU Mode with steaks4uce exploit for S5L8720 devices.
+* Pwned DFU Mode with limera1n exploit for S5L8920/S5L8922 devices.
+* Pwned DFU Mode with SHAtter exploit for S5L8930 devices.
+* Dump SecureROM on S5L8920/S5L8922/S5L8930 devices.
+* Dump NOR on S5L8920 devices.
+* Flash NOR on S5L8920 devices.
+* Encrypt or decrypt hex data on a connected device in pwned DFU Mode using its GID or UID key.
 
 
 ## Tutorial
@@ -67,34 +96,24 @@ This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without
 
 ## Exploit write-up
 
-Write-up for alloc8 exploit can be found here:
-
-https://github.com/axi0mX/alloc8
+Write-up for alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8)
 
 
 ## iBSS
 
-Download iPhone 3GS iOS 4.3.5 IPSW from Apple:
-
-http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw
-
-In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
-
-```
-unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
-```
+* Download [iPhone 3GS iOS 4.3.5 IPSW](http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw) from Apple
+* In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
+   ```
+   unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
+   ```
 
 
 ## Coming soon!
 
 * Reorganize and refactor code.
-
 * Easier setup: download iBSS automatically using partial zip.
-
 * Dump SecureROM on S5L8720 devices.
-
 * Install custom boot logos on devices jailbroken with 24Kpwn and alloc8.
-
 * Enable verbose boot on devices jailbroken with 24Kpwn and alloc8.
 
 ## Disclaimer
