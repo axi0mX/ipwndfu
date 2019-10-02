@@ -38,14 +38,10 @@
 
 ## Quick start guide for checkm8
 
-1. Use a cable to connect device to your Mac. Hold buttons as needed to enter DFU Mode.
-
-2. First run ```./ipwndfu -p``` to exploit the device. Repeat the process if it fails, it is not reliable.
-
+1. Use a cable to connect device to your Mac or Linux machine. Hold buttons as needed to enter DFU Mode.
+2. First run ```./ipwndfu -p``` to exploit the device. Repeat the process if it fails, **it is not reliable**.
 3. Run ```./ipwndfu --dump-rom``` to get a dump of SecureROM.
-
 4. Run ```./ipwndfu --decrypt-gid KEYBAG``` to decrypt a keybag.
-
 5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
 
 
@@ -84,10 +80,9 @@ Write-up for alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8
 
 * Download [iPhone 3GS iOS 4.3.5 IPSW](http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw) from Apple
 * In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
-
-```
-unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
-```
+   ```
+   unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
+   ```
 
 
 ## Coming soon!
