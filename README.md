@@ -32,7 +32,7 @@
     - s8001
     - s8003
     - t8012
-*(more support information in [Detailed Support](#Detailed Support)*
+(more support information in [Detailed Support](#Detailed-Support)
 
 *Full (Cydia-inclusive) jailbreak on any iOS version is possible, but requires additional work*
 
@@ -55,7 +55,7 @@ This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. I
 5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
 
 
-## Detailed Support
+## Detailed-Support
 | SoC                | CPUID  | Name        | Supported Devices                                                                  |
 |--------------------|--------|-------------|------------------------------------------------------------------------------------|
 | S5L8930            | 0x8930 | A4          | * iPad <br>* iPhone 4 <br>* iPod Touch (4th Gen) <br>* Apple TV (2nd Gen)          |
