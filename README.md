@@ -7,12 +7,9 @@
 
 ## checkm8
 
-* permanent unpatchable bootrom exploit for hundreds of millions of iOS devices
-
-* meant for researchers, this is not a jailbreak with Cydia yet
-
-* allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
-
+* Permanent, unpatchable bootrom exploit for hundreds of millions of iOS devices
+* Meant for researchers, **this is not a jailbreak with Cydia yet** (see below)
+* Allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
 * current SoC support: 
     - s5l8947x
     - s5l8950x
@@ -23,7 +20,6 @@
     - t8010
     - t8011
     - t8015
-
 * future SoC support:
     - s5l8940x
     - s5l8942x
@@ -36,8 +32,8 @@
     - s8001
     - s8003
     - t8012
-
-* full jailbreak with Cydia on latest iOS version is possible, but requires additional work
+    
+*Full (Cydia-inclusive) jailbreak on any iOS version is possible, but requires additional work*
 
 
 ## Quick start guide for checkm8
@@ -56,19 +52,12 @@
 ## Features
 
 * Jailbreak and downgrade iPhone 3GS (new bootrom) with alloc8 untethered bootrom exploit. :-)
-
 * Pwned DFU Mode with steaks4uce exploit for S5L8720 devices.
-
 * Pwned DFU Mode with limera1n exploit for S5L8920/S5L8922 devices.
-
 * Pwned DFU Mode with SHAtter exploit for S5L8930 devices.
-
 * Dump SecureROM on S5L8920/S5L8922/S5L8930 devices.
-
 * Dump NOR on S5L8920 devices.
-
 * Flash NOR on S5L8920 devices.
-
 * Encrypt or decrypt hex data on a connected device in pwned DFU Mode using its GID or UID key.
 
 
@@ -88,18 +77,13 @@ This tool can be used to downgrade or jailbreak iPhone 3GS (new bootrom) without
 
 ## Exploit write-up
 
-Write-up for alloc8 exploit can be found here:
-
-https://github.com/axi0mX/alloc8
+Write-up for alloc8 exploit can be found [here](https://github.com/axi0mX/alloc8)
 
 
 ## iBSS
 
-Download iPhone 3GS iOS 4.3.5 IPSW from Apple:
-
-http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw
-
-In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
+* Download [iPhone 3GS iOS 4.3.5 IPSW](http://appldnld.apple.com/iPhone4/041-1965.20110721.gxUB5/iPhone2,1_4.3.5_8L1_Restore.ipsw) from Apple
+* In Terminal, extract iBSS using the following command, then move the file to ipwndfu folder:
 
 ```
 unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3
@@ -109,13 +93,9 @@ unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > 
 ## Coming soon!
 
 * Reorganize and refactor code.
-
 * Easier setup: download iBSS automatically using partial zip.
-
 * Dump SecureROM on S5L8720 devices.
-
 * Install custom boot logos on devices jailbroken with 24Kpwn and alloc8.
-
 * Enable verbose boot on devices jailbroken with 24Kpwn and alloc8.
 
 ## Disclaimer
