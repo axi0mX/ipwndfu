@@ -57,6 +57,8 @@ This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. I
 
 
 ## Detailed-Support
+
+This table lists all currently supported devices for the checkm8 exploit:
 | SoC                | CPUID  | Name        | Supported Devices                                                                  |
 |--------------------|--------|-------------|------------------------------------------------------------------------------------|
 | S5L8930            | 0x8930 | A4          | * iPad <br>* iPhone 4 <br>* iPod Touch (4th Gen) <br>* Apple TV (2nd Gen)          |
@@ -71,7 +73,8 @@ This tool is compatible with macOS and Linux **[NO WINDOWS SUPPORT FOR NOW]**. I
 | T8015              | 0x8015 | A11 Bionic  | * iPhone 8/8+ <br>* iPhone X                                                       |
 
 **If your device is not on this list, it is _NOT SUPPORTED_**
-Future device support is being worked on, please be patient.
+Future device support is being worked on, please be patient. 
+If you have a device older than the iPhone 3GS (the iPhone 3G or original) or newer than the iPhone X (all A12 and A13 devices), this tool will *not* support your device. Not now, most likely not ever.
 
 ## Features
 
