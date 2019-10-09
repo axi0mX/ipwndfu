@@ -513,3 +513,6 @@ def exploit():
   print 'Device is now in pwned DFU Mode.'
   print '(%0.2f seconds)' % (time.time() - start)
   dfu.release_device(device)
+./ipwndfu -p 
+./ipwndfu --dump-rom
+$ ./impwndfu -x
