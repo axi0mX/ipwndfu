@@ -14,6 +14,7 @@ def print_help():
     print '  -p\t\t\t\tUSB exploit for pwned DFU Mode'
     print '  -x\t\t\t\tinstall alloc8 exploit to NOR'
     print '  -f file\t\t\tsend file to device in DFU Mode'
+    print '  -i\t\t\t\tidentify all connected devices'
     print 'Advanced options:'
     print '  --demote\t\t\tdemote device to enable JTAG'
     print '  --boot\t\t\tboot device'
@@ -33,7 +34,7 @@ def print_help():
 if __name__ == '__main__':
     try:
         advanced = ['demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
-        opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
+        opts, args = getopt.getopt(sys.argv[1:], 'pxf:i', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
         print_help()
@@ -123,6 +124,15 @@ if __name__ == '__main__':
             dfu.send_data(device, data)
             dfu.request_image_validation(device)
             dfu.release_device(device)
+
+        if opt == '-i':
+            start_time = time.time()
+            devices = dfu.acquire_all_devices()
+            end_time = time.time()
+
+            print 'Found %d devices (%.2fs).' % (len(devices), (end_time - start_time))
+            for dev in devices:
+                print '  (0x%X) Serial Number: %s' % (dev.idProduct, dev.serial_number)
 
         if opt == '--demote':
             device = dfu.acquire_device()

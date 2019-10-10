@@ -5,23 +5,46 @@ import libusbfinder
 
 MAX_PACKET_SIZE = 0x800
 
-def acquire_device(timeout=5.0, match=None, fatal=True):
-  backend = usb.backend.libusb1.get_backend(find_library=lambda x:libusbfinder.libusb1_path())
-  #print 'Acquiring device handle.'
-  # Keep retrying for up to timeout seconds if device is not found.
-  start = time.time()
-  once = False
-  while not once or time.time() - start < timeout:
-      once = True
-      for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
-          if match is not None and match not in device.serial_number:
-              continue
-          return device
-      time.sleep(0.001)
-  if fatal:
-      print 'ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout
-      sys.exit(1)
-  return None
+backend = usb.backend.libusb1.get_backend(find_library=lambda x:libusbfinder.libusb1_path())
+
+def acquire_device(retry=True, timeout=5.0, match=None, fatal=True):
+    #print 'Acquiring device handle.'
+    # Keep retrying for up to timeout seconds if device is not found.
+    start = time.time()
+    once = False
+    while not once or time.time() - start < timeout:
+        once = True
+        for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
+            if device is not None:
+                if match is not None and match not in device.serial_number:
+                    continue
+                return device
+        if not retry:
+            return None
+        time.sleep(0.001)
+    if fatal:
+        print 'ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout
+        sys.exit(1)
+    return None
+
+def acquire_all_devices():
+    def _is_mobile(device):
+        try:
+            for cfg in device:
+                iprod = usb.util.get_string(device, device.iProduct)
+                icfg = usb.util.get_string(device, cfg.iConfiguration)
+                if "Mobile" in icfg or "PTP" in icfg:
+                    device.set_configuration(cfg)
+                    return True
+                return False
+        except TypeError: return False
+
+    devices = []
+    for device in usb.core.find(find_all=True, idVendor=0x5AC, backend=backend):
+        if _is_mobile(device):
+            devices.append(device)
+
+    return devices
 
 def release_device(device):
     #print 'Releasing device handle.'
