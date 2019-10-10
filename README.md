@@ -2,7 +2,7 @@
 # Open-source jailbreaking tool for many iOS devices
 
 
-**Read [disclaimer](#disclaimer) before using this software.*
+**Read [disclaimer](#disclaimer) before using this software.**
 
 
 ## checkm8
