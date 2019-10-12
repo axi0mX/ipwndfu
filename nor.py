@@ -1,7 +1,5 @@
 import binascii, struct
-
 NOR_SIZE = 0x100000
-
 class NorData():
     def __init__(self, dump):
         assert len(dump) == NOR_SIZE
