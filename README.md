@@ -4,6 +4,37 @@
 
 **Read [disclaimer](#disclaimer) before using this software.*
 
+## About this fork
+
+- supports loading of unsigned images.<br>
+- supports debugging of images.<br>
+- supports T8015 (iPhoneX) and ONLY iPhoneX.<br>
+
+## Please use at your own risk!
+
+## Usage
+***loading unsigned images***<br>
+```
+$ ./ipwndfu -p
+$ ./ipwndfu --patch
+Now issue an abort to the device, for  example:
+$ ./idevicerestore /folder_with_extracted_ipsw
+Now (assuming you replaced the ibss and the ibec under /firmware/dfu with a patched one):
+$ ./idevicerestore /folder_with_extracted_ipsw
+and it should restore and load..
+```
+***debugging images***<br>
+```
+$ ./ipwndfu -p
+$ ./ipwndfu --demote
+$ ./ipwndfu --patch
+Now issue an abort to the device, for  example:
+$ ./idevicerestore /folder_with_extracted_ipsw
+Now (it dont matter signed or not):
+$ ./idevicerestore /folder_with_extracted_ipsw
+you should see that ibss never finish.
+open the debugger and you'll see you already at the ibss..
+```
 
 ## checkm8
 
