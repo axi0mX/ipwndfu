@@ -9,15 +9,15 @@
 
 * permanent unpatchable bootrom exploit for hundreds of millions of iOS devices
 
-* meant for researchers, this is not a jailbreak with Cydia yet
+* meant for researchers first and foremost. ~~this is not a jailbreak with Cydia yet~~ A jailbreak exists now, but can be unstable and unpredictable. Use at your own risk.
 
 * allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
 
-* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t8002, t8004, t8010, t8011, t8015
+* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t8002, t8004, t8010, t8011, t8015, s8003
 
-* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7000, t7001, s7002, s8000, s8001, s8003, t8012
+* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7000, t7001, s7002, s8000, s8001, t8012
 
-* full jailbreak with Cydia on latest iOS version is possible, but requires additional work
+* full jailbreak with Cydia on latest iOS version is possible, but requires additional work and can be unpredictable 
 
 
 ## Quick start guide for checkm8
@@ -31,6 +31,14 @@
 4. Run ```./ipwndfu --decrypt-gid KEYBAG``` to decrypt a keybag.
 
 5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
+
+## Checkra1n
+
+https://www.checkrain.com/
+
+(Enter the above website on a supported device. (Ex. iPhone 6s or iPhone 6s Plus)
+
+Video Link: https://youtu.be/7BFp99jPm74
 
 
 ## Features
