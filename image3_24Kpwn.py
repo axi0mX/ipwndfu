@@ -3,6 +3,11 @@
 import struct
 import image3
 
+try:
+    xrange  # Python 2
+except NameError:
+    xrange = range  # Python 3
+
 def exploit(img3, securerom):
     with open('bin/24Kpwn-shellcode.bin', 'rb') as f:
         shellcode = f.read()

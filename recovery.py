@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys, time
 import usb # pyusb: use 'pip install pyusb' to install this module
 import usb.backend.libusb1
@@ -16,7 +17,7 @@ def acquire_device(timeout=10):
             return device
         sys.stdout.flush()
         time.sleep(0.1)
-    print 'ERROR: No Apple device in Recovery Mode 0x1281 detected. Exiting.'
+    print('ERROR: No Apple device in Recovery Mode 0x1281 detected. Exiting.')
     sys.exit(1)
 
 def release_device(device):

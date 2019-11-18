@@ -41,10 +41,9 @@ assert sys.hexversion >= 0x020400f0
 
 # On Python 3, reduce became a functools module function
 try:
-    import functools
-    _reduce = functools.reduce
-except (ImportError, AttributeError):
-    _reduce = reduce
+    _reduce = reduce  # Python 2
+except NameError:
+    from functools import reduce as _reduce
 
 # all, introduced in Python 2.5
 try:

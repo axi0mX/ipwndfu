@@ -1,5 +1,13 @@
+from __future__ import print_function
 import struct, sys
 import dfu, device_platform
+
+try:
+  basestring  # Python 2
+  long
+except NameError:
+  basestring = str  # Python 3
+  long = int
 
 class ExecConfig:
   def __init__(self, info, aes_crypto_cmd):
@@ -80,7 +88,7 @@ class PwnedUSBDevice():
     assert len(data) % AES_BLOCK_SIZE == 0
     (retval, received) = self.execute(len(data), self.config.aes_crypto_cmd, action, self.cmd_data_address(7), self.cmd_data_address(0), len(data), key, 0, 0, data)
     assert retval & 0xFFFFFFFF == 0
-    return received[:len(data)]      
+    return received[:len(data)]
 
   def read_memory(self, address, length):
     data = str()
@@ -118,7 +126,7 @@ class PwnedUSBDevice():
       elif isinstance(args[i], basestring) and i == len(args) - 1:
         cmd += args[i]
       else:
-        print 'ERROR: usbexec.execute: invalid argument at position %s' % i
+        print('ERROR: usbexec.execute: invalid argument at position %s' % i)
         sys.exit(1)
       if i == 0 and self.platform.arch != 'arm64':
         cmd += '\0' * 4
@@ -134,14 +142,14 @@ class PwnedUSBDevice():
     device = dfu.acquire_device()
     self.serial_number = device.serial_number
     dfu.release_device(device)
- 
+
     for dp in device_platform.all_platforms:
       if self.serial_number.startswith('CPID:%04x CPRV:%02x ' % (dp.cpid, dp.cprv)):
         self.platform = dp
         break
     if self.platform is None:
-      print self.serial_number
-      print 'ERROR: No matching usbexec.platform found for this device.'
+      print(self.serial_number)
+      print('ERROR: No matching usbexec.platform found for this device.')
       sys.exit(1)
 
     info = self.read_memory(self.image_base() + 0x200, 0x100)
@@ -150,6 +158,6 @@ class PwnedUSBDevice():
         self.config = config
         break
     if self.config is None:
-      print info
-      print 'ERROR: No matching usbexec.config found for this image.'
+      print(info)
+      print('ERROR: No matching usbexec.config found for this image.')
       sys.exit(1)
