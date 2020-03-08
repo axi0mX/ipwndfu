@@ -1,6 +1,8 @@
 .text
 
 .pool
+// These values are placeholders that are replaced in the payload
+//  before it is sent to the processor.  They are arbitrary.
 .set PAYLOAD_OFFSET,               0xBAD00006
 .set PAYLOAD_SIZE,                 0xBAD00007
 .set PAYLOAD_DEST,                 0xBAD00005
@@ -76,6 +78,21 @@ copy_loop:
 
   LDP  X29, X30, [SP],#0x10
   RET
+
+// The USB descriptor is a series of 32 bit little-endian words that is directly parsed
+//  by the USB host.  More can be understood from reading the USB specification for each
+//  descriptor type.  This is encoded from:
+//
+// A USB configuration descriptor
+//   0902190001010580FA
+//
+// A USB interface descriptor
+//   0904000000FE010000
+//
+// A USB HID descriptor for a nil device
+//   0721010A000008
+//
+// The remainder is filled with zeros to alignment
 
 USB_DESCRIPTOR:
 .word 0x190209, 0x80050101, 0x409fa, 0x1fe0000, 0x21070000, 0xa01, 0x8, 0x0
