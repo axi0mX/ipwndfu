@@ -536,7 +536,7 @@ def exploit():
   libusb1_no_error_ctrl_transfer(device, 0x21, 4, 0, 0, 0, 0)
   dfu.release_device(device)
 
-  time.sleep(0.5)
+  time.sleep(0.8)
 
   device = dfu.acquire_device()
   usb_req_stall(device)
