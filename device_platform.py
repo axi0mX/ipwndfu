@@ -39,7 +39,7 @@ class DevicePlatform:
       self.dfu_load_base       = 0x800000000
       self.recovery_image_base = 0x1800B0000
       self.recovery_load_base  = 0x800000000
-    if self.cpid in [0x8015]:
+    if self.cpid in [0x8012, 0x8015]:
       self.dfu_image_base      = 0x18001C000
       self.dfu_load_base       = 0x800000000
       self.recovery_image_base = 0x18001C000
@@ -109,6 +109,13 @@ all_platforms = [
     dram_base=0x800000000,
     nonce_length=32, sep_nonce_length=20,
     demotion_reg=0x2102BC000,
+  ),
+  DevicePlatform(cpid=0x8012, cprv=0x10, scep=0x01, arch='arm64', srtg='iBoot-3401.0.0.1.16',
+    rom_base=0x100000000, rom_size=0x100000, rom_sha1='68be532dea4cc05b393ef5f49962aef3f99d629d',
+    sram_base=0x180000000, sram_size=0x200000,
+    dram_base=0x800000000,
+    nonce_length=32, sep_nonce_length=20,
+    demotion_reg=0x2112BC000,
   ),
   DevicePlatform(cpid=0x8015, cprv=0x11, scep=0x01, arch='arm64', srtg='iBoot-3332.0.0.1.23',
     rom_base=0x100000000, rom_size=0x100000, rom_sha1='96fccb1a63de1a2d50ff14555d3898a5af46e9b1',
