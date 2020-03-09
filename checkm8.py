@@ -489,7 +489,7 @@ def all_exploit_configs():
     DeviceConfig('iBoot-2651.0.0.3.3',    0x8004, None,    t800x_overwrite,    5,    1), # T8004 (buttons)   NEW: 1.06 seconds
     DeviceConfig('iBoot-2696.0.0.1.33',   0x8010, None,    t8010_overwrite,    5,    1), # T8010 (buttons)   NEW: 0.68 seconds
     DeviceConfig('iBoot-3135.0.0.2.3',    0x8011, None,    t8011_overwrite,    6,    1), # T8011 (buttons)   NEW: 0.87 seconds
-    DeviceConfig('iBoot-3401.0.0.1.16', 0x8012, None, t8012_overwrite, 6, 1),
+    DeviceConfig('iBoot-3401.0.0.1.16',   0x8012, None,    t8012_overwrite,    6,    1),
     DeviceConfig('iBoot-3332.0.0.1.23',   0x8015, None,    t8015_overwrite,    6,    1), # T8015 (DFU loop)  NEW: 0.66 seconds
   ]
 
