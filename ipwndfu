@@ -4,7 +4,7 @@
 
 import binascii, datetime, getopt, hashlib, struct, sys, time
 import dfu, nor, utilities
-import alloc8, checkm8, image3_24Kpwn, limera1n, SHAtter, steaks4uce, usbexec
+import alloc8, checkm8, image3_24Kpwn, limera1n, SHAtter, steaks4uce, usbexec, t8012_heap_fix
 from dfuexec import *
 
 def print_help():
@@ -73,6 +73,9 @@ if __name__ == '__main__':
                 checkm8.exploit()
             elif 'CPID:8011' in serial_number:
                 checkm8.exploit()
+            elif 'CPID:8012' in serial_number:
+                checkm8.exploit()
+                t8012_heap_fix.fix_heap()
             elif 'CPID:8015' in serial_number:
                 checkm8.exploit()
             else:
