@@ -1,6 +1,6 @@
 ![](repo/ipwndfu.png)
 # Open-source jailbreaking tool for many iOS devices
-
+# Cause there's no such thing as Good Silicon. Only Bad tests.
 
 **Read [disclaimer](#disclaimer) before using this software.*
 
