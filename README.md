@@ -4,6 +4,12 @@
 
 **Read [disclaimer](#disclaimer) before using this software.*
 
+## About this fork
+
+This fork only supports the t8012 chip. It is based on 
+[LinusHenze's ipwndfu patches](https://github.com/LinusHenze/ipwndfu_public), which allow it to boot iBoot without
+destroying the heap. A simple patch that allows you to boot any extracted iBoot image (without the img4 wrapper) is
+provided in `nop_image4.py`, which was based on LinusHenze's `rmsigchks.py`.
 
 ## checkm8
 
@@ -131,3 +137,5 @@ chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al. for 24Kp
 pod2g for steaks4uce exploit
 
 walac for pyusb
+
+checkra1n team, littlelailo for the idea of just removing the call to image4_load
