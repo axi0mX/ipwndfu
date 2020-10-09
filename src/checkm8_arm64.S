@@ -18,15 +18,16 @@ _main:
   STP  X29, X30, [SP,#-0x10]!
   MOV  X29, SP
 
+  # Do not set USB Descriptors anymore, this will cause a crash on t8011 (and maybe others)
   LDR  X0, =gUSBDescriptors
   LDP  X0, X1, [X0]
   ADR  X2, USB_DESCRIPTOR
   LDP  X3, X4, [X2]
-  STP  X3, X4, [X0]
-  STP  X3, X4, [X1]
+  //STP  X3, X4, [X0]
+  //STP  X3, X4, [X1]
   LDP  X3, X4, [X2,#0x10]
-  STP  X3, X4, [X0,#0x10]
-  STP  X3, X4, [X1,#0x10]
+  //STP  X3, X4, [X0,#0x10]
+  //STP  X3, X4, [X1,#0x10]
 
   LDR  X0, =gUSBSerialNumber
 find_zero_loop:
@@ -49,11 +50,16 @@ find_zero_loop:
   ADR  X1, _main
   LDR  X2, =PAYLOAD_OFFSET
   ADD  X1, X1, X2
-  MOV  X2, #0
   LDR  X3, =PAYLOAD_SIZE
   LDR  X4, =PAYLOAD_PTR
   ADD  X5, X0, #0x18
+  MOV  X2, #0x002000000
+  SUB  X5, X5, X2
   STR  X5, [X4]
+  MOV  X2, #0
+
+  MOV  X2, #0x004000000
+  SUB  X0, X0, X2
 
 copy_loop:
   LDP  X3, X4,  [X1]
