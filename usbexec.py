@@ -1,4 +1,4 @@
-import struct, sys
+import platform, struct, sys
 import dfu, device_platform
 
 class ExecConfig:
@@ -19,19 +19,23 @@ configs = [
   ExecConfig(('SecureROM for t8010si, Copyright 2007-2015, Apple Inc.', 'ROMRELEASE',  'iBoot-2696.0.0.1.33'),   aes_crypto_cmd=0x10000C8F4),
   ExecConfig(('SecureROM for t8011si, Copyright 2007-2015, Apple Inc.', 'ROMRELEASE',  'iBoot-3135.0.0.2.3'),    aes_crypto_cmd=0x10000C994),
   ExecConfig(('SecureROM for t8015si, Copyright 2007-2016, Apple Inc.', 'ROMRELEASE',  'iBoot-3332.0.0.1.23'),   aes_crypto_cmd=0x100009E9C),
+  ExecConfig(('SecureROM for t8012si, Copyright 2007-2016, Apple Inc.', 'ROMRELEASE',  'iBoot-3401.0.0.1.16'),   aes_crypto_cmd=0x1000082AC),
 ]
 
 EXEC_MAGIC = 'execexec'[::-1]
 DONE_MAGIC = 'donedone'[::-1]
 MEMC_MAGIC = 'memcmemc'[::-1]
 MEMS_MAGIC = 'memsmems'[::-1]
-USB_READ_LIMIT  = 0x8000
-CMD_TIMEOUT     = 5000
-AES_BLOCK_SIZE  = 16
-AES_ENCRYPT     = 16
-AES_DECRYPT     = 17
-AES_GID_KEY     = 0x20000200
-AES_UID_KEY     = 0x20000201
+if platform.system() == 'Linux':
+  USB_READ_LIMIT  = 0xFFF
+else:
+  USB_READ_LIMIT  = 0x8000
+CMD_TIMEOUT       = 5000
+AES_BLOCK_SIZE    = 16
+AES_ENCRYPT       = 16
+AES_DECRYPT       = 17
+AES_GID_KEY       = 0x20000200
+AES_UID_KEY       = 0x20000201
 
 class PwnedUSBDevice():
   def memset(self, address, c, length):          self.command(self.cmd_memset(address, c, length), 0)
