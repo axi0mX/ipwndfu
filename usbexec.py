@@ -42,12 +42,13 @@ class PwnedUSBDevice():
   def read_memory_uint32(self, address):         return struct.unpack('<I', self.read_memory(address, 4))[0]
   def read_memory_uint64(self, address):         return struct.unpack('<Q', self.read_memory(address, 8))[0]
   def write_memory(self, address, data):         self.command(self.cmd_memcpy(address, self.cmd_data_address(3), len(data)) + data, 0)
+/Users/franklineck/Documents/GitHub/ipwndfu/steaks4uce.py
   def write_memory_ptr(self, address, value):    self.write_memory(address, struct.pack('<%s' % self.cmd_arg_type(), value))
-  def write_memory_uint8(self, address, value):  self.write_memory(address, struct.pack('<B', value))
+  def write_memory_uint8(self, address, value):  self.write_memory(address, struct.pack('<B', value))/Users/franklineck/Documents/GitHub/ipwndfu/recovery.py
   def write_memory_uint16(self, address, value): self.write_memory(address, struct.pack('<H', value))
-  def write_memory_uint32(self, address, value): self.write_memory(address, struct.pack('<I', value))
+  def write_memory_uint32(self, address, value): self.write_memory(address, struct.pack('<I', value))/Users/franklineck/Documents/GitHub/ipwndfu/usb/_debug.py
   def write_memory_uint64(self, address, value): self.write_memory(address, struct.pack('<Q', value))
-  def cmd_arg_type(self):                        return 'Q' if self.platform.arch == 'arm64' else 'I'
+  def cmd_arg_type(self):                        return 'Q' if /Users/franklineck/Documents/GitHub/ipwndfu/limera1n.pyself.platform.arch == 'arm64' else 'I'
   def cmd_arg_size(self):                        return 8 if self.platform.arch == 'arm64' else 4
   def cmd_data_offset(self, index):              return 16 + index * self.cmd_arg_size()
   def cmd_data_address(self, index):             return self.load_base() + self.cmd_data_offset(index)
