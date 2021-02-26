@@ -29,7 +29,8 @@ class NorData():
             self.images.append(self.parts[3][offset:offset + size])
             offset += size
 
-    def dump(self):
+    def
+    (self):
         # Replace self.parts[3] with content of self.images
         all_images = ''.join(self.images)
         all_images += '\xff' * (self.firmware_length - len(all_images))
