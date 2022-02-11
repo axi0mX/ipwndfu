@@ -45,9 +45,9 @@ get_string - retrieve a string descriptor from the device.
 
 __author__ = 'Wander Lairson Costa'
 
-import operator
 import array
 from sys import hexversion
+
 import usb._interop as _interop
 
 # descriptor type
@@ -98,6 +98,7 @@ SPEED_HIGH = 3
 SPEED_SUPER = 4
 SPEED_UNKNOWN = 0
 
+
 def endpoint_address(address):
     r"""Return the endpoint absolute address.
 
@@ -105,6 +106,7 @@ def endpoint_address(address):
     of the endpoint descriptor.
     """
     return address & _ENDPOINT_ADDR_MASK
+
 
 def endpoint_direction(address):
     r"""Return the endpoint direction.
@@ -114,6 +116,7 @@ def endpoint_direction(address):
     The possible return values are ENDPOINT_OUT or ENDPOINT_IN.
     """
     return address & _ENDPOINT_DIR_MASK
+
 
 def endpoint_type(bmAttributes):
     r"""Return the transfer type of the endpoint.
@@ -125,6 +128,7 @@ def endpoint_type(bmAttributes):
     """
     return bmAttributes & _ENDPOINT_TRANSFER_TYPE_MASK
 
+
 def ctrl_direction(bmRequestType):
     r"""Return the direction of a control request.
 
@@ -133,6 +137,7 @@ def ctrl_direction(bmRequestType):
     The possible return values are CTRL_OUT or CTRL_IN.
     """
     return bmRequestType & _CTRL_DIR_MASK
+
 
 def build_request_type(direction, type, recipient):
     r"""Build a bmRequestType field for control requests.
@@ -150,6 +155,7 @@ def build_request_type(direction, type, recipient):
     """
     return recipient | type | direction
 
+
 def create_buffer(length):
     r"""Create a buffer to be passed to a read function.
 
@@ -160,6 +166,7 @@ def create_buffer(length):
     of the given length.
     """
     return array.array('B', _dummy_s * length)
+
 
 def find_descriptor(desc, find_all=False, custom_match=None, **args):
     r"""Find an inner descriptor.
@@ -177,6 +184,7 @@ def find_descriptor(desc, find_all=False, custom_match=None, **args):
     find_descriptor function also accepts the find_all parameter to get
     an iterator instead of just one descriptor.
     """
+
     def desc_iter(**kwargs):
         for d in desc:
             tests = (val == getattr(d, key) for key, val in list(kwargs.items()))
@@ -191,6 +199,7 @@ def find_descriptor(desc, find_all=False, custom_match=None, **args):
         except StopIteration:
             return None
 
+
 def claim_interface(device, interface):
     r"""Explicitly claim an interface.
 
@@ -204,6 +213,7 @@ def claim_interface(device, interface):
     """
     device._ctx.managed_claim_interface(device, interface)
 
+
 def release_interface(device, interface):
     r"""Explicitly release an interface.
 
@@ -215,6 +225,7 @@ def release_interface(device, interface):
     the device object takes care of it automatically.
     """
     device._ctx.managed_release_interface(device, interface)
+
 
 def dispose_resources(device):
     r"""Release internal resources allocated by the object.
@@ -231,6 +242,7 @@ def dispose_resources(device):
     will be allocated automatically.
     """
     device._ctx.dispose(device)
+
 
 def get_langids(dev):
     r"""Retrieve the list of supported Language IDs from the device.
@@ -262,11 +274,11 @@ def get_langids(dev):
     """
     from usb.control import get_descriptor
     buf = get_descriptor(
-                dev,
-                254,
-                DESC_TYPE_STRING,
-                0
-            )
+        dev,
+        254,
+        DESC_TYPE_STRING,
+        0
+    )
 
     # The array is retrieved by asking for string descriptor zero, which is
     # never the index of a real string. The returned descriptor has bLength
@@ -277,12 +289,13 @@ def get_langids(dev):
     # all the LANGIDs are given by buf[2:buf[0]:2] and MSBs by buf[3:buf[0]:2].
     # If the length of buf came back odd, something is wrong.
 
-    if len(buf) < 4 or buf[0] < 4 or buf[0]&1 != 0:
+    if len(buf) < 4 or buf[0] < 4 or buf[0] & 1 != 0:
         return ()
 
-    return tuple(map(lambda x,y: x+(y<<8), buf[2:buf[0]:2], buf[3:buf[0]:2]))
+    return tuple(map(lambda x, y: x + (y << 8), buf[2:buf[0]:2], buf[3:buf[0]:2]))
 
-def get_string(dev, index, langid = None):
+
+def get_string(dev, index, langid=None):
     r"""Retrieve a string descriptor from the device.
 
     dev is the Device object which the string will be read from.
@@ -318,12 +331,12 @@ def get_string(dev, index, langid = None):
         raise ValueError("The device does not support the specified langid")
 
     buf = get_descriptor(
-                dev,
-                255, # Maximum descriptor size
-                DESC_TYPE_STRING,
-                index,
-                langid
-            )
+        dev,
+        255,  # Maximum descriptor size
+        DESC_TYPE_STRING,
+        index,
+        langid
+    )
     if hexversion >= 0x03020000:
         return buf[2:buf[0]].tobytes().decode('utf-16-le')
     else:

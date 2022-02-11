@@ -51,6 +51,7 @@ __version__ = '%d.%d.%d' % version_info
 
 __all__ = ['legacy', 'control', 'core', 'backend', 'util', 'libloader']
 
+
 def _setup_log():
     from usb import _debug
     logger = logging.getLogger('usb')
@@ -67,7 +68,7 @@ def _setup_log():
                   'critical': logging.CRITICAL}
 
         level = LEVELS.get(debug_level, logging.CRITICAL + 10)
-        logger.setLevel(level = level)
+        logger.setLevel(level=level)
 
         try:
             handler = logging.FileHandler(filename)

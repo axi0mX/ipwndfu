@@ -1,6 +1,15 @@
-import binascii, datetime, hashlib, struct, sys, time
-import usb # pyusb: use 'pip install pyusb' to install this module
-import dfu, recovery, image3, image3_24Kpwn, utilities
+import binascii
+import datetime
+import hashlib
+import struct
+import sys
+import time
+
+import dfu
+import image3
+import recovery
+import usb  # pyusb: use 'pip install pyusb' to install this module
+import utilities
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16
@@ -9,8 +18,10 @@ AES_UID_KEY = 0x20000201
 AES_ENCRYPT = 16
 AES_DECRYPT = 17
 
+
 class PwnedDeviceConfig:
-    def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size, rom_sha256):
+    def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size,
+                 rom_sha256):
         self.version = version
         self.cpid = cpid
         self.aes_crypto_cmd = aes_crypto_cmd
@@ -21,8 +32,9 @@ class PwnedDeviceConfig:
         self.rom_size = rom_size
         self.rom_sha256 = rom_sha256
 
+
 configs = [
-    #PwnedDeviceConfig(
+    # PwnedDeviceConfig(
     #    # S5L8720 (old bootrom)
     #    version='240.4',
     #    cpid='8720',
@@ -33,8 +45,8 @@ configs = [
     #    rom_address=0x20000000,
     #    rom_size=0x10000,
     #    rom_sha256='55f4d8ea2791ba51dd89934168f38f0fb21ce8762ff614c1e742407c0d3ca054'
-    #),
-    #PwnedDeviceConfig(
+    # ),
+    # PwnedDeviceConfig(
     #    # S5L8720 (new bootrom)
     #    version='240.5.1',
     #    cpid='8720',
@@ -45,7 +57,7 @@ configs = [
     #    rom_address=0x20000000,
     #    rom_size=0x10000,
     #    rom_sha256='f15ae522dc9e645fcf997f6cec978ed3ce1811915e84938c68203fb95d80d300'
-    #),
+    # ),
     PwnedDeviceConfig(
         # S5L8920 (old bootrom)
         version='359.3',
@@ -70,30 +82,31 @@ configs = [
         rom_size=0x10000,
         rom_sha256='0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86'),
     PwnedDeviceConfig(
-       # S5L8922
-       version='359.5',
-       cpid='8922',
-       aes_crypto_cmd=0x919,
-       memmove=0x8564,
-       get_block_device=0x1851,
-       load_address=0x84000000,
-       rom_address=0xbf000000,
-       rom_size=0x10000,
-       rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
+        # S5L8922
+        version='359.5',
+        cpid='8922',
+        aes_crypto_cmd=0x919,
+        memmove=0x8564,
+        get_block_device=0x1851,
+        load_address=0x84000000,
+        rom_address=0xbf000000,
+        rom_size=0x10000,
+        rom_sha256='07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d'
     ),
     PwnedDeviceConfig(
-       # S5L8930
-       version='574.4',
-       cpid='8930',
-       aes_crypto_cmd=0x686d,
-       memmove=0x84dc,
-       get_block_device=0x81d5,
-       load_address=0x84000000,
-       rom_address=0xbf000000,
-       rom_size=0x10000,
-       rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
+        # S5L8930
+        version='574.4',
+        cpid='8930',
+        aes_crypto_cmd=0x686d,
+        memmove=0x84dc,
+        get_block_device=0x81d5,
+        load_address=0x84000000,
+        rom_address=0xbf000000,
+        rom_size=0x10000,
+        rom_sha256='4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d'
     ),
 ]
+
 
 class PwnedDFUDevice():
     def __init__(self):
@@ -161,27 +174,33 @@ class PwnedDFUDevice():
             print('ERROR: Length of data for AES encryption/decryption must be a multiple of %s.' % AES_BLOCK_SIZE)
             sys.exit(1)
 
-        cmd = struct.pack('<8I', self.config.aes_crypto_cmd, action, self.config.load_address + 36, self.config.load_address + 0x8, len(data), key, 0, 0)
+        cmd = struct.pack('<8I', self.config.aes_crypto_cmd, action, self.config.load_address + 36,
+                          self.config.load_address + 0x8, len(data), key, 0, 0)
         (retval, received) = self.execute(cmd + data, len(data))
         return received[:len(data)]
 
     def aes_hex(self, hexdata, action, key):
         if len(hexdata) % 32 != 0:
-            print('ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' % (2 * AES_BLOCK_SIZE))
+            print('ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' % (
+                        2 * AES_BLOCK_SIZE))
             sys.exit(1)
 
         return binascii.hexlify(self.aes(binascii.unhexlify(hexdata), action, key))
 
     def read_memory(self, address, length):
-        (retval, data) = self.execute(struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
+        (retval, data) = self.execute(
+            struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
         return data
 
     def write_memory(self, address, data):
-        (retval, data) = self.execute(struct.pack('<4I%ss' % len(data), self.config.memmove, address, self.config.load_address + 20, len(data), data), 0)
+        (retval, data) = self.execute(
+            struct.pack('<4I%ss' % len(data), self.config.memmove, address, self.config.load_address + 20, len(data),
+                        data), 0)
         return data
 
     def nor_dump(self, saveBackup):
-        (bdev, empty) = self.execute(struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
+        (bdev, empty) = self.execute(
+            struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
         if bdev == 0:
             print('ERROR: Unable to dump NOR. Pointer to nor0 block device was NULL.')
             sys.exit(1)
@@ -196,8 +215,10 @@ class PwnedDFUDevice():
         NOR_PARTS = 8
         nor = str()
         for i in range(NOR_PARTS):
-            print('Dumping NOR, part %s/%s.' % (i+1, NOR_PARTS))
-            (retval, received) = self.execute(struct.pack('<6I', read, bdev, self.config.load_address + 8, i * NOR_PART_SIZE, 0, NOR_PART_SIZE), NOR_PART_SIZE)
+            print('Dumping NOR, part %s/%s.' % (i + 1, NOR_PARTS))
+            (retval, received) = self.execute(
+                struct.pack('<6I', read, bdev, self.config.load_address + 8, i * NOR_PART_SIZE, 0, NOR_PART_SIZE),
+                NOR_PART_SIZE)
             nor += received
 
         if saveBackup:
@@ -241,8 +262,8 @@ class PwnedDFUDevice():
         iBSS = image3.Image3(data)
         decryptediBSS = iBSS.newImage3(decrypted=True)
         n88ap_iBSS_435_patches = [
-            (0x14954,                     'run\x00'), # patch 'reset' command string to 'run'
-            (0x17654, struct.pack('<I', 0x41000001)), # patch 'reset' command handler to LOAD_ADDRESS + 1
+            (0x14954, 'run\x00'),  # patch 'reset' command string to 'run'
+            (0x17654, struct.pack('<I', 0x41000001)),  # patch 'reset' command handler to LOAD_ADDRESS + 1
         ]
         patchediBSS = decryptediBSS[:64] + utilities.apply_patches(decryptediBSS[64:], n88ap_iBSS_435_patches)
 
@@ -283,7 +304,7 @@ class PwnedDFUDevice():
         except usb.core.USBError:
             # OK
             pass
-            #print 'Caught USBError; should still work.'
+            # print 'Caught USBError; should still work.'
         recovery.release_device(device)
         print('If screen is not red, NOR was flashed successfully and device will reboot.')
 
@@ -301,8 +322,8 @@ class PwnedDFUDevice():
         assert len(data) % 2 * KEYBAG_LENGTH == 0
 
         for i in range(0, len(data), 2 * KEYBAG_LENGTH):
-            if keybag == data[i:i+KEYBAG_LENGTH]:
-                return data[i+KEYBAG_LENGTH:i+2*KEYBAG_LENGTH]
+            if keybag == data[i:i + KEYBAG_LENGTH]:
+                return data[i + KEYBAG_LENGTH:i + 2 * KEYBAG_LENGTH]
 
         device = PwnedDFUDevice()
         decrypted_keybag = device.aes(keybag, AES_DECRYPT, AES_GID_KEY)

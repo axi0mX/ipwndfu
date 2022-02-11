@@ -26,12 +26,12 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
-import usb.core as core
-import usb.util as util
+from itertools import groupby
+
 import usb._objfinalizer as _objfinalizer
 import usb.control as control
-
-from itertools import groupby
+import usb.core as core
+import usb.util as util
 
 __author__ = 'Wander Lairson Costa'
 
@@ -95,16 +95,20 @@ TYPE_RESERVED = 96
 TYPE_STANDARD = 0
 TYPE_VENDOR = 64
 
+
 class Endpoint(object):
     r"""Endpoint descriptor object."""
+
     def __init__(self, ep):
         self.address = ep.bEndpointAddress
         self.interval = ep.bInterval
         self.maxPacketSize = ep.wMaxPacketSize
         self.type = util.endpoint_type(ep.bmAttributes)
 
+
 class Interface(object):
     r"""Interface descriptor object."""
+
     def __init__(self, intf):
         self.alternateSetting = intf.bAlternateSetting
         self.interfaceNumber = intf.bInterfaceNumber
@@ -114,8 +118,10 @@ class Interface(object):
         self.interfaceProtocol = intf.bInterfaceProtocol
         self.endpoints = [Endpoint(e) for e in intf]
 
+
 class Configuration(object):
     r"""Configuration descriptor object."""
+
     def __init__(self, cfg):
         self.iConfiguration = cfg.iConfiguration
         self.maxPower = cfg.bMaxPower << 1
@@ -124,13 +130,14 @@ class Configuration(object):
         self.totalLength = cfg.wTotalLength
         self.value = cfg.bConfigurationValue
         self.interfaces = [
-                            list(g) for k, g in groupby(
-                                    sorted(
-                                        [Interface(i) for i in cfg],
-                                        key=lambda i: i.interfaceNumber
-                                    ),
-                                    lambda i: i.alternateSetting)
-                        ]
+            list(g) for k, g in groupby(
+                sorted(
+                    [Interface(i) for i in cfg],
+                    key=lambda i: i.interfaceNumber
+                ),
+                lambda i: i.alternateSetting)
+        ]
+
 
 class DeviceHandle(_objfinalizer.AutoFinalizedObject):
     def __init__(self, dev):
@@ -141,7 +148,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         util.dispose_resources(self.dev)
         self.dev = None
 
-    def bulkWrite(self, endpoint, buffer, timeout = 100):
+    def bulkWrite(self, endpoint, buffer, timeout=100):
         r"""Perform a bulk write request to the endpoint specified.
 
             Arguments:
@@ -153,7 +160,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         """
         return self.dev.write(endpoint, buffer, timeout)
 
-    def bulkRead(self, endpoint, size, timeout = 100):
+    def bulkRead(self, endpoint, size, timeout=100):
         r"""Performs a bulk read request to the endpoint specified.
 
             Arguments:
@@ -164,7 +171,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         """
         return self.dev.read(endpoint, size, timeout)
 
-    def interruptWrite(self, endpoint, buffer, timeout = 100):
+    def interruptWrite(self, endpoint, buffer, timeout=100):
         r"""Perform a interrupt write request to the endpoint specified.
 
             Arguments:
@@ -176,7 +183,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         """
         return self.dev.write(endpoint, buffer, timeout)
 
-    def interruptRead(self, endpoint, size, timeout = 100):
+    def interruptRead(self, endpoint, size, timeout=100):
         r"""Performs a interrupt read request to the endpoint specified.
 
             Arguments:
@@ -187,7 +194,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         """
         return self.dev.read(endpoint, size, timeout)
 
-    def controlMsg(self, requestType, request, buffer, value = 0, index = 0, timeout = 100):
+    def controlMsg(self, requestType, request, buffer, value=0, index=0, timeout=100):
         r"""Perform a control request to the default control pipe on a device.
 
         Arguments:
@@ -203,12 +210,12 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         Returns the number of bytes written.
         """
         return self.dev.ctrl_transfer(
-                    requestType,
-                    request,
-                    wValue = value,
-                    wIndex = index,
-                    data_or_wLength = buffer,
-                    timeout = timeout)
+            requestType,
+            request,
+            wValue=value,
+            wIndex=index,
+            data_or_wLength=buffer,
+            timeout=timeout)
 
     def clearHalt(self, endpoint):
         r"""Clears any halt status on the specified endpoint.
@@ -255,7 +262,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
             configuration: a configuration value or a Configuration object.
         """
         if isinstance(configuration, Configuration):
-           configuration = configuration.value
+            configuration = configuration.value
 
         self.dev.set_configuration(configuration)
 
@@ -266,11 +273,11 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
             alternate: an alternate setting number or an Interface object.
         """
         if isinstance(alternate, Interface):
-           alternate = alternate.alternateSetting
+            alternate = alternate.alternateSetting
 
         self.dev.set_interface_altsetting(self.__claimed_interface, alternate)
 
-    def getString(self, index, length, langid = None):
+    def getString(self, index, length, langid=None):
         r"""Retrieve the string descriptor specified by index
             and langid from a device.
 
@@ -282,7 +289,7 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
         """
         return util.get_string(self.dev, index, langid).encode('ascii')
 
-    def getDescriptor(self, desc_type, desc_index, length, endpoint = -1):
+    def getDescriptor(self, desc_type, desc_index, length, endpoint=-1):
         r"""Retrieves a descriptor from the device identified by the type
         and index of the descriptor.
 
@@ -306,17 +313,19 @@ class DeviceHandle(_objfinalizer.AutoFinalizedObject):
 
         self.dev.detach_kernel_driver(interface)
 
+
 class Device(object):
     r"""Device descriptor object"""
+
     def __init__(self, dev):
         self.deviceClass = dev.bDeviceClass
         self.deviceSubClass = dev.bDeviceSubClass
         self.deviceProtocol = dev.bDeviceProtocol
         self.deviceVersion = str((dev.bcdDevice >> 12) & 0xf) + \
-                            str((dev.bcdDevice >> 8) & 0xf) + \
-                            '.' + \
-                            str((dev.bcdDevice >> 4) & 0xf) + \
-                            str(dev.bcdDevice & 0xf)
+                             str((dev.bcdDevice >> 8) & 0xf) + \
+                             '.' + \
+                             str((dev.bcdDevice >> 4) & 0xf) + \
+                             str(dev.bcdDevice & 0xf)
         self.devnum = dev.address
         self.filename = ''
         self.iManufacturer = dev.iManufacturer
@@ -326,10 +335,10 @@ class Device(object):
         self.idVendor = dev.idVendor
         self.maxPacketSize = dev.bMaxPacketSize0
         self.usbVersion = str((dev.bcdUSB >> 12) & 0xf) + \
-                         str((dev.bcdUSB >> 8) & 0xf) + \
-                         '.' + \
-                         str((dev.bcdUSB >> 4) & 0xf) + \
-                         str(dev.bcdUSB & 0xf)
+                          str((dev.bcdUSB >> 8) & 0xf) + \
+                          '.' + \
+                          str((dev.bcdUSB >> 4) & 0xf) + \
+                          str(dev.bcdUSB & 0xf)
         self.configurations = [Configuration(c) for c in dev]
         self.dev = dev
 
@@ -340,16 +349,18 @@ class Device(object):
         """
         return DeviceHandle(self.dev)
 
+
 class Bus(object):
     r"""Bus object."""
+
     def __init__(self, devices):
         self.dirname = ''
         self.devices = [Device(d) for d in devices]
         self.location = self.devices[0].dev.bus
 
+
 def busses():
     r"""Returns a tuple with the usb busses."""
     return (Bus(g) for k, g in groupby(
-            sorted(core.find(find_all=True), key=lambda d: d.bus),
-            lambda d: d.bus))
-
+        sorted(core.find(find_all=True), key=lambda d: d.bus),
+        lambda d: d.bus))

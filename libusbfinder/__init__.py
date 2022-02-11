@@ -1,4 +1,9 @@
-import hashlib, os, platform, io, tarfile
+import hashlib
+import io
+import os
+import platform
+import tarfile
+
 
 class VersionConfig:
     def __init__(self, version, bottle, bottle_sha256, dylib_patches, dylib_sha256):
@@ -7,6 +12,7 @@ class VersionConfig:
         self.bottle_sha256 = bottle_sha256
         self.dylib_patches = dylib_patches
         self.dylib_sha256 = dylib_sha256
+
 
 configs = [
     VersionConfig(
@@ -58,10 +64,12 @@ BOTTLE_PATH_FORMAT = os.path.join(dir, 'bottles', '%s.tar.gz')
 DYLIB_PATH_FORMAT = os.path.join(dir, '%s.dylib')
 DYLIB_NAME = 'libusb-1.0.0.dylib'
 
+
 def apply_patches(binary, patches):
     for (offset, data) in patches:
         binary = binary[:offset] + data + binary[offset + len(data):]
     return binary
+
 
 def libusb1_path_internal():
     version = platform.mac_ver()[0]
@@ -107,7 +115,9 @@ def libusb1_path_internal():
     # No match found.
     return None
 
+
 cached_path = libusb1_path_internal()
+
 
 def libusb1_path():
     return cached_path

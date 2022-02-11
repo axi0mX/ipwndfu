@@ -77,8 +77,10 @@ __author__ = 'Wander Lairson Costa'
 
 __all__ = ['IBackend', 'libusb01', 'libusb10', 'openusb']
 
+
 def _not_implemented(func):
     raise NotImplementedError(func.__name__)
+
 
 class IBackend(_objfinalizer.AutoFinalizedObject):
     r"""Backend interface.

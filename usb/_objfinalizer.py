@@ -66,7 +66,7 @@ class _AutoFinalizedObjectBase(object):
 
         Returns: None
         """
-        if not self._finalize_called: # race-free?
+        if not self._finalize_called:  # race-free?
             self._finalize_called = True
             self._finalize_object()
 
@@ -87,6 +87,7 @@ class _AutoFinalizedObjectBase(object):
 if sys.hexversion >= 0x3040000:
     # python >= 3.4: use weakref.finalize
     import weakref
+
 
     def _do_finalize_object_ref(obj_ref):
         """Helper function for weakref.finalize() that dereferences a weakref

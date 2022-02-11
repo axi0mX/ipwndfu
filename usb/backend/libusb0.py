@@ -26,16 +26,16 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
-from ctypes import *
-import os
-import usb.backend
-import usb.util
-import sys
-from usb.core import USBError
-from usb._debug import methodtrace
-import usb._interop as _interop
 import logging
+import os
+import sys
+from ctypes import *
+
+import usb.backend
 import usb.libloader
+import usb.util
+from usb._debug import methodtrace
+from usb.core import USBError
 
 __author__ = 'Wander Lairson Costa'
 
@@ -53,6 +53,7 @@ elif sys.platform == 'win32' or sys.platform == 'cygwin':
 else:
     _PATH_MAX = os.pathconf('.', 'PC_PATH_MAX')
 
+
 # libusb-win32 makes all structures packed, while
 # default libusb only does for some structures
 # _PackPolicy defines the structure packing according
@@ -60,8 +61,10 @@ else:
 class _PackPolicy(object):
     pass
 
+
 if sys.platform == 'win32' or sys.platform == 'cygwin':
     _PackPolicy._pack_ = 1
+
 
 # Data structures
 
@@ -70,11 +73,13 @@ class _usb_descriptor_header(Structure):
     _fields_ = [('blength', c_uint8),
                 ('bDescriptorType', c_uint8)]
 
+
 class _usb_string_descriptor(Structure):
     _pack_ = 1
     _fields_ = [('bLength', c_uint8),
                 ('bDescriptorType', c_uint8),
                 ('wData', c_uint16)]
+
 
 class _usb_endpoint_descriptor(Structure, _PackPolicy):
     _fields_ = [('bLength', c_uint8),
@@ -87,6 +92,7 @@ class _usb_endpoint_descriptor(Structure, _PackPolicy):
                 ('bSynchAddress', c_uint8),
                 ('extra', POINTER(c_uint8)),
                 ('extralen', c_int)]
+
 
 class _usb_interface_descriptor(Structure, _PackPolicy):
     _fields_ = [('bLength', c_uint8),
@@ -102,9 +108,11 @@ class _usb_interface_descriptor(Structure, _PackPolicy):
                 ('extra', POINTER(c_uint8)),
                 ('extralen', c_int)]
 
+
 class _usb_interface(Structure, _PackPolicy):
     _fields_ = [('altsetting', POINTER(_usb_interface_descriptor)),
                 ('num_altsetting', c_int)]
+
 
 class _usb_config_descriptor(Structure, _PackPolicy):
     _fields_ = [('bLength', c_uint8),
@@ -118,6 +126,7 @@ class _usb_config_descriptor(Structure, _PackPolicy):
                 ('interface', POINTER(_usb_interface)),
                 ('extra', POINTER(c_uint8)),
                 ('extralen', c_int)]
+
 
 class _usb_device_descriptor(Structure, _PackPolicy):
     _pack_ = 1
@@ -136,11 +145,14 @@ class _usb_device_descriptor(Structure, _PackPolicy):
                 ('iSerialNumber', c_uint8),
                 ('bNumConfigurations', c_uint8)]
 
+
 class _usb_device(Structure, _PackPolicy):
     pass
 
+
 class _usb_bus(Structure, _PackPolicy):
     pass
+
 
 _usb_device._fields_ = [('next', POINTER(_usb_device)),
                         ('prev', POINTER(_usb_device)),
@@ -161,6 +173,7 @@ _usb_bus._fields_ = [('next', POINTER(_usb_bus)),
                      ('root_dev', POINTER(_usb_device))]
 
 _usb_dev_handle = c_void_p
+
 
 class _DeviceDescriptor:
     def __init__(self, dev):
@@ -186,14 +199,17 @@ class _DeviceDescriptor:
         self.port_numbers = None
         self.speed = None
 
+
 _lib = None
+
 
 def _load_library(find_library=None):
     return usb.libloader.load_locate_library(
-                ('usb-0.1', 'usb', 'libusb0'),
-                'cygusb0.dll', 'Libusb 0',
-                find_library=find_library
+        ('usb-0.1', 'usb', 'libusb0'),
+        'cygusb0.dll', 'Libusb 0',
+        find_library=find_library
     )
+
 
 def _setup_prototypes(lib):
     # usb_dev_handle *usb_open(struct usb_device *dev);
@@ -209,23 +225,23 @@ def _setup_prototypes(lib):
     #                    char *buf,
     #                    size_t buflen);
     lib.usb_get_string.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_int,
-            c_char_p,
-            c_size_t
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_int,
+        c_char_p,
+        c_size_t
+    ]
 
     # int usb_get_string_simple(usb_dev_handle *dev,
     #                           int index,
     #                           char *buf,
     #                           size_t buflen);
     lib.usb_get_string_simple.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_char_p,
-            c_size_t
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_char_p,
+        c_size_t
+    ]
 
     # int usb_get_descriptor_by_endpoint(usb_dev_handle *udev,
     #                                    int ep,
@@ -234,13 +250,13 @@ def _setup_prototypes(lib):
     #                                    void *buf,
     #                                    int size);
     lib.usb_get_descriptor_by_endpoint.argtypes = [
-                                _usb_dev_handle,
-                                c_int,
-                                c_ubyte,
-                                c_ubyte,
-                                c_void_p,
-                                c_int
-                            ]
+        _usb_dev_handle,
+        c_int,
+        c_ubyte,
+        c_ubyte,
+        c_void_p,
+        c_int
+    ]
 
     # int usb_get_descriptor(usb_dev_handle *udev,
     #                        unsigned char type,
@@ -248,12 +264,12 @@ def _setup_prototypes(lib):
     #                        void *buf,
     #                        int size);
     lib.usb_get_descriptor.argtypes = [
-                    _usb_dev_handle,
-                    c_ubyte,
-                    c_ubyte,
-                    c_void_p,
-                    c_int
-                ]
+        _usb_dev_handle,
+        c_ubyte,
+        c_ubyte,
+        c_void_p,
+        c_int
+    ]
 
     # int usb_bulk_write(usb_dev_handle *dev,
     #                    int ep,
@@ -261,12 +277,12 @@ def _setup_prototypes(lib):
     #                    int size,
     #                    int timeout);
     lib.usb_bulk_write.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_char_p,
-            c_int,
-            c_int
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_char_p,
+        c_int,
+        c_int
+    ]
 
     # int usb_bulk_read(usb_dev_handle *dev,
     #                   int ep,
@@ -274,12 +290,12 @@ def _setup_prototypes(lib):
     #                   int size,
     #                   int timeout);
     lib.usb_bulk_read.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_char_p,
-            c_int,
-            c_int
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_char_p,
+        c_int,
+        c_int
+    ]
 
     # int usb_interrupt_write(usb_dev_handle *dev,
     #                         int ep,
@@ -287,12 +303,12 @@ def _setup_prototypes(lib):
     #                         int size,
     #                         int timeout);
     lib.usb_interrupt_write.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_char_p,
-            c_int,
-            c_int
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_char_p,
+        c_int,
+        c_int
+    ]
 
     # int usb_interrupt_read(usb_dev_handle *dev,
     #                        int ep,
@@ -300,12 +316,12 @@ def _setup_prototypes(lib):
     #                        int size,
     #                        int timeout);
     lib.usb_interrupt_read.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_char_p,
-            c_int,
-            c_int
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_char_p,
+        c_int,
+        c_int
+    ]
 
     # int usb_control_msg(usb_dev_handle *dev,
     #                     int requesttype,
@@ -316,15 +332,15 @@ def _setup_prototypes(lib):
     #                     int size,
     #                     int timeout);
     lib.usb_control_msg.argtypes = [
-            _usb_dev_handle,
-            c_int,
-            c_int,
-            c_int,
-            c_int,
-            c_char_p,
-            c_int,
-            c_int
-        ]
+        _usb_dev_handle,
+        c_int,
+        c_int,
+        c_int,
+        c_int,
+        c_char_p,
+        c_int,
+        c_int
+    ]
 
     # int usb_set_configuration(usb_dev_handle *dev, int configuration);
     lib.usb_set_configuration.argtypes = [_usb_dev_handle, c_int]
@@ -411,6 +427,7 @@ def _setup_prototypes(lib):
     if hasattr(lib, 'usb_free_async'):
         lib.usb_free_async.argtypes = [POINTER(c_void_p)]
 
+
 def _check(ret):
     if ret is None:
         errmsg = _lib.usb_strerror()
@@ -430,8 +447,10 @@ def _check(ret):
             return ret
     raise USBError(errmsg, ret)
 
+
 def _has_iso_transfer():
     return hasattr(_lib, 'usb_isochronous_setup_async')
+
 
 # implementation of libusb 0.1.x backend
 class _LibUSB(usb.backend.IBackend):
@@ -495,19 +514,19 @@ class _LibUSB(usb.backend.IBackend):
     @methodtrace(_logger)
     def get_configuration(self, dev_handle):
         bmRequestType = usb.util.build_request_type(
-                                usb.util.CTRL_IN,
-                                usb.util.CTRL_TYPE_STANDARD,
-                                usb.util.CTRL_RECIPIENT_DEVICE
-                            )
+            usb.util.CTRL_IN,
+            usb.util.CTRL_TYPE_STANDARD,
+            usb.util.CTRL_RECIPIENT_DEVICE
+        )
         buff = usb.util.create_buffer(1)
         ret = self.ctrl_transfer(
-                dev_handle,
-                bmRequestType,
-                0x08,
-                0,
-                0,
-                buff,
-                100)
+            dev_handle,
+            bmRequestType,
+            0x08,
+            0,
+            0,
+            buff,
+            100)
 
         assert ret == 1
         return buff[0]
@@ -583,15 +602,15 @@ class _LibUSB(usb.backend.IBackend):
         address, length = data.buffer_info()
         length *= data.itemsize
         return _check(_lib.usb_control_msg(
-                            dev_handle,
-                            bmRequestType,
-                            bRequest,
-                            wValue,
-                            wIndex,
-                            cast(address, c_char_p),
-                            length,
-                            timeout
-                        ))
+            dev_handle,
+            bmRequestType,
+            bRequest,
+            wValue,
+            wIndex,
+            cast(address, c_char_p),
+            length,
+            timeout
+        ))
 
     @methodtrace(_logger)
     def clear_halt(self, dev_handle, ep):
@@ -609,23 +628,23 @@ class _LibUSB(usb.backend.IBackend):
         address, length = data.buffer_info()
         length *= data.itemsize
         return int(_check(fn(
-                        dev_handle,
-                        ep,
-                        cast(address, c_char_p),
-                        length,
-                        timeout
-                    )))
+            dev_handle,
+            ep,
+            cast(address, c_char_p),
+            length,
+            timeout
+        )))
 
     def __read(self, fn, dev_handle, ep, intf, buff, timeout):
         address, length = buff.buffer_info()
         length *= buff.itemsize
         ret = int(_check(fn(
-                    dev_handle,
-                    ep,
-                    cast(address, c_char_p),
-                    length,
-                    timeout
-                )))
+            dev_handle,
+            ep,
+            cast(address, c_char_p),
+            length,
+            timeout
+        )))
         return ret
 
     def __iso_transfer(self, dev_handle, ep, intf, data, timeout):
@@ -660,6 +679,7 @@ class _LibUSB(usb.backend.IBackend):
             _check(_lib.usb_free_async(byref(context)))
 
         return transmitted
+
 
 def get_backend(find_library=None):
     global _lib

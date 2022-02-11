@@ -59,8 +59,9 @@ __all__ = ['get_status',
            'U2_ENABLE',
            'LTM_ENABLE']
 
-import usb.util as util
 import usb.core as core
+import usb.util as util
+
 
 def _parse_recipient(recipient, direction):
     if recipient is None:
@@ -75,11 +76,12 @@ def _parse_recipient(recipient, direction):
     else:
         raise ValueError('Invalid recipient.')
     bmRequestType = util.build_request_type(
-                            direction,
-                            util.CTRL_TYPE_STANDARD,
-                            r
-                        )
+        direction,
+        util.CTRL_TYPE_STANDARD,
+        r
+    )
     return (bmRequestType, wIndex)
+
 
 # standard feature selectors from USB 2.0/3.0
 ENDPOINT_HALT = 0
@@ -89,7 +91,8 @@ U1_ENABLE = 48
 U2_ENABLE = 49
 LTM_ENABLE = 50
 
-def get_status(dev, recipient = None):
+
+def get_status(dev, recipient=None):
     r"""Return the status for the specified recipient.
 
     dev is the Device object to which the request will be
@@ -102,13 +105,14 @@ def get_status(dev, recipient = None):
     word being the two bytes status value.
     """
     bmRequestType, wIndex = _parse_recipient(recipient, util.CTRL_IN)
-    ret = dev.ctrl_transfer(bmRequestType = bmRequestType,
-                            bRequest = 0x00,
-                            wIndex = wIndex,
-                            data_or_wLength = 2)
+    ret = dev.ctrl_transfer(bmRequestType=bmRequestType,
+                            bRequest=0x00,
+                            wIndex=wIndex,
+                            data_or_wLength=2)
     return ret[0] | (ret[1] << 8)
 
-def clear_feature(dev, feature, recipient = None):
+
+def clear_feature(dev, feature, recipient=None):
     r"""Clear/disable a specific feature.
 
     dev is the Device object to which the request will be
@@ -123,12 +127,13 @@ def clear_feature(dev, feature, recipient = None):
         dev.clear_halt(recipient)
     else:
         bmRequestType, wIndex = _parse_recipient(recipient, util.CTRL_OUT)
-        dev.ctrl_transfer(bmRequestType = bmRequestType,
-                          bRequest = 0x01,
-                          wIndex = wIndex,
-                          wValue = feature)
+        dev.ctrl_transfer(bmRequestType=bmRequestType,
+                          bRequest=0x01,
+                          wIndex=wIndex,
+                          wValue=feature)
 
-def set_feature(dev, feature, recipient = None):
+
+def set_feature(dev, feature, recipient=None):
     r"""Set/enable a specific feature.
 
     dev is the Device object to which the request will be
@@ -140,12 +145,13 @@ def set_feature(dev, feature, recipient = None):
     from the device), an Interface or Endpoint descriptors.
     """
     bmRequestType, wIndex = _parse_recipient(recipient, util.CTRL_OUT)
-    dev.ctrl_transfer(bmRequestType = bmRequestType,
-                      bRequest = 0x03,
-                      wIndex = wIndex,
-                      wValue = feature)
+    dev.ctrl_transfer(bmRequestType=bmRequestType,
+                      bRequest=0x03,
+                      wIndex=wIndex,
+                      wValue=feature)
 
-def get_descriptor(dev, desc_size, desc_type, desc_index, wIndex = 0):
+
+def get_descriptor(dev, desc_size, desc_type, desc_index, wIndex=0):
     r"""Return the specified descriptor.
 
     dev is the Device object to which the request will be
@@ -161,18 +167,19 @@ def get_descriptor(dev, desc_size, desc_type, desc_index, wIndex = 0):
     wValue = desc_index | (desc_type << 8)
 
     bmRequestType = util.build_request_type(
-                        util.CTRL_IN,
-                        util.CTRL_TYPE_STANDARD,
-                        util.CTRL_RECIPIENT_DEVICE)
+        util.CTRL_IN,
+        util.CTRL_TYPE_STANDARD,
+        util.CTRL_RECIPIENT_DEVICE)
 
     return dev.ctrl_transfer(
-            bmRequestType = bmRequestType,
-            bRequest = 0x06,
-            wValue = wValue,
-            wIndex = wIndex,
-            data_or_wLength = desc_size)
+        bmRequestType=bmRequestType,
+        bRequest=0x06,
+        wValue=wValue,
+        wIndex=wIndex,
+        data_or_wLength=desc_size)
 
-def set_descriptor(dev, desc, desc_type, desc_index, wIndex = None):
+
+def set_descriptor(dev, desc, desc_type, desc_index, wIndex=None):
     r"""Update an existing descriptor or add a new one.
 
     dev is the Device object to which the request will be
@@ -187,16 +194,17 @@ def set_descriptor(dev, desc, desc_type, desc_index, wIndex = None):
     wValue = desc_index | (desc_type << 8)
 
     bmRequestType = util.build_request_type(
-                        util.CTRL_OUT,
-                        util.CTRL_TYPE_STANDARD,
-                        util.CTRL_RECIPIENT_DEVICE)
+        util.CTRL_OUT,
+        util.CTRL_TYPE_STANDARD,
+        util.CTRL_RECIPIENT_DEVICE)
 
     dev.ctrl_transfer(
-        bmRequestType = bmRequestType,
-        bRequest = 0x07,
-        wValue = wValue,
-        wIndex = wIndex,
-        data_or_wLength = desc)
+        bmRequestType=bmRequestType,
+        bRequest=0x07,
+        wValue=wValue,
+        wIndex=wIndex,
+        data_or_wLength=desc)
+
 
 def get_configuration(dev):
     r"""Get the current active configuration of the device.
@@ -209,14 +217,15 @@ def get_configuration(dev):
     function always does a device request.
     """
     bmRequestType = util.build_request_type(
-                            util.CTRL_IN,
-                            util.CTRL_TYPE_STANDARD,
-                            util.CTRL_RECIPIENT_DEVICE)
+        util.CTRL_IN,
+        util.CTRL_TYPE_STANDARD,
+        util.CTRL_RECIPIENT_DEVICE)
 
     return dev.ctrl_transfer(
-                bmRequestType,
-                bRequest = 0x08,
-                data_or_wLength = 1)[0]
+        bmRequestType,
+        bRequest=0x08,
+        data_or_wLength=1)[0]
+
 
 def set_configuration(dev, bConfigurationNumber):
     r"""Set the current device configuration.
@@ -226,6 +235,7 @@ def set_configuration(dev, bConfigurationNumber):
     """
     dev.set_configuration(bConfigurationNumber)
 
+
 def get_interface(dev, bInterfaceNumber):
     r"""Get the current alternate setting of the interface.
 
@@ -233,15 +243,16 @@ def get_interface(dev, bInterfaceNumber):
     sent to.
     """
     bmRequestType = util.build_request_type(
-                            util.CTRL_IN,
-                            util.CTRL_TYPE_STANDARD,
-                            util.CTRL_RECIPIENT_INTERFACE)
+        util.CTRL_IN,
+        util.CTRL_TYPE_STANDARD,
+        util.CTRL_RECIPIENT_INTERFACE)
 
     return dev.ctrl_transfer(
-                bmRequestType = bmRequestType,
-                bRequest = 0x0a,
-                wIndex = bInterfaceNumber,
-                data_or_wLength = 1)[0]
+        bmRequestType=bmRequestType,
+        bRequest=0x0a,
+        wIndex=bInterfaceNumber,
+        data_or_wLength=1)[0]
+
 
 def set_interface(dev, bInterfaceNumber, bAlternateSetting):
     r"""Set the alternate setting of the interface.
@@ -250,4 +261,3 @@ def set_interface(dev, bInterfaceNumber, bAlternateSetting):
     sent to.
     """
     dev.set_interface_altsetting(bInterfaceNumber, bAlternateSetting)
-

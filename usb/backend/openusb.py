@@ -26,55 +26,54 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
-from ctypes import *
-import ctypes.util
-import usb.util
-from usb._debug import methodtrace
-import logging
 import errno
-import sys
+import logging
+from ctypes import *
+
 import usb._interop as _interop
 import usb._objfinalizer as _objfinalizer
-import usb.util as util
 import usb.libloader
+import usb.util
+import usb.util as util
+from usb._debug import methodtrace
 from usb.core import USBError
 
 __author__ = 'Wander Lairson Costa'
 
 __all__ = [
-            'get_backend'
-            'OPENUSB_SUCCESS'
-            'OPENUSB_PLATFORM_FAILURE'
-            'OPENUSB_NO_RESOURCES'
-            'OPENUSB_NO_BANDWIDTH'
-            'OPENUSB_NOT_SUPPORTED'
-            'OPENUSB_HC_HARDWARE_ERROR'
-            'OPENUSB_INVALID_PERM'
-            'OPENUSB_BUSY'
-            'OPENUSB_BADARG'
-            'OPENUSB_NOACCESS'
-            'OPENUSB_PARSE_ERROR'
-            'OPENUSB_UNKNOWN_DEVICE'
-            'OPENUSB_INVALID_HANDLE'
-            'OPENUSB_SYS_FUNC_FAILURE'
-            'OPENUSB_NULL_LIST'
-            'OPENUSB_CB_CONTINUE'
-            'OPENUSB_CB_TERMINATE'
-            'OPENUSB_IO_STALL'
-            'OPENUSB_IO_CRC_ERROR'
-            'OPENUSB_IO_DEVICE_HUNG'
-            'OPENUSB_IO_REQ_TOO_BIG'
-            'OPENUSB_IO_BIT_STUFFING'
-            'OPENUSB_IO_UNEXPECTED_PID'
-            'OPENUSB_IO_DATA_OVERRUN'
-            'OPENUSB_IO_DATA_UNDERRUN'
-            'OPENUSB_IO_BUFFER_OVERRUN'
-            'OPENUSB_IO_BUFFER_UNDERRUN'
-            'OPENUSB_IO_PID_CHECK_FAILURE'
-            'OPENUSB_IO_DATA_TOGGLE_MISMATCH'
-            'OPENUSB_IO_TIMEOUT'
-            'OPENUSB_IO_CANCELED'
-        ]
+    'get_backend'
+    'OPENUSB_SUCCESS'
+    'OPENUSB_PLATFORM_FAILURE'
+    'OPENUSB_NO_RESOURCES'
+    'OPENUSB_NO_BANDWIDTH'
+    'OPENUSB_NOT_SUPPORTED'
+    'OPENUSB_HC_HARDWARE_ERROR'
+    'OPENUSB_INVALID_PERM'
+    'OPENUSB_BUSY'
+    'OPENUSB_BADARG'
+    'OPENUSB_NOACCESS'
+    'OPENUSB_PARSE_ERROR'
+    'OPENUSB_UNKNOWN_DEVICE'
+    'OPENUSB_INVALID_HANDLE'
+    'OPENUSB_SYS_FUNC_FAILURE'
+    'OPENUSB_NULL_LIST'
+    'OPENUSB_CB_CONTINUE'
+    'OPENUSB_CB_TERMINATE'
+    'OPENUSB_IO_STALL'
+    'OPENUSB_IO_CRC_ERROR'
+    'OPENUSB_IO_DEVICE_HUNG'
+    'OPENUSB_IO_REQ_TOO_BIG'
+    'OPENUSB_IO_BIT_STUFFING'
+    'OPENUSB_IO_UNEXPECTED_PID'
+    'OPENUSB_IO_DATA_OVERRUN'
+    'OPENUSB_IO_DATA_UNDERRUN'
+    'OPENUSB_IO_BUFFER_OVERRUN'
+    'OPENUSB_IO_BUFFER_UNDERRUN'
+    'OPENUSB_IO_PID_CHECK_FAILURE'
+    'OPENUSB_IO_DATA_TOGGLE_MISMATCH'
+    'OPENUSB_IO_TIMEOUT'
+    'OPENUSB_IO_CANCELED'
+]
 
 _logger = logging.getLogger('usb.backend.openusb')
 
@@ -111,38 +110,39 @@ OPENUSB_IO_TIMEOUT = -62
 OPENUSB_IO_CANCELED = -63
 
 _openusb_errno = {
-    OPENUSB_SUCCESS:None,
-    OPENUSB_PLATFORM_FAILURE:None,
-    OPENUSB_NO_RESOURCES:errno.__dict__.get('ENOMEM', None),
-    OPENUSB_NO_BANDWIDTH:None,
-    OPENUSB_NOT_SUPPORTED:errno.__dict__.get('ENOSYS', None),
-    OPENUSB_HC_HARDWARE_ERROR:errno.__dict__.get('EIO', None),
-    OPENUSB_INVALID_PERM:errno.__dict__.get('EBADF', None),
-    OPENUSB_BUSY:errno.__dict__.get('EBUSY', None),
-    OPENUSB_BADARG:errno.__dict__.get('EINVAL', None),
-    OPENUSB_NOACCESS:errno.__dict__.get('EACCES', None),
-    OPENUSB_PARSE_ERROR:None,
-    OPENUSB_UNKNOWN_DEVICE:errno.__dict__.get('ENODEV', None),
-    OPENUSB_INVALID_HANDLE:errno.__dict__.get('EINVAL', None),
-    OPENUSB_SYS_FUNC_FAILURE:None,
-    OPENUSB_NULL_LIST:None,
-    OPENUSB_CB_CONTINUE:None,
-    OPENUSB_CB_TERMINATE:None,
-    OPENUSB_IO_STALL:errno.__dict__.get('EIO', None),
-    OPENUSB_IO_CRC_ERROR:errno.__dict__.get('EIO', None),
-    OPENUSB_IO_DEVICE_HUNG:errno.__dict__.get('EIO', None),
-    OPENUSB_IO_REQ_TOO_BIG:errno.__dict__.get('E2BIG', None),
-    OPENUSB_IO_BIT_STUFFING:None,
-    OPENUSB_IO_UNEXPECTED_PID:errno.__dict__.get('ESRCH', None),
-    OPENUSB_IO_DATA_OVERRUN:errno.__dict__.get('EOVERFLOW', None),
-    OPENUSB_IO_DATA_UNDERRUN:None,
-    OPENUSB_IO_BUFFER_OVERRUN:errno.__dict__.get('EOVERFLOW', None),
-    OPENUSB_IO_BUFFER_UNDERRUN:None,
-    OPENUSB_IO_PID_CHECK_FAILURE:None,
-    OPENUSB_IO_DATA_TOGGLE_MISMATCH:None,
-    OPENUSB_IO_TIMEOUT:errno.__dict__.get('ETIMEDOUT', None),
-    OPENUSB_IO_CANCELED:errno.__dict__.get('EINTR', None)
+    OPENUSB_SUCCESS: None,
+    OPENUSB_PLATFORM_FAILURE: None,
+    OPENUSB_NO_RESOURCES: errno.__dict__.get('ENOMEM', None),
+    OPENUSB_NO_BANDWIDTH: None,
+    OPENUSB_NOT_SUPPORTED: errno.__dict__.get('ENOSYS', None),
+    OPENUSB_HC_HARDWARE_ERROR: errno.__dict__.get('EIO', None),
+    OPENUSB_INVALID_PERM: errno.__dict__.get('EBADF', None),
+    OPENUSB_BUSY: errno.__dict__.get('EBUSY', None),
+    OPENUSB_BADARG: errno.__dict__.get('EINVAL', None),
+    OPENUSB_NOACCESS: errno.__dict__.get('EACCES', None),
+    OPENUSB_PARSE_ERROR: None,
+    OPENUSB_UNKNOWN_DEVICE: errno.__dict__.get('ENODEV', None),
+    OPENUSB_INVALID_HANDLE: errno.__dict__.get('EINVAL', None),
+    OPENUSB_SYS_FUNC_FAILURE: None,
+    OPENUSB_NULL_LIST: None,
+    OPENUSB_CB_CONTINUE: None,
+    OPENUSB_CB_TERMINATE: None,
+    OPENUSB_IO_STALL: errno.__dict__.get('EIO', None),
+    OPENUSB_IO_CRC_ERROR: errno.__dict__.get('EIO', None),
+    OPENUSB_IO_DEVICE_HUNG: errno.__dict__.get('EIO', None),
+    OPENUSB_IO_REQ_TOO_BIG: errno.__dict__.get('E2BIG', None),
+    OPENUSB_IO_BIT_STUFFING: None,
+    OPENUSB_IO_UNEXPECTED_PID: errno.__dict__.get('ESRCH', None),
+    OPENUSB_IO_DATA_OVERRUN: errno.__dict__.get('EOVERFLOW', None),
+    OPENUSB_IO_DATA_UNDERRUN: None,
+    OPENUSB_IO_BUFFER_OVERRUN: errno.__dict__.get('EOVERFLOW', None),
+    OPENUSB_IO_BUFFER_UNDERRUN: None,
+    OPENUSB_IO_PID_CHECK_FAILURE: None,
+    OPENUSB_IO_DATA_TOGGLE_MISMATCH: None,
+    OPENUSB_IO_TIMEOUT: errno.__dict__.get('ETIMEDOUT', None),
+    OPENUSB_IO_CANCELED: errno.__dict__.get('EINTR', None)
 }
+
 
 class _usb_endpoint_desc(Structure):
     _fields_ = [('bLength', c_uint8),
@@ -153,6 +153,7 @@ class _usb_endpoint_desc(Structure):
                 ('bInterval', c_uint8),
                 ('bRefresh', c_uint8),
                 ('bSynchAddress', c_uint8)]
+
 
 class _usb_interface_desc(Structure):
     _fields_ = [('bLength', c_uint8),
@@ -165,6 +166,7 @@ class _usb_interface_desc(Structure):
                 ('bInterfaceProtocol', c_uint8),
                 ('iInterface', c_uint8)]
 
+
 class _usb_config_desc(Structure):
     _fields_ = [('bLength', c_uint8),
                 ('bDescriptorType', c_uint8),
@@ -174,6 +176,7 @@ class _usb_config_desc(Structure):
                 ('iConfiguration', c_uint8),
                 ('bmAttributes', c_uint8),
                 ('bMaxPower', c_uint8)]
+
 
 class _usb_device_desc(Structure):
     _fields_ = [('bLength', c_uint8),
@@ -191,9 +194,11 @@ class _usb_device_desc(Structure):
                 ('iSerialNumber', c_uint8),
                 ('bNumConfigurations', c_uint8)]
 
+
 class _openusb_request_result(Structure):
     _fields_ = [('status', c_int32),
                 ('transferred_bytes', c_uint32)]
+
 
 class _openusb_ctrl_request(Structure):
     def __init__(self):
@@ -215,6 +220,7 @@ class _openusb_ctrl_request(Structure):
                     ('bRequest', c_uint8),
                     ('wValue', c_uint16),
                     ('wIndex', c_uint16)]
+
     _fields_ = [('setup', _openusb_ctrl_setup),
                 ('payload', POINTER(c_uint8)),
                 ('length', c_uint32),
@@ -222,6 +228,7 @@ class _openusb_ctrl_request(Structure):
                 ('flags', c_uint32),
                 ('result', _openusb_request_result),
                 ('next', c_void_p)]
+
 
 class _openusb_intr_request(Structure):
     _fields_ = [('interval', c_uint16),
@@ -232,6 +239,7 @@ class _openusb_intr_request(Structure):
                 ('result', _openusb_request_result),
                 ('next', c_void_p)]
 
+
 class _openusb_bulk_request(Structure):
     _fields_ = [('payload', POINTER(c_uint8)),
                 ('length', c_uint32),
@@ -240,12 +248,15 @@ class _openusb_bulk_request(Structure):
                 ('result', _openusb_request_result),
                 ('next', c_void_p)]
 
+
 class _openusb_isoc_pkts(Structure):
     class _openusb_isoc_packet(Structure):
         _fields_ = [('payload', POINTER(c_uint8)),
                     ('length', c_uint32)]
+
     _fields_ = [('num_packets', c_uint32),
                 ('packets', POINTER(_openusb_isoc_packet))]
+
 
 class _openusb_isoc_request(Structure):
     _fields_ = [('start_frame', c_uint32),
@@ -255,6 +266,7 @@ class _openusb_isoc_request(Structure):
                 ('isoc_status', c_int32),
                 ('next', c_void_p)]
 
+
 _openusb_devid = c_uint64
 _openusb_busid = c_uint64
 _openusb_handle = c_uint64
@@ -263,6 +275,7 @@ _openusb_dev_handle = c_uint64
 _lib = None
 _ctx = None
 
+
 def _load_library(find_library=None):
     # FIXME: cygwin name is "openusb"?
     #        (that's what the original _load_library() function
@@ -270,6 +283,7 @@ def _load_library(find_library=None):
     return usb.libloader.load_locate_library(
         ('openusb',), 'openusb', "OpenUSB library", find_library=find_library
     )
+
 
 def _setup_prototypes(lib):
     # int32_t openusb_init(uint32_t flags , openusb_handle_t *handle);
@@ -283,10 +297,10 @@ def _setup_prototypes(lib):
     #                                 openusb_busid_t **busids,
     #                                 uint32_t *num_busids);
     lib.openusb_get_busid_list.argtypes = [
-            _openusb_handle,
-            POINTER(POINTER(_openusb_busid)),
-            POINTER(c_uint32)
-        ]
+        _openusb_handle,
+        POINTER(POINTER(_openusb_busid)),
+        POINTER(c_uint32)
+    ]
 
     # void openusb_free_busid_list(openusb_busid_t * busids);
     lib.openusb_free_busid_list.argtypes = [POINTER(_openusb_busid)]
@@ -296,11 +310,11 @@ def _setup_prototypes(lib):
     #                                    openusb_devid_t **devids,
     #                                    uint32_t *num_devids);
     lib.openusb_get_devids_by_bus.argtypes = [
-                _openusb_handle,
-                _openusb_busid,
-                POINTER(POINTER(_openusb_devid)),
-                POINTER(c_uint32)
-            ]
+        _openusb_handle,
+        _openusb_busid,
+        POINTER(POINTER(_openusb_devid)),
+        POINTER(c_uint32)
+    ]
 
     lib.openusb_get_devids_by_bus.restype = c_int32
 
@@ -312,11 +326,11 @@ def _setup_prototypes(lib):
     #                             uint32_t flags,
     #                             openusb_dev_handle_t *dev);
     lib.openusb_open_device.argtypes = [
-                _openusb_handle,
-                _openusb_devid,
-                c_uint32,
-                POINTER(_openusb_dev_handle)
-            ]
+        _openusb_handle,
+        _openusb_devid,
+        c_uint32,
+        POINTER(_openusb_dev_handle)
+    ]
 
     lib.openusb_open_device.restype = c_int32
 
@@ -338,19 +352,19 @@ def _setup_prototypes(lib):
     #                                 uint8_t ifc,
     #                                 openusb_init_flag_t flags);
     lib.openusb_claim_interface.argtypes = [
-            _openusb_dev_handle,
-            c_uint8,
-            c_int
-        ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_int
+    ]
 
     lib.openusb_claim_interface.restype = c_int32
 
     # int32_t openusb_release_interface(openusb_dev_handle_t dev,
     #                                   uint8_t ifc);
     lib.openusb_release_interface.argtypes = [
-            _openusb_dev_handle,
-            c_uint8
-        ]
+        _openusb_dev_handle,
+        c_uint8
+    ]
 
     lib.openusb_release_interface.restype = c_int32
 
@@ -358,10 +372,10 @@ def _setup_prototypes(lib):
     #                               uint8_t ifc,
     #                               uint8_t alt);
     lib.openusb_set_altsetting.argtypes = [
-            _openusb_dev_handle,
-            c_uint8,
-            c_uint8
-        ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_uint8
+    ]
     lib.openusb_set_altsetting.restype = c_int32
 
     # int32_t openusb_reset(openusb_dev_handle_t dev);
@@ -374,12 +388,12 @@ def _setup_prototypes(lib):
     #                                   uint16_t buflen,
     #                                   usb_device_desc_t *devdesc);
     lib.openusb_parse_device_desc.argtypes = [
-            _openusb_handle,
-            _openusb_devid,
-            POINTER(c_uint8),
-            c_uint16,
-            POINTER(_usb_device_desc)
-        ]
+        _openusb_handle,
+        _openusb_devid,
+        POINTER(c_uint8),
+        c_uint16,
+        POINTER(_usb_device_desc)
+    ]
 
     lib.openusb_parse_device_desc.restype = c_int32
 
@@ -390,13 +404,13 @@ def _setup_prototypes(lib):
     #                                   uint8_t cfgidx,
     #                                   usb_config_desc_t *cfgdesc);
     lib.openusb_parse_config_desc.argtypes = [
-                _openusb_handle,
-                _openusb_devid,
-                POINTER(c_uint8),
-                c_uint16,
-                c_uint8,
-                POINTER(_usb_config_desc)
-            ]
+        _openusb_handle,
+        _openusb_devid,
+        POINTER(c_uint8),
+        c_uint16,
+        c_uint8,
+        POINTER(_usb_config_desc)
+    ]
     lib.openusb_parse_config_desc.restype = c_int32
 
     # int32_t openusb_parse_interface_desc(openusb_handle_t handle,
@@ -408,15 +422,15 @@ def _setup_prototypes(lib):
     #                                      uint8_t alt,
     #                                      usb_interface_desc_t *ifcdesc);
     lib.openusb_parse_interface_desc.argtypes = [
-                    _openusb_handle,
-                    _openusb_devid,
-                    POINTER(c_uint8),
-                    c_uint16,
-                    c_uint8,
-                    c_uint8,
-                    c_uint8,
-                    POINTER(_usb_interface_desc)
-                ]
+        _openusb_handle,
+        _openusb_devid,
+        POINTER(c_uint8),
+        c_uint16,
+        c_uint8,
+        c_uint8,
+        c_uint8,
+        POINTER(_usb_interface_desc)
+    ]
 
     lib.openusb_parse_interface_desc.restype = c_int32
 
@@ -430,16 +444,16 @@ def _setup_prototypes(lib):
     #                                     uint8_t eptidx,
     #                                     usb_endpoint_desc_t *eptdesc);
     lib.openusb_parse_endpoint_desc.argtypes = [
-                    _openusb_handle,
-                    _openusb_devid,
-                    POINTER(c_uint8),
-                    c_uint16,
-                    c_uint8,
-                    c_uint8,
-                    c_uint8,
-                    c_uint8,
-                    POINTER(_usb_endpoint_desc)
-                ]
+        _openusb_handle,
+        _openusb_devid,
+        POINTER(c_uint8),
+        c_uint16,
+        c_uint8,
+        c_uint8,
+        c_uint8,
+        c_uint8,
+        POINTER(_usb_endpoint_desc)
+    ]
 
     lib.openusb_parse_interface_desc.restype = c_int32
 
@@ -452,11 +466,11 @@ def _setup_prototypes(lib):
     #                           uint8_t ept,
     #                           openusb_ctrl_request_t *ctrl);
     lib.openusb_ctrl_xfer.argtypes = [
-            _openusb_dev_handle,
-            c_uint8,
-            c_uint8,
-            POINTER(_openusb_ctrl_request)
-        ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_uint8,
+        POINTER(_openusb_ctrl_request)
+    ]
 
     lib.openusb_ctrl_xfer.restype = c_int32
 
@@ -465,11 +479,11 @@ def _setup_prototypes(lib):
     #                           uint8_t ept,
     #                           openusb_intr_request_t *intr);
     lib.openusb_intr_xfer.argtypes = [
-                _openusb_dev_handle,
-                c_uint8,
-                c_uint8,
-                POINTER(_openusb_intr_request)
-            ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_uint8,
+        POINTER(_openusb_intr_request)
+    ]
 
     lib.openusb_bulk_xfer.restype = c_int32
 
@@ -478,11 +492,11 @@ def _setup_prototypes(lib):
     #                           uint8_t ept,
     #                           openusb_bulk_request_t *bulk);
     lib.openusb_bulk_xfer.argtypes = [
-            _openusb_dev_handle,
-            c_uint8,
-            c_uint8,
-            POINTER(_openusb_bulk_request)
-        ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_uint8,
+        POINTER(_openusb_bulk_request)
+    ]
 
     lib.openusb_bulk_xfer.restype = c_int32
 
@@ -491,13 +505,14 @@ def _setup_prototypes(lib):
     #                           uint8_t ept,
     #                           openusb_isoc_request_t *isoc);
     lib.openusb_isoc_xfer.argtypes = [
-            _openusb_dev_handle,
-            c_uint8,
-            c_uint8,
-            POINTER(_openusb_isoc_request)
-        ]
+        _openusb_dev_handle,
+        c_uint8,
+        c_uint8,
+        POINTER(_openusb_isoc_request)
+    ]
 
     lib.openusb_isoc_xfer.restype = c_int32
+
 
 def _check(ret):
     if hasattr(ret, 'value'):
@@ -507,12 +522,15 @@ def _check(ret):
         raise USBError(_lib.openusb_strerror(ret), ret, _openusb_errno[ret])
     return ret
 
+
 class _Context(_objfinalizer.AutoFinalizedObject):
     def __init__(self):
         self.handle = _openusb_handle()
         _check(_lib.openusb_init(0, byref(self.handle)))
+
     def _finalize_object(self):
         _lib.openusb_fini(self.handle)
+
 
 class _BusIterator(_objfinalizer.AutoFinalizedObject):
     def __init__(self):
@@ -522,11 +540,14 @@ class _BusIterator(_objfinalizer.AutoFinalizedObject):
                                            byref(self.buslist),
                                            byref(num_busids)))
         self.num_busids = num_busids.value
+
     def __iter__(self):
         for i in range(self.num_busids):
             yield self.buslist[i]
+
     def _finalize_object(self):
         _lib.openusb_free_busid_list(self.buslist)
+
 
 class _DevIterator(_objfinalizer.AutoFinalizedObject):
     def __init__(self, busid):
@@ -537,11 +558,14 @@ class _DevIterator(_objfinalizer.AutoFinalizedObject):
                                               byref(self.devlist),
                                               byref(num_devids)))
         self.num_devids = num_devids.value
+
     def __iter__(self):
         for i in range(self.num_devids):
             yield self.devlist[i]
+
     def _finalize_object(self):
         _lib.openusb_free_devid_list(self.devlist)
+
 
 class _OpenUSB(usb.backend.IBackend):
     @methodtrace(_logger)
@@ -678,14 +702,14 @@ class _OpenUSB(usb.backend.IBackend):
         _check(_lib.openusb_intr_xfer(dev_handle, intf, ep, byref(request)))
         return request.result.transferred_bytes
 
-# TODO: implement isochronous
-#    @methodtrace(_logger)
-#    def iso_write(self, dev_handle, ep, intf, data, timeout):
-#       pass
+    # TODO: implement isochronous
+    #    @methodtrace(_logger)
+    #    def iso_write(self, dev_handle, ep, intf, data, timeout):
+    #       pass
 
-#    @methodtrace(_logger)
-#    def iso_read(self, dev_handle, ep, intf, size, timeout):
-#        pass
+    #    @methodtrace(_logger)
+    #    def iso_read(self, dev_handle, ep, intf, size, timeout):
+    #        pass
 
     @methodtrace(_logger)
     def ctrl_transfer(self,
@@ -720,9 +744,9 @@ class _OpenUSB(usb.backend.IBackend):
     @methodtrace(_logger)
     def clear_halt(self, dev_handle, ep):
         bmRequestType = util.build_request_type(
-                            util.CTRL_OUT,
-                            util.CTRL_TYPE_STANDARD,
-                            util.CTRL_RECIPIENT_ENDPOINT)
+            util.CTRL_OUT,
+            util.CTRL_TYPE_STANDARD,
+            util.CTRL_RECIPIENT_ENDPOINT)
         self.ctrl_transfer(
             dev_handle,
             bmRequestType,
@@ -731,6 +755,7 @@ class _OpenUSB(usb.backend.IBackend):
             ep,
             _interop.as_array(),
             1000)
+
 
 def get_backend(find_library=None):
     try:
