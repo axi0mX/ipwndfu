@@ -40,7 +40,7 @@ def remove_exploit(img3):
 
         # Try to find the correct value for the first dword.
         found = False
-        for pos in xrange(shellcode_address - 0x84000000, len(img3)):
+        for pos in range(shellcode_address - 0x84000000, len(img3)):
             obj = image3.Image3(img3[:64] + img3[pos:pos + 4] + img3[68:])
             if obj.getDecryptedPayload()[:4] == '\x0e\x00\x00\xea':
                 found = True

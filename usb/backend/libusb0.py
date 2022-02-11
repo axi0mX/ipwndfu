@@ -444,8 +444,8 @@ class _LibUSB(usb.backend.IBackend):
             dev = bus[0].devices
             while bool(dev):
                 yield dev[0]
-                dev = dev[0].next
-            bus = bus[0].next
+                dev = dev[0].__next__
+            bus = bus[0].__next__
 
     @methodtrace(_logger)
     def get_device_descriptor(self, dev):

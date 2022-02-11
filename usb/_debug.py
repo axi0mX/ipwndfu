@@ -44,7 +44,7 @@ def _trace_function_call(logger, fname, *args, **named_args):
                 # TODO: check if 'f' is a method or a free function
                 fname + '(' + \
                 ', '.join((str(val) for val in args)) + \
-                ', '.join((name + '=' + str(val) for name, val in named_args.items())) + ')'
+                ', '.join((name + '=' + str(val) for name, val in list(named_args.items()))) + ')'
             )
 
 # decorator for methods calls tracing

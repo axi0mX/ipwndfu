@@ -179,7 +179,7 @@ def find_descriptor(desc, find_all=False, custom_match=None, **args):
     """
     def desc_iter(**kwargs):
         for d in desc:
-            tests = (val == getattr(d, key) for key, val in kwargs.items())
+            tests = (val == getattr(d, key) for key, val in list(kwargs.items()))
             if _interop._all(tests) and (custom_match is None or custom_match(d)):
                 yield d
 

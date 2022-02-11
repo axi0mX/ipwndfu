@@ -1245,7 +1245,7 @@ def find(find_all=False, backend = None, custom_match = None, **args):
     def device_iter(**kwargs):
         for dev in backend.enumerate_devices():
             d = Device(dev, backend)
-            tests = (val == getattr(d, key) for key, val in kwargs.items())
+            tests = (val == getattr(d, key) for key, val in list(kwargs.items()))
             if _interop._all(tests) and (custom_match is None or custom_match(d)):
                 yield d
 
