@@ -290,7 +290,7 @@ class PwnedDFUDevice():
     def flash_nor(self, nor):
         self.boot_ibss()
         print('Sending iBSS payload to flash NOR.')
-        MAX_SHELLCODE_LENGTH = 128
+        MAX_SHELLCODE_LENGTH = 132
         payload = open('bin/ibss-flash-nor-shellcode.bin', 'rb').read()
         assert len(payload) <= MAX_SHELLCODE_LENGTH
         payload += '\x00' * (MAX_SHELLCODE_LENGTH - len(payload)) + nor
