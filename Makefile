@@ -43,6 +43,10 @@ arm64:
 	gobjcopy -O binary -j .text bin/checkm8_arm64.o bin/checkm8_arm64.bin
 	rm bin/checkm8_arm64.o
 
+	xcrun -sdk iphoneos clang src/checkm8_nopaddingcorruption_arm64.S -target arm64-apple-darwin -Wall -o bin/checkm8_nopaddingcorruption_arm64.o
+	gobjcopy -O binary -j .text bin/checkm8_nopaddingcorruption_arm64.o bin/checkm8_nopaddingcorruption_arm64.bin
+	rm bin/checkm8_nopaddingcorruption_arm64.o
+
 	xcrun -sdk iphoneos clang src/t8010_t8011_disable_wxn_arm64.S -target arm64-apple-darwin -Wall -o bin/t8010_t8011_disable_wxn_arm64.o
 	gobjcopy -O binary -j .text bin/t8010_t8011_disable_wxn_arm64.o bin/t8010_t8011_disable_wxn_arm64.bin
 	rm bin/t8010_t8011_disable_wxn_arm64.o

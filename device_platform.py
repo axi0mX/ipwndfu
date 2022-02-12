@@ -45,6 +45,11 @@ class DevicePlatform:
             self.dfu_load_base = 0x800000000
             self.recovery_image_base = 0x18001C000
             self.recovery_load_base = 0x800000000
+        if self.cpid in [0x8000, 0x8003, 0x7000]:
+            self.dfu_image_base = 0x180380000
+            self.dfu_load_base = 0x180000000  # varies (HACK: test purposes)
+            self.recovery_image_base = 0x83D7F7000  # varies
+            self.recovery_load_base = 0x800000000
 
     def name(self):
         if 0x8720 <= self.cpid <= 0x8960:
@@ -125,5 +130,26 @@ all_platforms = [
                    dram_base=0x800000000,
                    nonce_length=32, sep_nonce_length=20,
                    demotion_reg=0x2352BC000,
+                   ),
+    DevicePlatform(cpid=0x7000, cprv=0x11, scep=0x01, arch='arm64', srtg='iBoot-1992.0.0.1.19',
+                   rom_base=0x100000000, rom_size=0x80000, rom_sha1='c4dcd22ae135c14244fc2b62165c85effa566bfe',
+                   sram_base=0x180000000, sram_size=0x400000,
+                   dram_base=0x800000000,
+                   nonce_length=20, sep_nonce_length=20,
+                   demotion_reg=0x20E02A000,
+                   ),
+    DevicePlatform(cpid=0x8000, cprv=0x20, scep=0x01, arch='arm64', srtg='"iBoot-2234.0.0.3.3',
+                   rom_base=0x100000000, rom_size=0x80000, rom_sha1='9979dce30e913c888cf77234c7a7e2a7fa676f4c',
+                   sram_base=0x180000000, sram_size=0x400000,
+                   dram_base=0x800000000,
+                   nonce_length=32, sep_nonce_length=20,
+                   demotion_reg=0x2102BC000,
+                   ),
+    DevicePlatform(cpid=0x8003, cprv=0x01, scep=0x01, arch='arm64', srtg='iBoot-2234.0.0.2.22',
+                   rom_base=0x100000000, rom_size=0x80000, rom_sha1='93d69e2430e2f0c161e3e1144b69b4da1859169b',
+                   sram_base=0x180000000, sram_size=0x400000,
+                   dram_base=0x800000000,
+                   nonce_length=32, sep_nonce_length=20,
+                   demotion_reg=0x2102BC000,
                    ),
 ]

