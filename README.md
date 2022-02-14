@@ -8,10 +8,7 @@
 
 ## About this fork
 
-This fork only supports the t8012 chip. It is based on
-[LinusHenze's ipwndfu patches](https://github.com/LinusHenze/ipwndfu_public), which allow it to boot iBoot without
-destroying the heap. A simple patch that allows you to boot any extracted iBoot image (without the img4 wrapper) is
-provided in `nop_image4.py`, which was based on LinusHenze's `rmsigchks.py`.
+This fork is maintained by the hack-different team and is gladly accepting PRs from the wider community.
 
 ## checkm8
 
@@ -21,9 +18,9 @@ provided in `nop_image4.py`, which was based on LinusHenze's `rmsigchks.py`.
 
 * allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
 
-* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t8002, t8004, t8010, t8011, t8015
+* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t7000, s8000, t8002, s8003, t8004, t8010, t8011, t8012, t8015
 
-* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7000, t7001, s7002, s8000, s8001, s8003, t8012
+* future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7001, s7002, s8001
 
 * full jailbreak with Cydia on latest iOS version is possible, but requires additional work
 
@@ -38,6 +35,13 @@ provided in `nop_image4.py`, which was based on LinusHenze's `rmsigchks.py`.
 4. Run ```./ipwndfu --decrypt-gid KEYBAG``` to decrypt a keybag.
 
 5. Run ```./ipwndfu --demote``` to demote device and enable JTAG.
+
+## About this fork (addendum)
+
+This fork supports the t8012 chip. It is based on
+[LinusHenze's ipwndfu patches](https://github.com/LinusHenze/ipwndfu_public), which allow it to boot iBoot without
+destroying the heap. A simple patch that allows you to boot any extracted iBoot image (without the img4 wrapper) is
+provided in `nop_image4.py`, which was based on LinusHenze's `rmsigchks.py`.
 
 ## Features
 
