@@ -14,6 +14,8 @@ import t8012_heap_fix
 import usbexec
 from dfuexec import *
 
+global TARGET_SOC
+TARGET_SOC = None
 
 def print_help():
     print
@@ -30,6 +32,8 @@ def print_help():
     '  -f file\t\t\tsend file to device in DFU Mode'
     print
     'Advanced options:'
+    print
+    '  --dev=SOC\t\t\t Target a specific SOC (when multiple are plugged in). e.g. `--dev=8015`'
     print
     '  --demote\t\t\tdemote device to enable JTAG'
     print
@@ -62,7 +66,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn',
+        advanced = ['demote', 'boot', 'dev=', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn',
                     'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
@@ -76,8 +80,12 @@ if __name__ == '__main__':
         sys.exit(2)
 
     for opt, arg in opts:
+        
+        if opt == '--dev':
+            TARGET_SOC = arg
+        
         if opt == '-p':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -168,14 +176,14 @@ if __name__ == '__main__':
                 'ERROR: Could not read file:', arg
                 sys.exit(1)
 
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             dfu.reset_counters(device)
             dfu.send_data(device, data)
             dfu.request_image_validation(device)
             dfu.release_device(device)
 
         if opt == '--demote':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -214,7 +222,7 @@ if __name__ == '__main__':
             address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
             length = int(raw_length, 16) if raw_length.startswith('0x') else int(raw_length, 10)
 
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -235,7 +243,7 @@ if __name__ == '__main__':
             address = int(raw_address, 16) if raw_address.startswith('0x') else int(raw_address, 10)
             length = int(raw_length, 16) if raw_length.startswith('0x') else int(raw_length, 10)
 
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -253,7 +261,7 @@ if __name__ == '__main__':
                 utilities.hex_dump(dump, address),
 
         if opt == '--dump-rom':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -402,7 +410,7 @@ if __name__ == '__main__':
             device.flash_nor(new_nor.dump())
 
         if opt == '--decrypt-gid':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -420,7 +428,7 @@ if __name__ == '__main__':
                 device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
 
         if opt == '--encrypt-gid':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -438,7 +446,7 @@ if __name__ == '__main__':
                 device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
 
         if opt == '--decrypt-uid':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -456,7 +464,7 @@ if __name__ == '__main__':
                 device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
 
         if opt == '--encrypt-uid':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
@@ -474,7 +482,7 @@ if __name__ == '__main__':
                 device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
 
         if opt == '--boot':
-            device = dfu.acquire_device()
+            device = dfu.acquire_device(match=TARGET_SOC)
             serial_number = device.serial_number
             dfu.release_device(device)
 
