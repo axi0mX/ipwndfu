@@ -16,6 +16,10 @@ import t8012_heap_fix
 import usbexec
 from dfuexec import *
 
+import libusbfinder
+import usb  # pyusb: use 'pip install pyusb' to install this module
+import usb.backend.libusb1
+
 global TARGET_SOC
 TARGET_SOC = None
 
@@ -34,7 +38,7 @@ Basic options:
   -x\t\t\t\tinstall alloc8 exploit to NOR
   -f file\t\t\tsend file to device in DFU Mode
 Advanced options:
-  --dev=<filter>\t\t\t Target a specific device (when multiple are plugged in). e.g. `--dev=8015` or `--dev=<ecid>`
+  --dev=<filter>\t\t\tTarget a specific device (when multiple are plugged in). e.g. `--dev=8015` or `--dev=<ecid>`
   --demote\t\t\tdemote device to enable JTAG
   --boot\t\t\tboot device
   --dump=address,length\t\tdump memory to stdout
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     try:
         advanced = ['demote', 'boot', 'dev=', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn',
                     'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
-        opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
+        opts, args = getopt.getopt(sys.argv[1:], 'pxfl:', advanced)
     except getopt.GetoptError:
         print('ERROR: Invalid arguments provided.', file=sys.stderr)
         
@@ -67,6 +71,28 @@ if __name__ == '__main__':
         exit(2)
 
     for opt, arg in opts:
+
+        if opt == '-l':
+            displayed_serials = []
+
+            backend = usb.backend.libusb1.get_backend(find_library=lambda x: libusbfinder.libusb1_path())
+            start = time.time()
+            once = False
+            while not once or time.time() - start < 5:
+                once = True
+                for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
+                    if device.serial_number in displayed_serials:
+                        continue
+                    displayed_serials.append(device.serial_number)
+                time.sleep(0.001)
+                
+            if len(displayed_serials) < 1:
+                print('ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout)
+                exit(1)
+            else:
+                for s in displayed_serials:
+                    print(s)
+            exit(0)
         
         if opt == '--dev':
             TARGET_SOC = arg
