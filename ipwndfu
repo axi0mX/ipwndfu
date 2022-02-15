@@ -59,8 +59,8 @@ if __name__ == '__main__':
     try:
         advanced = ['demote', 'boot', 'dev=', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn',
                     'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
-        opts, args = getopt.getopt(sys.argv[1:], 'pxfl:', advanced)
-    except getopt.GetoptError:
+        opts, args = getopt.getopt(sys.argv[1:], 'pxlf:', advanced)
+    except getopt.GetoptError as ex:
         print('ERROR: Invalid arguments provided.', file=sys.stderr)
         
         print_help()
