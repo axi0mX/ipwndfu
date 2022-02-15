@@ -8,7 +8,7 @@
 
 ## About this fork
 
-This fork is maintained by the hack-different team and is gladly accepting PRs from the wider community.
+This fork is maintained by the hack-different team and is gladly accepting PRs from the wider community.  All of the original credit go to axi0mx et al.
 
 ## checkm8
 
