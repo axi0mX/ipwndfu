@@ -2,9 +2,9 @@
 # ipwndfu: open-source jailbreaking tool for older iOS devices
 # Author: axi0mX
 
+from __future__ import print_function
 import getopt
 
-from __future__ import print_function
 
 import SHAtter
 import alloc8
