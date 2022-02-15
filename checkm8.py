@@ -683,7 +683,7 @@ def exploit(match=None):
     print('(%0.2f seconds)' % (time.time() - start))
     dfu.release_device(device)
 
-def exploit_a8_a9():
+def exploit_a8_a9(match=None):
   print('*** checkm8 exploit by axi0mX ***')
 
   device = dfu.acquire_device(match=match)
