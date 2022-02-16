@@ -137,7 +137,7 @@ def main():
         remove_alloc8()
     
     elif args.decrypt_gid:
-        decrypt_gid(device, args.decrypt_gid)
+        decrypt_gid(device, args.decrypt_gid, match=args.match_device)
 
     elif args.encrypt_gid:
         encrypt_gid(device, args.encrypt_gid)
@@ -342,7 +342,7 @@ def dump_rom(device=None):
         print('SecureROM dumped to file:', filename)
 
 
-def decrypt_gid(device, arg):
+def decrypt_gid(device, arg, match=None):
     
     if not device:
         device=dfu.acquire_device()
@@ -351,7 +351,7 @@ def decrypt_gid(device, arg):
     dfu.release_device(device)
 
     if 'PWND:[checkm8]' in serial_number:
-        pwned = usbexec.PwnedUSBDevice()
+        pwned = usbexec.PwnedUSBDevice(match=match)
         print('Decrypting with %s GID key.' % pwned.platform.name())
         print(pwned.aes(arg.decode('hex'), usbexec.AES_DECRYPT, usbexec.AES_GID_KEY).encode('hex'))
     else:

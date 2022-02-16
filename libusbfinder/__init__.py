@@ -78,7 +78,7 @@ def apply_patches(binary, patches):
 def libusb1_path_internal():
     version = platform.mac_ver()[0]
     # HACK to support macOS 10.15
-    if version == '10.15':
+    if version == '10.15' or version == '10.16' or version.startswith('11'):
         version = '10.14'
     if version == '':
         # We're not running on a Mac.
@@ -104,7 +104,7 @@ def libusb1_path_internal():
                 print('ERROR: SHA256 hash of bottle does not match.')
                 sys.exit(1)
 
-            tar = tarfile.open(fileobj=io.StringIO(bottle))
+            tar = tarfile.open(fileobj=io.BytesIO(bottle))
             for member in tar.getmembers():
                 if member.name.endswith(DYLIB_NAME):
                     patched_dylib = apply_patches(tar.extractfile(member.name).read(), config.dylib_patches)

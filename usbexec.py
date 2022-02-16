@@ -55,6 +55,9 @@ AES_UID_KEY = 0x20000201
 
 
 class PwnedUSBDevice():
+
+
+
     def memset(self, address, c, length):
         self.command(self.cmd_memset(address, c, length), 0)
 
@@ -153,7 +156,7 @@ class PwnedUSBDevice():
 
     def command(self, request_data, response_length):
         assert 0 <= response_length <= USB_READ_LIMIT
-        device = dfu.acquire_device()
+        device = dfu.acquire_device(match=self.match)
         assert self.serial_number == device.serial_number
         dfu.send_data(device, '\0' * 16)
         device.ctrl_transfer(0x21, 1, 0, 0, 0, 100)
@@ -187,11 +190,12 @@ class PwnedUSBDevice():
         assert done == DONE_MAGIC
         return retval, response[self.cmd_data_offset(0):]
 
-    def __init__(self):
+    def __init__(self, match=None):
         self.config = None
         self.platform = None
+        self.match = match
 
-        device = dfu.acquire_device()
+        device = dfu.acquire_device(match=self.match)
         self.serial_number = device.serial_number
         dfu.release_device(device)
 
