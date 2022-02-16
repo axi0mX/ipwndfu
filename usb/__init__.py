@@ -61,13 +61,13 @@ def _setup_log():
         _debug.enable_tracing(True)
         filename = os.getenv('PYUSB_LOG_FILENAME')
 
-        levels = {'debug': logging.DEBUG,
+        LEVELS = {'debug': logging.DEBUG,
                   'info': logging.INFO,
                   'warning': logging.WARNING,
                   'error': logging.ERROR,
                   'critical': logging.CRITICAL}
 
-        level = levels.get(debug_level, logging.CRITICAL + 10)
+        level = LEVELS.get(debug_level, logging.CRITICAL + 10)
         logger.setLevel(level=level)
 
         try:
