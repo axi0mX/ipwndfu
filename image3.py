@@ -1,5 +1,6 @@
-import binascii
 import struct
+
+import binascii
 
 import dfuexec
 import utilities
@@ -7,12 +8,15 @@ import utilities
 
 class Image3:
     def __init__(self, data):
-        (self.magic, self.totalSize, self.dataSize, self.signedSize, self.type) = struct.unpack('4s3I4s', data[0:20])
+        (self.magic, self.totalSize, self.dataSize, self.signedSize,
+         self.type) = struct.unpack('4s3I4s', data[0:20])
         self.tags = []
         pos = 20
         while pos < 20 + self.dataSize:
-            (tagMagic, tagTotalSize, tagDataSize) = struct.unpack('4s2I', data[pos:pos + 12])
-            self.tags.append((tagMagic, tagTotalSize, tagDataSize, data[pos + 12:pos + tagTotalSize]))
+            (tagMagic, tagTotalSize, tagDataSize) = struct.unpack(
+                '4s2I', data[pos:pos + 12])
+            self.tags.append((tagMagic, tagTotalSize, tagDataSize,
+                             data[pos + 12:pos + tagTotalSize]))
             pos += tagTotalSize
             if tagTotalSize == 0:
                 break
@@ -32,10 +36,18 @@ class Image3:
         if remainder != 0:
             totalSize += 64 - remainder
 
-        bytes = struct.pack('4s3I4s', 'Img3'[::-1], totalSize, dataSize, signedSize, type)
+        bytes = struct.pack(
+            '4s3I4s',
+            'Img3'[
+                ::-1],
+            totalSize,
+            dataSize,
+            signedSize,
+            type)
         for (tagMagic, tagTotalSize, tagDataSize, tagData) in tags:
-            bytes += struct.pack('4s2I', tagMagic, tagTotalSize, tagDataSize) + tagData
-        return bytes + '\x00' * (totalSize - len(bytes))
+            bytes += struct.pack('4s2I', tagMagic,
+                                 tagTotalSize, tagDataSize) + tagData
+        return bytes + b'\x00' * (totalSize - len(bytes))
 
     def getTags(self, magic):
         matches = []
@@ -61,8 +73,8 @@ class Image3:
         keybag = self.getKeybag()
         device = dfuexec.PwnedDFUDevice()
         decrypted_keybag = device.decrypt_keybag(keybag)
-        return utilities.aes_decrypt(self.getPayload(), binascii.hexlify(decrypted_keybag[:16]),
-                                     binascii.hexlify(decrypted_keybag[16:]))
+        return utilities.aes_decrypt(self.getPayload(), binascii.hexlify(
+            decrypted_keybag[:16]), binascii.hexlify(decrypted_keybag[16:]))
 
     def shrink24KpwnCertificate(self):
         for i in range(len(self.tags)):
@@ -100,5 +112,11 @@ class Image3:
             newTagData = tagData
         assert len(tagData) == len(newTagData)
 
-        return Image3.createImage3FromTags(self.type, typeTag + [(tagMagic, tagTotalSize, tagDataSize,
-                                                                  newTagData)] + versTag + sepoTag + bordTag + kbagTag + shshTag + certTag)
+        return Image3.createImage3FromTags(self.type, typeTag +
+                                           [(tagMagic, tagTotalSize, tagDataSize, newTagData)] +
+                                           versTag +
+                                           sepoTag +
+                                           bordTag +
+                                           kbagTag +
+                                           shshTag +
+                                           certTag)

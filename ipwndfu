@@ -3,34 +3,24 @@
 # Author: axi0mX
 
 from __future__ import print_function
-import getopt
 
 import argparse
+from collections import namedtuple
 
 import SHAtter
 import alloc8
 import checkm8
+import libusbfinder
 import limera1n
-import nor
 import steaks4uce
 import t8012_heap_fix
+import usb.backend.libusb1
 import usbexec
+import nor
+import image3_24Kpwn
 from dfuexec import *
 
-import libusbfinder
-import usb  # pyusb: use 'pip install pyusb' to install this module
-import usb.backend.libusb1
-
-from collections import namedtuple
-
-global TARGET_SOC
 TARGET_SOC = None
-
-# py2 rebinding
-try:
-    input = raw_input
-except NameError:
-    pass
 
 
 def print_help():
@@ -82,7 +72,7 @@ def main():
     parser.add_argument('--encrypt-gid', dest='encrypt_gid')
     parser.add_argument('--decrypt-uid', dest='decrypt_uid')
     parser.add_argument('--encrypt_uid', dest='encrypt_uid')
-    
+
     # remap argparse's internally generated help function to our nicely formatted one.
     parser.print_help = print_help
 
@@ -105,37 +95,37 @@ def main():
 
     elif args.send_file:
         send_file(args.send_file)
-    
+
     elif args.demote:
         demote(device)
-    
+
     elif args.boot:
         boot(device)
 
     elif args.dump:
         dump(device, args.dump)
-    
+
     elif args.hexdump:
         hexdump(device, args.hexdump)
 
     elif args.dump_rom:
         dump_rom(device)
-    
+
     elif args.dump_nor:
         dump_nor(args.dump_nor)
 
     elif args.flash_nor:
         flash_nor(args.flash_nor)
-    
+
     elif args.do_24kpwn:
         do_24kpwn()
-    
+
     elif args.remove_24kpwn:
         remove_24kpwn()
-    
+
     elif args.remove_alloc8:
         remove_alloc8()
-    
+
     elif args.decrypt_gid:
         decrypt_gid(device, args.decrypt_gid, match=args.match_device)
 
@@ -147,14 +137,14 @@ def main():
 
     elif args.encrypt_uid:
         encrypt_uid(device, args.encrypt_uid)
-    
+
     else:
         print_help()
 
-    
+
 def pwn(device=None, match_device=None):
     if not device:
-        device=dfu.acquire_device(match=match_device)
+        device = dfu.acquire_device(match=match_device)
 
     serial = get_serial(device.serial_number)
     serial_number = device.serial_number
@@ -174,7 +164,7 @@ def pwn(device=None, match_device=None):
         print('Found: ' + serial_number, file=sys.stderr)
         print('ERROR: This device is not supported.', file=sys.stderr)
         exit(1)
-    
+
     if serial.cpid in ['8012']:
         t8012_heap_fix.fix_heap()
 
@@ -186,35 +176,34 @@ def xploit():
         exit(1)
 
     if device.config.version == '359.3':
-        print('WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster boots, alloc8 exploit is for testing purposes only.', file=sys.stderr)
+        print('WARNING: iPhone 3GS (old bootrom) was detected. Use 24Kpwn exploit for faster '
+              'boots, alloc8 exploit is for testing purposes only.', file=sys.stderr)
         input("Press ENTER to continue.")
 
     print('Installing alloc8 exploit to NOR.')
 
-    dump = device.nor_dump(saveBackup=True)
+    dump_data = device.nor_dump(save_backup=True)
 
-    nor = nor.NorData(dump)
+    nor_data = nor.NorData(dump_data)
 
-    for byte in nor.parts[1]:
+    for byte in nor_data.parts[1]:
         if byte != '\x00':
-            print('ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.', file=sys.stderr)
+            print('ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 '
+                  'exploit was likely previously installed. Exiting.', file=sys.stderr)
             exit(1)
-    if len(nor.images) == 0 or len(nor.images[0]) < 0x24000:
-        print('ERROR: 24Kpwn LLB was not found. You must restore a custom 24Kpwn IPSW before using this exploit.', file=sys.stderr)
+    if len(nor_data.images) == 0 or len(nor_data.images[0]) < 0x24000:
+        print('ERROR: 24Kpwn LLB was not found. You must restore a custom 24Kpwn IPSW before using this exploit.',
+              file=sys.stderr)
         exit(1)
 
     print('Preparing modified NOR with alloc8 exploit.')
     # Remove 24Kpwn first.
-    nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
-    new_nor = alloc8.exploit(nor, device.config.version)
+    nor_data.images[0] = image3_24Kpwn.remove_exploit(nor_data.images[0])
+    new_nor = alloc8.exploit(nor_data, device.config.version)
     device.flash_nor(new_nor.dump())
 
 
 def send_file(device=None, filename=''):
-
-    if not device:
-        device=dfu.acquire_device()
-
     try:
         with open(filename, 'rb') as f:
             data = f.read()
@@ -222,7 +211,9 @@ def send_file(device=None, filename=''):
         print('ERROR: Could not read file: ' + filename, file=sys.stderr)
         exit(1)
 
-    device = dfu.acquire_device(match=TARGET_SOC)
+    if not device:
+        device = dfu.acquire_device(match=TARGET_SOC)
+
     dfu.reset_counters(device)
     dfu.send_data(device, data)
     dfu.request_image_validation(device)
@@ -230,10 +221,9 @@ def send_file(device=None, filename=''):
 
 
 def demote(device=None):
-    
     if not device:
-        device=dfu.acquire_device()
-        
+        device = dfu.acquire_device()
+
     serial_number = device.serial_number
     dfu.release_device(device)
 
@@ -257,10 +247,9 @@ def demote(device=None):
         exit(1)
 
 
-def dump(device=None, _dump_args=''):
-    
+def dump(device=None, dump_args=''):
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     arg = dump_args
     if arg.count(',') != 1:
@@ -283,9 +272,8 @@ def dump(device=None, _dump_args=''):
 
 
 def hexdump(device=None, arg=""):
-
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     if arg.count(',') != 1:
         print('ERROR: You must provide exactly 2 comma separated values: address,length', file=sys.stderr)
@@ -300,20 +288,19 @@ def hexdump(device=None, arg=""):
 
     if 'PWND:[checkm8]' in serial_number:
         device = usbexec.PwnedUSBDevice()
-        dump = device.read_memory(address, length)
-        for line in utilities.hex_dump(dump, address).splitlines():
+        memory_dump = device.read_memory(address, length)
+        for line in utilities.hex_dump(memory_dump, address).splitlines():
             print('%x: %s' % (address, line[10:]))
             address += 16
     else:
         device = PwnedDFUDevice()
-        dump = device.read_memory(address, length)
-        print(utilities.hex_dump(dump, address))
+        memory_dump = device.read_memory(address, length)
+        print(utilities.hex_dump(memory_dump, address))
 
 
 def dump_rom(device=None):
-
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -343,9 +330,8 @@ def dump_rom(device=None):
 
 
 def decrypt_gid(device, arg, match=None):
-    
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -361,9 +347,8 @@ def decrypt_gid(device, arg, match=None):
 
 
 def encrypt_gid(device, arg):
-    
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -379,9 +364,8 @@ def encrypt_gid(device, arg):
 
 
 def decrypt_uid(device, arg):
-    
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -397,9 +381,8 @@ def decrypt_uid(device, arg):
 
 
 def encrypt_uid(device, arg):
-    
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -415,12 +398,13 @@ def encrypt_uid(device, arg):
 
 
 def list_devices():
+    timeout = 5
     displayed_serials = []
 
     backend = usb.backend.libusb1.get_backend(find_library=lambda x: libusbfinder.libusb1_path())
     start = time.time()
     once = False
-    while not once or time.time() - start < 5:
+    while not once or time.time() - start < timeout:
         once = True
         for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
             if device.serial_number in displayed_serials:
@@ -428,7 +412,7 @@ def list_devices():
             print(device.serial_number)
             displayed_serials.append(device.serial_number)
         time.sleep(0.001)
-        
+
     if len(displayed_serials) < 1:
         print('ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout)
         return 1
@@ -437,9 +421,8 @@ def list_devices():
 
 
 def boot(device=None):
-    
     if not device:
-        device=dfu.acquire_device()
+        device = dfu.acquire_device()
 
     serial_number = device.serial_number
     dfu.release_device(device)
@@ -448,37 +431,37 @@ def boot(device=None):
         print(serial_number)
         print('ERROR: Option --boot is currently only supported on iPhone X pwned with checkm8.', file=sys.stderr)
     else:
-        HEAP_BASE = 0x1801E8000
-        HEAP_WRITE_OFFSET = 0x5000
-        HEAP_WRITE_HASH = 0x10000D4EC
-        HEAP_CHECK_ALL = 0x10000DB98
-        HEAP_STATE = 0x1800086A0
-        NAND_BOOT_JUMP = 0x10000188C
-        BOOTSTRAP_TASK_LR = 0x180015F88
-        DFU_BOOL = 0x1800085B0
-        DFU_NOTIFY = 0x1000098B4
-        DFU_STATE = 0x1800085E0
-        TRAMPOLINE = 0x180018000
-        block1 = struct.pack('<8Q', 0, 0, 0, HEAP_STATE, 2, 132, 128, 0)
-        block2 = struct.pack('<8Q', 0, 0, 0, HEAP_STATE, 2, 8, 128, 0)
+        heap_base = 0x1801E8000
+        heap_write_offset = 0x5000
+        heap_write_hash = 0x10000D4EC
+        heap_check_all = 0x10000DB98
+        heap_state = 0x1800086A0
+        nand_boot_jump = 0x10000188C
+        bootstrap_task_lr = 0x180015F88
+        dfu_bool = 0x1800085B0
+        dfu_notify = 0x1000098B4
+        dfu_state = 0x1800085E0
+        trampoline = 0x180018000
+        block1 = struct.pack('<8Q', 0, 0, 0, heap_state, 2, 132, 128, 0)
+        block2 = struct.pack('<8Q', 0, 0, 0, heap_state, 2, 8, 128, 0)
         device = usbexec.PwnedUSBDevice()
-        device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET, block1)
-        device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET + 0x80, block2)
-        device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET + 0x100, block2)
-        device.write_memory(HEAP_BASE + HEAP_WRITE_OFFSET + 0x180, block2)
-        device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET)
-        device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET + 0x80)
-        device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET + 0x100)
-        device.execute(0, HEAP_WRITE_HASH, HEAP_BASE + HEAP_WRITE_OFFSET + 0x180)
-        device.execute(0, HEAP_CHECK_ALL)
+        device.write_memory(heap_base + heap_write_offset, block1)
+        device.write_memory(heap_base + heap_write_offset + 0x80, block2)
+        device.write_memory(heap_base + heap_write_offset + 0x100, block2)
+        device.write_memory(heap_base + heap_write_offset + 0x180, block2)
+        device.execute(0, heap_write_hash, heap_base + heap_write_offset)
+        device.execute(0, heap_write_hash, heap_base + heap_write_offset + 0x80)
+        device.execute(0, heap_write_hash, heap_base + heap_write_offset + 0x100)
+        device.execute(0, heap_write_hash, heap_base + heap_write_offset + 0x180)
+        device.execute(0, heap_check_all)
         print('Heap repaired.')
 
-        device.write_memory(TRAMPOLINE, checkm8.asm_arm64_branch(TRAMPOLINE, TRAMPOLINE + 0x400))
-        device.write_memory(TRAMPOLINE + 0x400, open('bin/t8015_shellcode_arm64.bin').read())
+        device.write_memory(trampoline, checkm8.asm_arm64_branch(trampoline, trampoline + 0x400))
+        device.write_memory(trampoline + 0x400, open('bin/t8015_shellcode_arm64.bin').read())
 
-        device.write_memory_ptr(BOOTSTRAP_TASK_LR, NAND_BOOT_JUMP)
-        device.write_memory(DFU_BOOL, '\x01')
-        device.execute(0, DFU_NOTIFY, DFU_STATE)
+        device.write_memory_ptr(bootstrap_task_lr, nand_boot_jump)
+        device.write_memory(dfu_bool, '\x01')
+        device.execute(0, dfu_notify, dfu_state)
         print('Booted.')
 
 
@@ -487,11 +470,12 @@ def dump_nor(arg):
     if device.config.cpid != '8920':
         print('This is not a compatible device. Dumping NOR is only supported on iPhone 3GS.', file=sys.stderr)
         exit(1)
-    nor = device.nor_dump(saveBackup=False)
+    nor_data = device.nor_dump(save_backup=False)
     f = open(arg, 'wb')
-    f.write(nor)
+    f.write(nor_data)
     f.close()
     print('NOR dumped to file: %s' % arg)
+
 
 def flash_nor(arg):
     print('Flashing NOR from file:', arg)
@@ -506,87 +490,99 @@ def flash_nor(arg):
     if device.config.cpid != '8920':
         print('This is not a compatible device. Flashing NOR is only supported on iPhone 3GS.', file=sys.stderr)
         exit(1)
-    device.nor_dump(saveBackup=True)
+    device.nor_dump(save_backup=True)
     device.flash_nor(new_nor)
 
 
 def do_24kpwn(device=None):
-    
-    print('*** based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, Planetbeing, pod2g, posixninja, et al. ***')
+    print('*** based on 24Kpwn exploit (segment overflow) by chronic, CPICH, ius, MuscleNerd, '
+          'Planetbeing, pod2g, posixninja, et al. ***')
 
-    device = PwnedDFUDevice()
+    if not device:
+        device = PwnedDFUDevice()
+
     if device.config.version != '359.3':
         print('Only iPhone 3GS (old bootrom) is supported.', file=sys.stderr)
         exit(1)
 
-    dump = device.nor_dump(saveBackup=True)
+    dump_data = device.nor_dump(save_backup=True)
 
     print('Preparing modified NOR with 24Kpwn exploit.')
-    nor = nor.NorData(dump)
-    for byte in nor.parts[1]:
+    nor_data = nor.NorData(dump_data)
+    for byte in nor_data.parts[1]:
         if byte != '\x00':
-            print('ERROR: Bytes following IMG2 header in NOR are not zero. alloc8 exploit was likely previously installed. Exiting.', file=sys.stderr)
+            print('ERROR: Bytes following IMG2 header in NOR are not zero. '
+                  'alloc8 exploit was likely previously installed. Exiting.', file=sys.stderr)
             exit(1)
-    if len(nor.images) == 0:
+
+    if len(nor_data.images) == 0:
         print('ERROR: 24Kpwn exploit cannot be installed, because NOR has no valid LLB. Exiting.', file=sys.stderr)
         exit(1)
 
     # Remove existing 24Kpwn exploit.
-    if len(nor.images[0]) > 0x24000:
-        nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
-    nor.images[0] = image3_24Kpwn.exploit(nor.images[0], device.securerom_dump())
-    device.flash_nor(nor.dump())
+    if len(nor_data.images[0]) > 0x24000:
+        nor_data.images[0] = image3_24Kpwn.remove_exploit(nor_data.images[0])
+    nor_data.images[0] = image3_24Kpwn.exploit(nor_data.images[0], device.securerom_dump())
+    device.flash_nor(nor_data.dump())
 
 
 def remove_24kpwn(device=None):
-    device = PwnedDFUDevice()
+    if not device:
+        device = PwnedDFUDevice()
     if device.config.cpid != '8920':
         print('This is not a compatible device. 24Kpwn exploit is only supported on iPhone 3GS.', file=sys.stderr)
         exit(1)
 
-    print('WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.')
+    print('WARNING: This feature is for researchers only. Device will probably not boot into '
+          'iOS until it is restored in iTunes.')
     input("Press ENTER to continue.")
 
-    dump = device.nor_dump(saveBackup=True)
+    dump_data = device.nor_dump(save_backup=True)
 
-    nor = nor.NorData(dump)
+    nor_data = nor.NorData(dump_data)
 
-    if len(nor.images) == 0:
+    if len(nor_data.images) == 0:
         print('ERROR: NOR has no valid LLB. It seems that 24Kpwn exploit is not installed. Exiting.', file=sys.stderr)
         exit(1)
-    if len(nor.images[0]) <= 0x24000:
+    if len(nor_data.images[0]) <= 0x24000:
         print('ERROR: LLB is not oversized. It seems that 24Kpwn exploit is not installed. Exiting.', file=sys.stderr)
         exit(1)
 
     print('Preparing modified NOR without 24Kpwn exploit.')
-    nor.images[0] = image3_24Kpwn.remove_exploit(nor.images[0])
-    device.flash_nor(nor.dump())
+    nor_data.images[0] = image3_24Kpwn.remove_exploit(nor_data.images[0])
+    device.flash_nor(nor_data.dump())
+
 
 def remove_alloc8(device=None):
-    device = PwnedDFUDevice()
+    if device is None:
+        device = PwnedDFUDevice()
+
     if device.config.cpid != '8920':
         print('This is not a compatible device. alloc8 exploit is for iPhone 3GS only.', file=sys.stderr)
         exit(1)
 
-    print('WARNING: This feature is for researchers only. Device will probably not boot into iOS until it is restored in iTunes.', file=sys.stderr)
+    print('WARNING: This feature is for researchers only. Device will probably not '
+          'boot into iOS until it is restored in iTunes.', file=sys.stderr)
     input("Press ENTER to continue.")
 
-    dump = device.nor_dump(saveBackup=True)
+    dump_data = device.nor_dump(save_backup=True)
 
-    nor = nor.NorData(dump)
+    nor_data = nor.NorData(dump_data)
 
-    if len(nor.images) < 700:
-        print('ERROR: It seems that alloc8 exploit is not installed. There are less than 700 images in NOR. Exiting.', file=sys.stderr)
+    if len(nor_data.images) < 700:
+        print('ERROR: It seems that alloc8 exploit is not installed. There are less than 700 images in NOR. Exiting.',
+              file=sys.stderr)
         exit(1)
 
     print('Preparing modified NOR without alloc8 exploit.')
-    new_nor = alloc8.remove_exploit(nor)
+    new_nor = alloc8.remove_exploit(nor_data)
     device.flash_nor(new_nor.dump())
 
 
 # this bit nicely divvys up a standard DFU usb serial string into a usable 'object' representing its fields
 
 _serial_number = namedtuple('serial', ['cpid', 'cprv', 'cpfm', 'scep', 'bdid', 'ecid', 'ibfl', 'srtg', 'pwned'])
+
 
 def get_serial(_serial):
     tokens = _serial.split(' ')

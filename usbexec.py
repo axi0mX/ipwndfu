@@ -12,30 +12,61 @@ class ExecConfig:
         self.aes_crypto_cmd = aes_crypto_cmd
 
     def match(self, info):
-        return info == self.info[0].ljust(0x40, '\0') + self.info[1].ljust(0x40, '\0') + self.info[2].ljust(0x80, '\0')
+        return info == self.info[0].ljust(
+            0x40, '\0') + self.info[1].ljust(0x40, '\0') + self.info[2].ljust(0x80, '\0')
 
 
 configs = [
-    ExecConfig(('SecureROM for s5l8947xsi, Copyright 2011, Apple Inc.', 'RELEASE', 'iBoot-1458.2'),
-               aes_crypto_cmd=0x7060 + 1),
-    ExecConfig(('SecureROM for s5l8950xsi, Copyright 2011, Apple Inc.', 'RELEASE', 'iBoot-1145.3'),
-               aes_crypto_cmd=0x7300 + 1),
-    ExecConfig(('SecureROM for s5l8955xsi, Copyright 2011, Apple Inc.', 'RELEASE', 'iBoot-1145.3.3'),
-               aes_crypto_cmd=0x7340 + 1),
-    ExecConfig(('SecureROM for t8002si, Copyright 2007-2014, Apple Inc.', 'ROMRELEASE', 'iBoot-2651.0.0.1.31'),
-               aes_crypto_cmd=0x86DC + 1),
-    ExecConfig(('SecureROM for t8004si, Copyright 2007-2014, Apple Inc.', 'ROMRELEASE', 'iBoot-2651.0.0.3.3'),
-               aes_crypto_cmd=0x786C + 1),
-    ExecConfig(('SecureROM for s5l8960xsi, Copyright 2012, Apple Inc.', 'RELEASE', 'iBoot-1704.10'),
-               aes_crypto_cmd=0x10000B9A8),
-    ExecConfig(('SecureROM for t8010si, Copyright 2007-2015, Apple Inc.', 'ROMRELEASE', 'iBoot-2696.0.0.1.33'),
-               aes_crypto_cmd=0x10000C8F4),
-    ExecConfig(('SecureROM for t8011si, Copyright 2007-2015, Apple Inc.', 'ROMRELEASE', 'iBoot-3135.0.0.2.3'),
-               aes_crypto_cmd=0x10000C994),
-    ExecConfig(('SecureROM for t8015si, Copyright 2007-2016, Apple Inc.', 'ROMRELEASE', 'iBoot-3332.0.0.1.23'),
-               aes_crypto_cmd=0x100009E9C),
-    ExecConfig(('SecureROM for t8012si, Copyright 2007-2016, Apple Inc.', 'ROMRELEASE', 'iBoot-3401.0.0.1.16'),
-               aes_crypto_cmd=0x1000082AC),
+    ExecConfig(
+        ('SecureROM for s5l8947xsi, Copyright 2011, Apple Inc.',
+         'RELEASE',
+         'iBoot-1458.2'),
+        aes_crypto_cmd=0x7060 + 1),
+    ExecConfig(
+        ('SecureROM for s5l8950xsi, Copyright 2011, Apple Inc.',
+         'RELEASE',
+         'iBoot-1145.3'),
+        aes_crypto_cmd=0x7300 + 1),
+    ExecConfig(
+        ('SecureROM for s5l8955xsi, Copyright 2011, Apple Inc.',
+         'RELEASE',
+         'iBoot-1145.3.3'),
+        aes_crypto_cmd=0x7340 + 1),
+    ExecConfig(
+        ('SecureROM for t8002si, Copyright 2007-2014, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-2651.0.0.1.31'),
+        aes_crypto_cmd=0x86DC + 1),
+    ExecConfig(
+        ('SecureROM for t8004si, Copyright 2007-2014, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-2651.0.0.3.3'),
+        aes_crypto_cmd=0x786C + 1),
+    ExecConfig(
+        ('SecureROM for s5l8960xsi, Copyright 2012, Apple Inc.',
+         'RELEASE',
+         'iBoot-1704.10'),
+        aes_crypto_cmd=0x10000B9A8),
+    ExecConfig(
+        ('SecureROM for t8010si, Copyright 2007-2015, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-2696.0.0.1.33'),
+        aes_crypto_cmd=0x10000C8F4),
+    ExecConfig(
+        ('SecureROM for t8011si, Copyright 2007-2015, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-3135.0.0.2.3'),
+        aes_crypto_cmd=0x10000C994),
+    ExecConfig(
+        ('SecureROM for t8015si, Copyright 2007-2016, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-3332.0.0.1.23'),
+        aes_crypto_cmd=0x100009E9C),
+    ExecConfig(
+        ('SecureROM for t8012si, Copyright 2007-2016, Apple Inc.',
+         'ROMRELEASE',
+         'iBoot-3401.0.0.1.16'),
+        aes_crypto_cmd=0x1000082AC),
 ]
 
 EXEC_MAGIC = 'execexec'[::-1]
@@ -54,9 +85,7 @@ AES_GID_KEY = 0x20000200
 AES_UID_KEY = 0x20000201
 
 
-class PwnedUSBDevice():
-
-
+class PwnedUSBDevice:
 
     def memset(self, address, c, length):
         self.command(self.cmd_memset(address, c, length), 0)
@@ -65,7 +94,12 @@ class PwnedUSBDevice():
         self.command(self.cmd_memcpy(dest, src, length), 0)
 
     def read_memory_ptr(self, address):
-        return struct.unpack('<%s' % self.cmd_arg_type(), self.read_memory(address, self.cmd_arg_size()))[0]
+        return struct.unpack(
+            '<%s' %
+            self.cmd_arg_type(),
+            self.read_memory(
+                address,
+                self.cmd_arg_size()))[0]
 
     def read_memory_uint8(self, address):
         return struct.unpack('<B', self.read_memory(address, 1))[0]
@@ -80,10 +114,20 @@ class PwnedUSBDevice():
         return struct.unpack('<Q', self.read_memory(address, 8))[0]
 
     def write_memory(self, address, data):
-        self.command(self.cmd_memcpy(address, self.cmd_data_address(3), len(data)) + data, 0)
+        self.command(
+            self.cmd_memcpy(
+                address,
+                self.cmd_data_address(3),
+                len(data)) + data,
+            0)
 
     def write_memory_ptr(self, address, value):
-        self.write_memory(address, struct.pack('<%s' % self.cmd_arg_type(), value))
+        self.write_memory(
+            address,
+            struct.pack(
+                '<%s' %
+                self.cmd_arg_type(),
+                value))
 
     def write_memory_uint8(self, address, value):
         self.write_memory(address, struct.pack('<B', value))
@@ -110,10 +154,22 @@ class PwnedUSBDevice():
         return self.load_base() + self.cmd_data_offset(index)
 
     def cmd_memcpy(self, dest, src, length):
-        return struct.pack('<8s8x3%s' % self.cmd_arg_type(), MEMC_MAGIC, dest, src, length)
+        return struct.pack(
+            '<8s8x3%s' %
+            self.cmd_arg_type(),
+            MEMC_MAGIC,
+            dest,
+            src,
+            length)
 
     def cmd_memset(self, address, c, length):
-        return struct.pack('<8s8x3%s' % self.cmd_arg_type(), MEMS_MAGIC, address, c, length)
+        return struct.pack(
+            '<8s8x3%s' %
+            self.cmd_arg_type(),
+            MEMS_MAGIC,
+            address,
+            c,
+            length)
 
     def load_base(self):
         if 'SRTG:' in self.serial_number:
@@ -139,17 +195,36 @@ class PwnedUSBDevice():
 
     def aes(self, data, action, key):
         assert len(data) % AES_BLOCK_SIZE == 0
-        (retval, received) = self.execute(len(data), self.config.aes_crypto_cmd, action, self.cmd_data_address(7),
-                                          self.cmd_data_address(0), len(data), key, 0, 0, data)
+        (retval,
+         received) = self.execute(len(data),
+                                  self.config.aes_crypto_cmd,
+                                  action,
+                                  self.cmd_data_address(7),
+                                  self.cmd_data_address(0),
+                                  len(data),
+                                  key,
+                                  0,
+                                  0,
+                                  data)
         assert retval & 0xFFFFFFFF == 0
         return received[:len(data)]
 
     def read_memory(self, address, length):
         data = str()
         while len(data) < length:
-            part_length = min(length - len(data), USB_READ_LIMIT - self.cmd_data_offset(0))
-            response = self.command(self.cmd_memcpy(self.cmd_data_address(0), address + len(data), part_length),
-                                    self.cmd_data_offset(0) + part_length)
+            part_length = min(
+                length -
+                len(data),
+                USB_READ_LIMIT -
+                self.cmd_data_offset(0))
+            response = self.command(
+                self.cmd_memcpy(
+                    self.cmd_data_address(0),
+                    address +
+                    len(data),
+                    part_length),
+                self.cmd_data_offset(0) +
+                part_length)
             assert response[:8] == DONE_MAGIC
             data += response[self.cmd_data_offset(0):]
         return data
@@ -166,9 +241,17 @@ class PwnedUSBDevice():
 
         # HACK
         if response_length == 0:
-            response = device.ctrl_transfer(0xA1, 2, 0xFFFF, 0, response_length + 1, CMD_TIMEOUT).tostring()[1:]
+            response = device.ctrl_transfer(
+                0xA1,
+                2,
+                0xFFFF,
+                0,
+                response_length + 1,
+                CMD_TIMEOUT).tostring()[
+                1:]
         else:
-            response = device.ctrl_transfer(0xA1, 2, 0xFFFF, 0, response_length, CMD_TIMEOUT).tostring()
+            response = device.ctrl_transfer(
+                0xA1, 2, 0xFFFF, 0, response_length, CMD_TIMEOUT).tostring()
         dfu.release_device(device)
         assert len(response) == response_length
         return response
@@ -181,12 +264,19 @@ class PwnedUSBDevice():
             elif isinstance(args[i], str) and i == len(args) - 1:
                 cmd += args[i]
             else:
-                print('ERROR: usbexec.execute: invalid argument at position %s' % i)
+                print(
+                    'ERROR: usbexec.execute: invalid argument at position %s' %
+                    i)
                 sys.exit(1)
             if i == 0 and self.platform.arch != 'arm64':
                 cmd += '\0' * 4
-        response = self.command(EXEC_MAGIC + cmd, self.cmd_data_offset(0) + response_length)
-        done, retval = struct.unpack('<8sQ', response[:self.cmd_data_offset(0)])
+        response = self.command(
+            EXEC_MAGIC +
+            cmd,
+            self.cmd_data_offset(0) +
+            response_length)
+        done, retval = struct.unpack(
+            '<8sQ', response[:self.cmd_data_offset(0)])
         assert done == DONE_MAGIC
         return retval, response[self.cmd_data_offset(0):]
 
@@ -200,7 +290,9 @@ class PwnedUSBDevice():
         dfu.release_device(device)
 
         for dp in device_platform.all_platforms:
-            if self.serial_number.startswith('CPID:%04x CPRV:%02x ' % (dp.cpid, dp.cprv)):
+            if self.serial_number.startswith(
+                'CPID:%04x CPRV:%02x ' %
+                    (dp.cpid, dp.cprv)):
                 self.platform = dp
                 break
         if self.platform is None:

@@ -17,7 +17,15 @@ def aes_decrypt(data, iv, key):
         print('ERROR: Bad AES key given to aes_decrypt. Exiting.')
         sys.exit(1)
 
-    p = subprocess.Popen(['openssl', 'enc', '-aes-%s-cbc' % aes, '-d', '-nopad', '-iv', iv, '-K', key],
+    p = subprocess.Popen(['openssl',
+                          'enc',
+                          '-aes-%s-cbc' % aes,
+                          '-d',
+                          '-nopad',
+                          '-iv',
+                          iv,
+                          '-K',
+                          key],
                          stdout=subprocess.PIPE,
                          stdin=subprocess.PIPE,
                          stderr=subprocess.PIPE)
@@ -31,7 +39,11 @@ def aes_decrypt(data, iv, key):
 
 
 def hex_dump(data, address):
-    p = subprocess.Popen(['xxd', '-o', str(address)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    p = subprocess.Popen(['xxd',
+                          '-o',
+                          str(address)],
+                         stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     (stdout, stderr) = p.communicate(input=data)
 

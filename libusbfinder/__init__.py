@@ -3,6 +3,7 @@ import io
 import os
 import platform
 import tarfile
+import sys
 
 
 class VersionConfig:
@@ -63,9 +64,9 @@ configs = [
         dylib_sha256='0490800ca9ff82d37c310a09f9bd29aaa87143cf86b35d94b170617ec9d127bb'),
 ]
 
-dir = os.path.dirname(__file__)
-BOTTLE_PATH_FORMAT = os.path.join(dir, 'bottles', '%s.tar.gz')
-DYLIB_PATH_FORMAT = os.path.join(dir, '%s.dylib')
+MY_DIRECTORY = os.path.dirname(__file__)
+BOTTLE_PATH_FORMAT = os.path.join(MY_DIRECTORY, 'bottles', '%s.tar.gz')
+DYLIB_PATH_FORMAT = os.path.join(MY_DIRECTORY, '%s.dylib')
 DYLIB_NAME = 'libusb-1.0.0.dylib'
 
 

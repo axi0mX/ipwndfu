@@ -1,9 +1,10 @@
-import binascii
 import datetime
 import hashlib
 import struct
 import sys
 import time
+
+import binascii
 
 import dfu
 import image3
@@ -20,8 +21,17 @@ AES_DECRYPT = 17
 
 
 class PwnedDeviceConfig:
-    def __init__(self, version, cpid, aes_crypto_cmd, memmove, get_block_device, load_address, rom_address, rom_size,
-                 rom_sha256):
+    def __init__(
+            self,
+            version,
+            cpid,
+            aes_crypto_cmd,
+            memmove,
+            get_block_device,
+            load_address,
+            rom_address,
+            rom_size,
+            rom_sha256):
         self.version = version
         self.cpid = cpid
         self.aes_crypto_cmd = aes_crypto_cmd
@@ -108,14 +118,15 @@ configs = [
 ]
 
 
-class PwnedDFUDevice():
+class PwnedDFUDevice:
     def __init__(self):
         device = dfu.acquire_device()
         self.identifier = device.serial_number
         dfu.release_device(device)
 
         if 'PWND:[' not in self.identifier:
-            print('ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.')
+            print(
+                'ERROR: Device is not in pwned DFU Mode. Use -p flag to exploit device and then try again.')
             sys.exit(1)
 
         if 'CPID:8720' in self.identifier:
@@ -128,7 +139,8 @@ class PwnedDFUDevice():
                 self.config = config
                 break
         if self.config is None:
-            print('ERROR: Device seems to be in pwned DFU Mode, but a matching configuration was not found.')
+            print(
+                'ERROR: Device seems to be in pwned DFU Mode, but a matching configuration was not found.')
             sys.exit(1)
 
     def ecid_string(self):
@@ -139,7 +151,7 @@ class PwnedDFUDevice():
         print('ERROR: ECID is missing from USB serial number string.')
         sys.exit(1)
 
-    def execute(self, cmd, receiveLength):
+    def execute(self, cmd, receive_length):
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
 
@@ -153,54 +165,79 @@ class PwnedDFUDevice():
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
 
-        requiredLength = 0x8 + receiveLength
-        requiredLength = requiredLength if requiredLength % 0x800 == 0 else requiredLength / 0x800 * 0x800 + 0x800
-        received = dfu.get_data(device, requiredLength)
+        required_length = 0x8 + receive_length
+        required_length = required_length if required_length % 0x800 == 0 else required_length / \
+            0x800 * 0x800 + 0x800
+        received = dfu.get_data(device, required_length)
         dfu.release_device(device)
 
         (exec_cleared, retval) = struct.unpack('<2I', received[:8])
         assert exec_cleared == 0
-        return (retval, received[8:8 + receiveLength])
+        return retval, received[8:8 + receive_length]
 
     def securerom_dump(self):
-        securerom = self.read_memory(self.config.rom_address, self.config.rom_size)
+        securerom = self.read_memory(
+            self.config.rom_address,
+            self.config.rom_size)
         if hashlib.sha256(securerom).hexdigest() != self.config.rom_sha256:
-            print('ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting.')
+            print(
+                'ERROR: SecureROM was dumped, but the SHA256 hash does not match. Exiting.')
             sys.exit(1)
         return securerom
 
     def aes(self, data, action, key):
         if len(data) % AES_BLOCK_SIZE != 0:
-            print('ERROR: Length of data for AES encryption/decryption must be a multiple of %s.' % AES_BLOCK_SIZE)
+            print(
+                'ERROR: Length of data for AES encryption/decryption must be a multiple of %s.' %
+                AES_BLOCK_SIZE)
             sys.exit(1)
 
-        cmd = struct.pack('<8I', self.config.aes_crypto_cmd, action, self.config.load_address + 36,
-                          self.config.load_address + 0x8, len(data), key, 0, 0)
+        cmd = struct.pack(
+            '<8I',
+            self.config.aes_crypto_cmd,
+            action,
+            self.config.load_address +
+            36,
+            self.config.load_address +
+            0x8,
+            len(data),
+            key,
+            0,
+            0)
         (retval, received) = self.execute(cmd + data, len(data))
         return received[:len(data)]
 
     def aes_hex(self, hexdata, action, key):
         if len(hexdata) % 32 != 0:
-            print('ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' % (
-                        2 * AES_BLOCK_SIZE))
+            print(
+                'ERROR: Length of hex data for AES encryption/decryption must be a multiple of %s.' %
+                (2 * AES_BLOCK_SIZE))
             sys.exit(1)
 
-        return binascii.hexlify(self.aes(binascii.unhexlify(hexdata), action, key))
+        return binascii.hexlify(
+            self.aes(
+                binascii.unhexlify(hexdata),
+                action,
+                key))
 
     def read_memory(self, address, length):
-        (retval, data) = self.execute(
-            struct.pack('<4I', self.config.memmove, self.config.load_address + 8, address, length), length)
+        (retval, data) = self.execute(struct.pack('<4I', self.config.memmove,
+                                                  self.config.load_address + 8, address, length), length)
         return data
 
     def write_memory(self, address, data):
-        (retval, data) = self.execute(
-            struct.pack('<4I%ss' % len(data), self.config.memmove, address, self.config.load_address + 20, len(data),
-                        data), 0)
+        (retval, data) = self.execute(struct.pack('<4I%ss' %
+                                                  len(data), self.config.memmove, address, self.config.load_address +
+                                                  20, len(data), data), 0)
         return data
 
-    def nor_dump(self, saveBackup):
-        (bdev, empty) = self.execute(
-            struct.pack('<2I5s', self.config.get_block_device, self.config.load_address + 12, 'nor0\x00'), 0)
+    def nor_dump(self, save_backup):
+        (bdev,
+         empty) = self.execute(struct.pack('<2I5s',
+                                           self.config.get_block_device,
+                                           self.config.load_address + 12,
+                                           'nor0\x00'),
+                               0)
         if bdev == 0:
             print('ERROR: Unable to dump NOR. Pointer to nor0 block device was NULL.')
             sys.exit(1)
@@ -211,19 +248,26 @@ class PwnedDFUDevice():
             print('ERROR: Unable to dump NOR. Function pointer for reading was NULL.')
             sys.exit(1)
 
-        NOR_PART_SIZE = 0x20000
-        NOR_PARTS = 8
-        nor = str()
-        for i in range(NOR_PARTS):
-            print('Dumping NOR, part %s/%s.' % (i + 1, NOR_PARTS))
-            (retval, received) = self.execute(
-                struct.pack('<6I', read, bdev, self.config.load_address + 8, i * NOR_PART_SIZE, 0, NOR_PART_SIZE),
-                NOR_PART_SIZE)
+        nor_part_size = 0x20000
+        nor_parts = 8
+        nor = bytes()
+        for i in range(nor_parts):
+            print('Dumping NOR, part %s/%s.' % (i + 1, nor_parts))
+            (retval,
+             received) = self.execute(struct.pack('<6I',
+                                                  read,
+                                                  bdev,
+                                                  self.config.load_address + 8,
+                                                  i * nor_part_size,
+                                                  0,
+                                                  nor_part_size),
+                                      nor_part_size)
             nor += received
 
-        if saveBackup:
+        if save_backup:
             date = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
-            filename = 'nor-backups/nor-%s-%s.dump' % (self.ecid_string(), date)
+            filename = 'nor-backups/nor-%s-%s.dump' % (
+                self.ecid_string(), date)
             f = open(filename, 'wb')
             f.write(nor)
             f.close()
@@ -232,40 +276,45 @@ class PwnedDFUDevice():
         return nor
 
     def boot_ibss(self):
-        print('Sending iBSS.')
+        print('Sending i_bss.')
         if self.config.cpid != '8920':
-            print('ERROR: Boot iBSS is currently only supported on iPhone 3GS.')
+            print('ERROR: Boot i_bss is currently only supported on iPhone 3GS.')
             sys.exit(1)
 
-        help1 = 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract iBSS:'
-        help2 = 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw Firmware/dfu/iBSS.n88ap.RELEASE.dfu > n88ap-iBSS-4.3.5.img3'
+        help1 = 'Download iPhone2,1_4.3.5_8L1_Restore.ipsw and use the following command to extract i_bss:'
+        help2 = 'unzip -p iPhone2,1_4.3.5_8L1_Restore.ipsw ' \
+                'Firmware/dfu/i_bss.n88ap.RELEASE.dfu > n88ap-i_bss-4.3.5.img3'
         try:
-            f = open('n88ap-iBSS-4.3.5.img3', 'rb')
+            f = open('n88ap-i_bss-4.3.5.img3', 'rb')
             data = f.read()
             f.close()
-        except:
-            print('ERROR: n88ap-iBSS-4.3.5.img3 is missing.')
+        except BaseException:
+            print('ERROR: n88ap-i_bss-4.3.5.img3 is missing.')
             print(help1)
             print(help2)
             sys.exit(1)
         if len(data) == 0:
-            print('ERROR: n88ap-iBSS-4.3.5.img3 exists, but is empty (size: 0 bytes).')
+            print('ERROR: n88ap-i_bss-4.3.5.img3 exists, but is empty (size: 0 bytes).')
             print(help1)
             print(help2)
             sys.exit(1)
-        if hashlib.sha256(data).hexdigest() != 'b47816105ce97ef02637ec113acdefcdee32336a11e04eda0a6f4fc5e6617e61':
-            print('ERROR: n88ap-iBSS-4.3.5.img3 exists, but is from the wrong IPSW or corrupted.')
+        if hashlib.sha256(data).hexdigest(
+        ) != 'b47816105ce97ef02637ec113acdefcdee32336a11e04eda0a6f4fc5e6617e61':
+            print(
+                'ERROR: n88ap-i_bss-4.3.5.img3 exists, but is from the wrong IPSW or corrupted.')
             print(help1)
             print(help2)
             sys.exit(1)
 
-        iBSS = image3.Image3(data)
-        decryptediBSS = iBSS.newImage3(decrypted=True)
-        n88ap_iBSS_435_patches = [
+        i_bss = image3.Image3(data)
+        decrypted_ibss = i_bss.newImage3(decrypted=True)
+        n88ap_i_bss_435_patches = [
             (0x14954, 'run\x00'),  # patch 'reset' command string to 'run'
-            (0x17654, struct.pack('<I', 0x41000001)),  # patch 'reset' command handler to LOAD_ADDRESS + 1
+            # patch 'reset' command handler to LOAD_ADDRESS + 1
+            (0x17654, struct.pack('<I', 0x41000001)),
         ]
-        patchediBSS = decryptediBSS[:64] + utilities.apply_patches(decryptediBSS[64:], n88ap_iBSS_435_patches)
+        patched_ibss = decrypted_ibss[:64] + utilities.apply_patches(
+            decrypted_ibss[64:], n88ap_i_bss_435_patches)
 
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
@@ -277,23 +326,23 @@ class PwnedDFUDevice():
 
         device = dfu.acquire_device()
         assert self.identifier == device.serial_number
-        data = dfu.send_data(device, patchediBSS)
+        dfu.send_data(device, patched_ibss)
         dfu.request_image_validation(device)
         dfu.release_device(device)
 
         time.sleep(0.5)
 
-        print('Waiting for iBSS to enter Recovery Mode.')
+        print('Waiting for i_bss to enter Recovery Mode.')
         device = recovery.acquire_device()
         recovery.release_device(device)
 
     def flash_nor(self, nor):
         self.boot_ibss()
         print('Sending iBSS payload to flash NOR.')
-        MAX_SHELLCODE_LENGTH = 132
+        max_shellcode_length = 132
         payload = open('bin/ibss-flash-nor-shellcode.bin', 'rb').read()
-        assert len(payload) <= MAX_SHELLCODE_LENGTH
-        payload += '\x00' * (MAX_SHELLCODE_LENGTH - len(payload)) + nor
+        assert len(payload) <= max_shellcode_length
+        payload += '\x00' * (max_shellcode_length - len(payload)) + nor
 
         device = recovery.acquire_device()
         assert 'CPID:8920' in device.serial_number
@@ -309,26 +358,26 @@ class PwnedDFUDevice():
         print('If screen is not red, NOR was flashed successfully and device will reboot.')
 
     def decrypt_keybag(self, keybag):
-        KEYBAG_LENGTH = 48
-        assert len(keybag) == KEYBAG_LENGTH
+        keybag_length = 48
+        assert len(keybag) == keybag_length
 
-        KEYBAG_FILENAME = 'aes-keys/S5L%s-firmware' % self.config.cpid
+        keybag_filename = 'aes-keys/S5L%s-firmware' % self.config.cpid
         try:
-            f = open(KEYBAG_FILENAME, 'rb')
+            f = open(keybag_filename, 'rb')
             data = f.read()
             f.close()
         except IOError:
             data = str()
-        assert len(data) % 2 * KEYBAG_LENGTH == 0
+        assert len(data) % 2 * keybag_length == 0
 
-        for i in range(0, len(data), 2 * KEYBAG_LENGTH):
-            if keybag == data[i:i + KEYBAG_LENGTH]:
-                return data[i + KEYBAG_LENGTH:i + 2 * KEYBAG_LENGTH]
+        for i in range(0, len(data), 2 * keybag_length):
+            if keybag == data[i:i + keybag_length]:
+                return data[i + keybag_length:i + 2 * keybag_length]
 
         device = PwnedDFUDevice()
         decrypted_keybag = device.aes(keybag, AES_DECRYPT, AES_GID_KEY)
 
-        f = open(KEYBAG_FILENAME, 'a')
+        f = open(keybag_filename, 'a')
         f.write(keybag + decrypted_keybag)
         f.close()
 

@@ -45,10 +45,13 @@ get_string - retrieve a string descriptor from the device.
 
 __author__ = 'Wander Lairson Costa'
 
-import array
 from sys import hexversion
 
+import array
+
 import usb._interop as _interop
+
+GET_DESC_SIZE = 0x02
 
 # descriptor type
 DESC_TYPE_DEVICE = 0x01
@@ -330,13 +333,22 @@ def get_string(dev, index, langid=None):
     elif langid not in langids:
         raise ValueError("The device does not support the specified langid")
 
-    buf = get_descriptor(
+    lenbuf = get_descriptor(
         dev,
-        255,  # Maximum descriptor size
+        GET_DESC_SIZE,  # Maximum descriptor size
         DESC_TYPE_STRING,
         index,
         langid
     )
+
+    buf = get_descriptor(
+        dev,
+        lenbuf[0],  # Maximum descriptor size
+        DESC_TYPE_STRING,
+        index,
+        langid
+    )
+
     if hexversion >= 0x03020000:
         return buf[2:buf[0]].tobytes().decode('utf-16-le')
     else:

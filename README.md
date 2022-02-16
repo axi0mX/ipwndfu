@@ -8,7 +8,8 @@
 
 ## About this fork
 
-This fork is maintained by the hack-different team and is gladly accepting PRs from the wider community.  All of the original credit go to axi0mx et al.
+This fork is maintained by the hack-different team and is gladly accepting PRs from the wider community. All of the
+original credit go to axi0mx et al.
 
 ## checkm8
 
@@ -18,7 +19,8 @@ This fork is maintained by the hack-different team and is gladly accepting PRs f
 
 * allows dumping SecureROM, decrypting keybags for iOS firmware, and demoting device for JTAG
 
-* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t7000, s8000, t8002, s8003, t8004, t8010, t8011, t8012, t8015
+* current SoC support: s5l8947x, s5l8950x, s5l8955x, s5l8960x, t7000, s8000, t8002, s8003, t8004, t8010, t8011, t8012,
+  t8015
 
 * future SoC support: s5l8940x, s5l8942x, s5l8945x, s5l8747x, t7001, s7002, s8001
 

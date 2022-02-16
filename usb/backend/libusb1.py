@@ -28,9 +28,10 @@
 
 import errno
 import logging
-import math
 import sys
 from ctypes import *
+
+import math
 
 import usb._objfinalizer as _objfinalizer
 import usb.libloader

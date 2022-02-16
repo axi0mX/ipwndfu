@@ -43,11 +43,12 @@ __author__ = 'Wander Lairson Costa'
 __all__ = ['Device', 'Configuration', 'Interface', 'Endpoint', 'find',
            'show_devices']
 
-import array
 import copy
 import functools
 import logging
 import threading
+
+import array
 
 import usb._interop as _interop
 import usb._lookup as _lu

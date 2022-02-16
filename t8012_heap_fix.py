@@ -18,5 +18,8 @@ def fix_heap():
         m = d.read_memory_uint32(block_2 + i)
         d.write_memory_uint32(block_2_move_to + i, m)
 
-    d.write_memory_uint32(block_1 + 0x20, d.read_memory_uint32(block_1 + 0x20) - 1)
+    d.write_memory_uint32(
+        block_1 + 0x20,
+        d.read_memory_uint32(
+            block_1 + 0x20) - 1)
     d.execute(0, calculate_block_checksum, block_1)
