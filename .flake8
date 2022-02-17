@@ -1,0 +1,16 @@
+[flake8]
+min_python_version = 3.8.0
+max-line-length = 88
+ban-relative-imports = true
+format-greedy = 1
+inline-quotes = double
+# Allow omission of a return type hint for __init__ if at least one argument is annotated
+# used by flake8-annotations
+mypy-init-return = true
+enable-extensions = TC, TC2
+type-checking-exempt-modules = typing, typing-extensions
+eradicate-whitelist-extend = ^-.*;
+extend-ignore =
+extend-exclude =
+    tests/fixtures/*,
+    tests/**/fixtures/*,
