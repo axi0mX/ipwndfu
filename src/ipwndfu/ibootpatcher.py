@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ibootpatcher: patch assembly code in iBoot binaries
 # Author: axi0mX
 

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ipwnrecovery: open-source jailbreaking tool for older iOS devices
 # Author: axi0mX
 
 import getopt
 import sys
 
-import recovery
+import ipwndfu.recovery as recovery
 import usb  # pyusb: use 'pip install pyusb' to install this module
 
 

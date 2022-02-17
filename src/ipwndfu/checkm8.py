@@ -2,10 +2,11 @@ import ctypes
 import struct
 import sys
 import time
+import pkgutil
 
 import array
 
-import dfu
+import ipwndfu.dfu as dfu
 import usb
 
 # Must be global so garbage collector never frees it
@@ -160,8 +161,7 @@ def prepare_shellcode(name, constants=None):
             name)
         sys.exit(1)
 
-    with open('bin/%s.bin' % name, 'rb') as f:
-        shellcode = f.read()
+    shellcode = pkgutil.get_data('ipwndfu', 'bin/%s.bin' % name)
 
     # Shellcode has placeholder values for constants; check they match and
     # replace with constants from config

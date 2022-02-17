@@ -4,7 +4,7 @@ import struct
 import sys
 import time
 
-import dfu
+import ipwndfu.dfu as dfu
 
 constants_240_4 = [
     0x22030000,  # 1 - MAIN_STACK_ADDRESS

@@ -5,7 +5,7 @@ import struct
 import sys
 import time
 
-import dfu
+import ipwndfu.dfu as dfu
 
 
 def generate_payload():

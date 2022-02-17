@@ -7,7 +7,7 @@ import time
 
 import array
 
-import dfu
+import ipwndfu.dfu as dfu
 import usb  # pyusb: use 'pip install pyusb' to install this module
 
 # Must be global so garbage collector never frees it

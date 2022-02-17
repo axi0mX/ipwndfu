@@ -2,9 +2,17 @@
 name = "ipwndfu"
 version = "2.0.0"
 description = "The DFU exploitation toolkit for Apple devices"
+
+packages = [
+    { include = "ipwndfu", from="src" },
+    { include = "usb", from="src" },
+    { include = "libusbfinder", from="src" }
+]
+
 authors = ["axi0mX <axi0mXor@gmail.com>"]
 
 [tool.poetry.scripts]
+ipwndfu = "ipwndfu.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"

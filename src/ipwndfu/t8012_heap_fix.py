@@ -1,4 +1,4 @@
-import usbexec
+import ipwndfu.usbexec
 
 
 def fix_heap():

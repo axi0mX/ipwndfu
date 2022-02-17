@@ -1,5 +1,5 @@
-import dfu
-import usbexec
+import ipwndfu.dfu as dfu 
+import ipwndfu.usbexec as usbexec
 
 HOST2DEVICE = 0x21
 DFU_ABORT = 4

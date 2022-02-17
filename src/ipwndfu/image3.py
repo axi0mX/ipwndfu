@@ -2,8 +2,8 @@ import struct
 
 import binascii
 
-import dfuexec
-import utilities
+import ipwndfu.dfuexec
+import ipwndfu.utilities
 
 
 class Image3:

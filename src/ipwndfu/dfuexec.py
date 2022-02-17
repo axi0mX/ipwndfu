@@ -6,11 +6,11 @@ import time
 
 import binascii
 
-import dfu
-import image3
-import recovery
+import ipwndfu.dfu as dfu
+import ipwndfu.image3 as image3
+import ipwndfu.recovery as recovery
 import usb  # pyusb: use 'pip install pyusb' to install this module
-import utilities
+import ipwndfu.utilities as utilities
 
 EXEC_MAGIC = 'exec'[::-1]
 AES_BLOCK_SIZE = 16

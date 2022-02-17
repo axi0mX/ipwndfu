@@ -3,7 +3,7 @@
 
 import struct
 
-import image3
+import ipwndfu.image3 as image3
 
 
 def exploit(img3, securerom):

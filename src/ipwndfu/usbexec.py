@@ -2,8 +2,8 @@ import platform
 import struct
 import sys
 
-import device_platform
-import dfu
+import ipwndfu.device_platform as device_platform
+import ipwndfu.dfu as dfu
 
 
 class ExecConfig:
@@ -155,9 +155,8 @@ class PwnedUSBDevice:
 
     def cmd_memcpy(self, dest, src, length):
         return struct.pack(
-            '<8s8x3%s' %
-            self.cmd_arg_type(),
-            MEMC_MAGIC,
+            f'<8s8x3{self.cmd_arg_type()}',
+            bytes(MEMC_MAGIC, 'utf-8'),
             dest,
             src,
             length)

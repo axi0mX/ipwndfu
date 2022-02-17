@@ -7,18 +7,18 @@ from __future__ import print_function
 import argparse
 from collections import namedtuple
 
-import SHAtter
-import alloc8
-import checkm8
-import libusbfinder
-import limera1n
-import steaks4uce
-import t8012_heap_fix
-import usb.backend.libusb1
-import usbexec
-import nor
-import image3_24Kpwn
-from dfuexec import *
+import ipwndfu.SHAtter as SHAtter
+import ipwndfu.alloc8 as alloc8 
+import ipwndfu.checkm8 as checkm8
+import libusbfinder 
+import ipwndfu.limera1n as limera1n
+import ipwndfu.steaks4uce as steaks4uce
+import ipwndfu.t8012_heap_fix as t8012_heap_fix
+import usb.backend.libusb1 
+import ipwndfu.usbexec as usbexec
+import ipwndfu.nor as nor
+import ipwndfu.image3_24Kpwn as image3_24Kpwn
+from ipwndfu.dfuexec import *
 
 TARGET_SOC = None
 
@@ -61,6 +61,7 @@ def main():
     parser.add_argument('--boot', dest='boot', action='store_true')
     parser.add_argument('--dev', dest='match_device')
     parser.add_argument('--dump', dest='dump')
+    parser.add_argument('--reset', dest='reset', action='store_true')
     parser.add_argument('--hexdump', dest='hexdump')
     parser.add_argument('--dump-rom', dest='dump_rom', action='store_true')
     parser.add_argument('--dump-nor', dest='dump_nor')
@@ -84,10 +85,15 @@ def main():
 
     device = None
 
+
     if args.match_device:
         device = dfu.acquire_device(match=args.match_device)
 
-    if args.pwn:
+    if args.reset:
+        dump(device, '0xDEADBEEF,0xFFFFFFF', match=args.match_device)
+        exit()
+
+    elif args.pwn:
         pwn(device, match_device=args.match_device)
 
     elif args.xploit:
@@ -247,7 +253,7 @@ def demote(device=None):
         exit(1)
 
 
-def dump(device=None, dump_args=''):
+def dump(device=None, dump_args='', match=None):
     if not device:
         device = dfu.acquire_device()
 
@@ -264,7 +270,7 @@ def dump(device=None, dump_args=''):
     dfu.release_device(device)
 
     if 'PWND:[checkm8]' in serial_number:
-        device = usbexec.PwnedUSBDevice()
+        device = usbexec.PwnedUSBDevice(match=match)
         sys.stdout.write(device.read_memory(address, length))
     else:
         device = PwnedDFUDevice()
