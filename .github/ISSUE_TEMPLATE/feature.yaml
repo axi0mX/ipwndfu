@@ -1,0 +1,45 @@
+name: New Feature
+description: Request a feature or document one you're building
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+assignees:
+  - legit
+  - checkra1n
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Brief Description
+      description: What is a brief description of the feature?
+      placeholder: Support all the things
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Problem Solved
+      description: What problem does this solve?
+    validations:
+      required: false
+  - type: textarea
+    id: how
+    attributes:
+      label: Proposed Design
+      description: What is the proposed design for this feature?
+    validations:
+      required: false
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Plan
+      description: How will the feature be tested?
+    validations:
+      required: false
+  - type: checkboxes
+    id: it-me
+    attributes:
+      label: I'm building this
+      description: I am documenting a feature that I am building
+      options:
+        - label: I volenteer to own this feature
+          required: false

@@ -1,0 +1,31 @@
+name: Work Task
+description: Document a Task / TODO
+title: "[Task]: "
+labels: ["task", "triage"]
+assignees:
+  - legit
+  - checkra1n
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Brief Description
+      description: What is the task to be performed?
+      placeholder: Convert to pig latin
+    validations:
+      required: true
+  - type: textarea
+    id: testing
+    attributes:
+      label: Test Criteria
+      description: How will the change be tested / success be defined?
+    validations:
+      required: false
+  - type: checkboxes
+    id: blocking
+    attributes:
+      label: Loud Noise
+      description: This task will block other workstreams or complicate merges
+      options:
+        - label: Others should rebase after this task
+          required: false
