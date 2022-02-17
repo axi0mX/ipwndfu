@@ -1,6 +1,6 @@
 [flake8]
 min_python_version = 3.8.0
-max-line-length = 88
+max-line-length = 120
 ban-relative-imports = true
 format-greedy = 1
 inline-quotes = double
@@ -14,3 +14,4 @@ extend-ignore =
 extend-exclude =
     tests/fixtures/*,
     tests/**/fixtures/*,
+    src/usb/**/*
