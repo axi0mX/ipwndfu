@@ -16,7 +16,7 @@ jobs:
   deploy:
 
     runs-on: ubuntu-latest
-
+    environment: python-publish
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
