@@ -1,7 +1,8 @@
 [tool.poetry]
 name = "ipwndfu"
-version = "2.0.0b2"
+version = "2.0.0b3"
 description = "The DFU exploitation toolkit for Apple devices"
+readme = "README.md"
 
 packages = [
     { include = "ipwndfu", from="src" },
