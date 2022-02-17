@@ -34,17 +34,17 @@ import logging
 import sys
 
 __all__ = [
-    'LibraryException',
-    'LibraryNotFoundException',
-    'NoLibraryCandidatesException',
-    'LibraryNotLoadedException',
-    'LibraryMissingSymbolsException',
-    'locate_library',
-    'load_library',
-    'load_locate_library'
+    "LibraryException",
+    "LibraryNotFoundException",
+    "NoLibraryCandidatesException",
+    "LibraryNotLoadedException",
+    "LibraryMissingSymbolsException",
+    "locate_library",
+    "load_library",
+    "load_locate_library",
 ]
 
-_LOGGER = logging.getLogger('usb.libloader')
+_LOGGER = logging.getLogger("usb.libloader")
 
 
 class LibraryException(OSError):
@@ -87,13 +87,13 @@ def locate_library(candidates, find_library=ctypes.util.find_library):
         find_library = ctypes.util.find_library
 
     use_dll_workaround = (
-            sys.platform == 'win32' and find_library is ctypes.util.find_library
+        sys.platform == "win32" and find_library is ctypes.util.find_library
     )
 
     for candidate in candidates:
         # Workaround for CPython 3.3 issue#16283 / pyusb #14
         if use_dll_workaround:
-            candidate += '.dll'
+            candidate += ".dll"
 
         libname = find_library(candidate)
         if libname:
@@ -120,21 +120,28 @@ def load_library(lib, name=None, lib_cls=None):
             return ctypes.CDLL(lib)
     except Exception:
         if name:
-            lib_msg = '%s (%s)' % (name, lib)
+            lib_msg = "%s (%s)" % (name, lib)
         else:
             lib_msg = lib
 
-        lib_msg += ' could not be loaded'
+        lib_msg += " could not be loaded"
 
-        if sys.platform == 'cygwin':
-            lib_msg += ' in cygwin'
+        if sys.platform == "cygwin":
+            lib_msg += " in cygwin"
         _LOGGER.error(lib_msg, exc_info=True)
         return None
 
 
-def load_locate_library(candidates, cygwin_lib, name,
-                        win_cls=None, cygwin_cls=None, others_cls=None,
-                        find_library=None, check_symbols=None):
+def load_locate_library(
+    candidates,
+    cygwin_lib,
+    name,
+    win_cls=None,
+    cygwin_cls=None,
+    others_cls=None,
+    find_library=None,
+    check_symbols=None,
+):
     """Locates and loads a library.
 
     Returns: the loaded library
@@ -161,7 +168,7 @@ def load_locate_library(candidates, cygwin_lib, name,
     * LibraryNotLoadedException
     * LibraryMissingSymbolsException
     """
-    if sys.platform == 'cygwin':
+    if sys.platform == "cygwin":
         if cygwin_lib:
             loaded_lib = load_library(cygwin_lib, name, cygwin_cls)
         else:
@@ -169,12 +176,12 @@ def load_locate_library(candidates, cygwin_lib, name,
     elif candidates:
         lib = locate_library(candidates, find_library)
         if lib:
-            if sys.platform == 'win32':
+            if sys.platform == "win32":
                 loaded_lib = load_library(lib, name, win_cls)
             else:
                 loaded_lib = load_library(lib, name, others_cls)
         else:
-            _LOGGER.error('%r could not be found', (name or candidates))
+            _LOGGER.error("%r could not be found", (name or candidates))
             raise LibraryNotFoundException(name)
     else:
         raise NoLibraryCandidatesException(name)
@@ -182,11 +189,9 @@ def load_locate_library(candidates, cygwin_lib, name,
     if loaded_lib is None:
         raise LibraryNotLoadedException(name)
     elif check_symbols:
-        symbols_missing = [
-            s for s in check_symbols if not hasattr(loaded_lib, s)
-        ]
+        symbols_missing = [s for s in check_symbols if not hasattr(loaded_lib, s)]
         if symbols_missing:
-            msg = ('%r, missing symbols: %r', lib, symbols_missing)
+            msg = ("%r, missing symbols: %r", lib, symbols_missing)
             _LOGGER.error(msg)
             raise LibraryMissingSymbolsException(lib)
         else:

@@ -11,6 +11,7 @@ enable-extensions = TC, TC2
 type-checking-exempt-modules = typing, typing-extensions
 eradicate-whitelist-extend = ^-.*;
 extend-ignore =
+    E203
 extend-exclude =
     tests/fixtures/*,
     tests/**/fixtures/*,

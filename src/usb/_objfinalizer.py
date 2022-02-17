@@ -28,9 +28,9 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
-import sys
+import weakref
 
-__all__ = ['AutoFinalizedObject']
+__all__ = ["AutoFinalizedObject"]
 
 
 class _AutoFinalizedObjectBase(object):
@@ -84,73 +84,54 @@ class _AutoFinalizedObjectBase(object):
         self.finalize()
 
 
-if sys.hexversion >= 0x3040000:
-    # python >= 3.4: use weakref.finalize
-    import weakref
+def _do_finalize_object_ref(obj_ref):
+    """Helper function for weakref.finalize() that dereferences a weakref
+    to an object and calls its _do_finalize_object() method if the object
+    is still alive. Does nothing otherwise.
+
+    Returns: None (implicit)
+
+    Arguments:
+    * obj_ref -- weakref to an object
+    """
+    obj = obj_ref()
+    if obj is not None:
+        # else object disappeared
+        obj._do_finalize_object()
 
 
-    def _do_finalize_object_ref(obj_ref):
-        """Helper function for weakref.finalize() that dereferences a weakref
-        to an object and calls its _do_finalize_object() method if the object
-        is still alive. Does nothing otherwise.
+class AutoFinalizedObject(_AutoFinalizedObjectBase):
+    def __new__(cls, *args, **kwargs):
+        """Creates a new object instance and adds the private finalizer
+        attributes to it.
 
-        Returns: None (implicit)
+        Returns: new object instance
 
         Arguments:
-        * obj_ref -- weakref to an object
+        * *args, **kwargs -- passed to the parent instance creator
+                             (which ignores them)
         """
-        obj = obj_ref()
-        if obj is not None:
-            # else object disappeared
-            obj._do_finalize_object()
+        # Note:   Do not pass a (hard) reference to instance to the
+        #         finalizer as func/args/kwargs, it'd keep the object
+        #         alive until the program terminates.
+        #         A weak reference is fine.
+        #
+        # Note 2: When using weakrefs and not calling finalize() in
+        #         __del__, the object may already have disappeared
+        #         when weakref.finalize() kicks in.
+        #         Make sure that _finalizer() gets called,
+        #         i.e. keep __del__() from the base class.
+        #
+        # Note 3: the _finalize_called attribute is (probably) useless
+        #         for this class
+        instance = super(AutoFinalizedObject, cls).__new__(cls, *args, **kwargs)
 
+        instance._finalizer = weakref.finalize(
+            instance, _do_finalize_object_ref, weakref.ref(instance)
+        )
 
-    class AutoFinalizedObject(_AutoFinalizedObjectBase):
+        return instance
 
-        def __new__(cls, *args, **kwargs):
-            """Creates a new object instance and adds the private finalizer
-            attributes to it.
-
-            Returns: new object instance
-
-            Arguments:
-            * *args, **kwargs -- passed to the parent instance creator
-                                 (which ignores them)
-            """
-            # Note:   Do not pass a (hard) reference to instance to the
-            #         finalizer as func/args/kwargs, it'd keep the object
-            #         alive until the program terminates.
-            #         A weak reference is fine.
-            #
-            # Note 2: When using weakrefs and not calling finalize() in
-            #         __del__, the object may already have disappeared
-            #         when weakref.finalize() kicks in.
-            #         Make sure that _finalizer() gets called,
-            #         i.e. keep __del__() from the base class.
-            #
-            # Note 3: the _finalize_called attribute is (probably) useless
-            #         for this class
-            instance = super(AutoFinalizedObject, cls).__new__(
-                cls, *args, **kwargs
-            )
-
-            instance._finalizer = weakref.finalize(
-                instance, _do_finalize_object_ref, weakref.ref(instance)
-            )
-
-            return instance
-
-        def finalize(self):
-            """Finalizes the object if not already done."""
-            self._finalizer()
-
-
-else:
-    # python < 3.4: keep the old behavior (rely on __del__),
-    #                but don't call _finalize_object() more than once
-
-    class AutoFinalizedObject(_AutoFinalizedObjectBase):
-
-        def finalize(self):
-            """Finalizes the object if not already done."""
-            self._do_finalize_object()
+    def finalize(self):
+        """Finalizes the object if not already done."""
+        self._finalizer()

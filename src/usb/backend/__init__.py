@@ -73,9 +73,9 @@ find() function documentation.
 
 import usb._objfinalizer as _objfinalizer
 
-__author__ = 'Wander Lairson Costa'
+__author__ = "Wander Lairson Costa"
 
-__all__ = ['IBackend', 'libusb01', 'libusb10', 'openusb']
+__all__ = ["IBackend", "libusb1"]
 
 
 def _not_implemented(func):
@@ -323,14 +323,9 @@ class IBackend(_objfinalizer.AutoFinalizedObject):
         """
         _not_implemented(self.iso_read)
 
-    def ctrl_transfer(self,
-                      dev_handle,
-                      bmRequestType,
-                      bRequest,
-                      wValue,
-                      wIndex,
-                      data,
-                      timeout):
+    def ctrl_transfer(
+        self, dev_handle, bmRequestType, bRequest, wValue, wIndex, data, timeout
+    ):
         r"""Perform a control transfer on the endpoint 0.
 
         The direction of the transfer is inferred from the bmRequestType

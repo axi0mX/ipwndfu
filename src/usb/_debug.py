@@ -26,9 +26,9 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
-__author__ = 'Wander Lairson Costa'
+__author__ = "Wander Lairson Costa"
 
-__all__ = ['methodtrace', 'functiontrace']
+__all__ = ["methodtrace", "functiontrace"]
 
 import logging
 
@@ -45,9 +45,11 @@ def enable_tracing(enable):
 def _trace_function_call(logger, fname, *args, **named_args):
     logger.debug(
         # TODO: check if 'f' is a method or a free function
-        fname + '(' + \
-        ', '.join((str(val) for val in args)) + \
-        ', '.join((name + '=' + str(val) for name, val in list(named_args.items()))) + ')'
+        fname
+        + "("
+        + ", ".join((str(val) for val in args))
+        + ", ".join((name + "=" + str(val) for name, val in list(named_args.items())))
+        + ")"
     )
 
 
@@ -60,7 +62,7 @@ def methodtrace(logger):
         def do_trace(*args, **named_args):
             # this if is just a optimization to avoid unecessary string formatting
             if logging.DEBUG >= logger.getEffectiveLevel():
-                fn = type(args[0]).__name__ + '.' + f.__name__
+                fn = type(args[0]).__name__ + "." + f.__name__
                 _trace_function_call(logger, fn, *args[1:], **named_args)
             return f(*args, **named_args)
 

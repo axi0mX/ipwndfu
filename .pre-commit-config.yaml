@@ -15,8 +15,18 @@ repos:
         args: [--autofix, --no-ensure-ascii, --no-sort-keys]
       - id: check-toml
       - id: check-added-large-files
-  - repo: local
-    hooks: []
+
+  - repo: https://github.com/myint/autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        exclude: tests/functional/|tests/input|tests/regrtest_data/|tests/data/
+        args:
+          - --in-place
+          - --remove-all-unused-imports
+          - --expand-star-imports
+          - --remove-duplicate-keys
+          - --remove-unused-variables
 
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.9.0
@@ -31,7 +41,6 @@ repos:
     hooks:
       - id: yesqa
         additional_dependencies: &flake8_deps
-          - flake8-annotations==2.7.0
           - flake8-broken-line==0.4.0
           - flake8-bugbear==21.9.2
           - flake8-comprehensions==3.7.0
@@ -61,10 +70,16 @@ repos:
     hooks:
       - id: black
 
+  - repo: https://github.com/DanielNoord/pydocstringformatter
+    rev: a9f94bf13b08fe33f784ed7f0a0fc39e2a8549e2
+    hooks:
+      - id: pydocstringformatter
+
   - repo: https://github.com/pycqa/flake8
     rev: 4.0.1
     hooks:
       - id: flake8
+        exclude: ^src/(usb|libusbfinder)/
         additional_dependencies: *flake8_deps
 
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -72,8 +87,10 @@ repos:
     hooks:
       - id: mypy
         pass_filenames: false
+        args: ['src/']
         additional_dependencies:
           - types-requests
+          - types-cryptography
 
   - repo: https://github.com/pre-commit/pre-commit
     rev: v2.17.0
