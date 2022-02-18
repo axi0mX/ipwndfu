@@ -3,7 +3,7 @@ name: Desired flake8 / pylint
 on: [ push ]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     env:
       python_version: 3.10
