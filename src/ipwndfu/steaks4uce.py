@@ -1,4 +1,6 @@
 # Credit: This file is based on steaks4uce exploit (heap overflow) by pod2g.
+from __future__ import annotations
+
 import dataclasses
 import struct
 import sys

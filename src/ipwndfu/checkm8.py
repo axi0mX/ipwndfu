@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import array
 import ctypes
 import dataclasses
@@ -6,7 +8,7 @@ import struct
 import sys
 import time
 from contextlib import suppress
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import usb
 from ipwndfu import dfu
@@ -97,7 +99,7 @@ def libusb1_no_error_ctrl_transfer(
 
 
 def usb_rop_callbacks(
-    address: int, func_gadget: int, callbacks: List[Tuple[int, int]]
+    address: int, func_gadget: int, callbacks: list[Tuple[int, int]]
 ) -> bytes:
     data = b""
     for i in range(0, len(callbacks), 5):
@@ -144,7 +146,7 @@ def asm_thumb_trampoline(src, dest):
         return struct.pack("<2I", 0xF002F8DF, dest)
 
 
-def prepare_shellcode(name: str, constants: Optional[List[int]] = None) -> bytes:
+def prepare_shellcode(name: str, constants: Optional[list[int]] = None) -> bytes:
     if constants is None:
         constants = []
     if name.endswith("_armv7"):
@@ -742,7 +744,7 @@ def payload(cpid: int) -> bytes:
     raise NotImplementedError("This SoC is not yet supported")
 
 
-def all_exploit_configs() -> List[DeviceConfig]:
+def all_exploit_configs() -> list[DeviceConfig]:
     t8010_nop_gadget = 0x10000CC6C
     t8011_nop_gadget = 0x10000CD0C
     t8012_nop_gadget = 0x100008DB8

@@ -1,4 +1,5 @@
 # Credit: This file is based on limera1n exploit (heap overflow) by geohot.
+from __future__ import annotations
 
 import array
 import ctypes

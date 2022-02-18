@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import hashlib
 import io
 import os
 import platform
 import sys
 import tarfile
-from typing import Any, List, Tuple, Union
+from typing import Any, Tuple, Union
 
 
 class VersionConfig:
@@ -13,7 +15,7 @@ class VersionConfig:
         version: str,
         bottle: str,
         bottle_sha256: str,
-        dylib_patches: List[Union[Tuple[int, bytes], Any]],
+        dylib_patches: list[Union[Tuple[int, bytes], Any]],
         dylib_sha256: str,
     ) -> None:
         self.version = version

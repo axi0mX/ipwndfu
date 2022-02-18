@@ -43,6 +43,8 @@ get_langids - retrieve the list of supported string languages from the device.
 get_string - retrieve a string descriptor from the device.
 """
 
+from __future__ import annotations
+
 __author__ = "Wander Lairson Costa"
 
 import array

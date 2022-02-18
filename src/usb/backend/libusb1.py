@@ -26,6 +26,8 @@
 # NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
 
+from __future__ import annotations
+
 import errno
 import logging
 import math
@@ -42,7 +44,7 @@ __author__ = "Wander Lairson Costa"
 
 __all__ = [
     "get_backend",
-    "LIBUSB_SUCESS",
+    "LIBUSB_SUCCESS",
     "LIBUSB_ERROR_IO",
     "LIBUSB_ERROR_INVALID_PARAM",
     "LIBUSB_ERROR_ACCESS",
@@ -55,7 +57,8 @@ __all__ = [
     "LIBUSB_ERROR_INTERRUPTED",
     "LIBUSB_ERROR_NO_MEM",
     "LIBUSB_ERROR_NOT_SUPPORTED",
-    "LIBUSB_ERROR_OTHER" "LIBUSB_TRANSFER_COMPLETED",
+    "LIBUSB_ERROR_OTHER",
+    "LIBUSB_TRANSFER_COMPLETED",
     "LIBUSB_TRANSFER_ERROR",
     "LIBUSB_TRANSFER_TIMED_OUT",
     "LIBUSB_TRANSFER_CANCELLED",
