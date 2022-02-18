@@ -68,6 +68,14 @@ configs = [
     ),
     ExecConfig(
         (
+            "SecureROM for s8000si, Copyright 2007-2014, Apple Inc.",
+            "RELEASE",
+            "iBoot-2234.0.0.3.3",
+        ),
+        aes_crypto_cmd=0x10000DAA0,
+    ),
+    ExecConfig(
+        (
             "SecureROM for t8010si, Copyright 2007-2015, Apple Inc.",
             "ROMRELEASE",
             "iBoot-2696.0.0.1.33",
@@ -100,10 +108,10 @@ configs = [
     ),
 ]
 
-EXEC_MAGIC = "execexec"[::-1]
-DONE_MAGIC = "donedone"[::-1]
-MEMC_MAGIC = "memcmemc"[::-1]
-MEMS_MAGIC = "memsmems"[::-1]
+EXEC_MAGIC = b"execexec"[::-1]
+DONE_MAGIC = b"donedone"[::-1]
+MEMC_MAGIC = b"memcmemc"[::-1]
+MEMS_MAGIC = b"memsmems"[::-1]
 if platform.system() == "Linux":
     USB_READ_LIMIT = 0xFFF
 else:
@@ -175,7 +183,7 @@ class PwnedUSBDevice:
     def cmd_memcpy(self, dest, src, length):
         return struct.pack(
             f"<8s8x3{self.cmd_arg_type()}",
-            bytes(MEMC_MAGIC, "utf-8"),
+            MEMC_MAGIC,
             dest,
             src,
             length,
@@ -197,6 +205,21 @@ class PwnedUSBDevice:
             return self.platform.rom_base
         else:
             return self.platform.dfu_image_base
+
+    def heap_base(self):
+        return self.platform.heap_base
+
+    def heap_offset(self):
+        return self.platform.heap_offset
+
+    def trampoline_base(self):
+        return self.platform.trampoline_base
+
+    def trampoline_offset(self):
+        return self.platform.trampoline_offset
+
+    def page_offset(self):
+        return self.platform.page_offset
 
     def usb_serial_number(self, key):
         for pair in self.serial_number.split(" "):
@@ -226,7 +249,7 @@ class PwnedUSBDevice:
         return received[: len(data)]
 
     def read_memory(self, address, length):
-        data = str()
+        data = bytes()
         while len(data) < length:
             part_length = min(
                 length - len(data), USB_READ_LIMIT - self.cmd_data_offset(0)
@@ -255,17 +278,17 @@ class PwnedUSBDevice:
         if response_length == 0:
             response = device.ctrl_transfer(
                 0xA1, 2, 0xFFFF, 0, response_length + 1, CMD_TIMEOUT
-            ).tostring()[1:]
+            ).tobytes().decode("ascii")[1:]
         else:
             response = device.ctrl_transfer(
                 0xA1, 2, 0xFFFF, 0, response_length, CMD_TIMEOUT
-            ).tostring()
+            ).tobytes()
         dfu.release_device(device)
         assert len(response) == response_length
         return response
 
     def execute(self, response_length, *args):
-        cmd = str()
+        cmd = bytes()
         for i in range(len(args)):
             if isinstance(args[i], int):
                 cmd += struct.pack(f"<{self.cmd_arg_type()}", args[i])
@@ -301,7 +324,7 @@ class PwnedUSBDevice:
             print("ERROR: No matching usbexec.platform found for this device.")
             sys.exit(1)
 
-        info = self.read_memory(self.image_base() + 0x200, 0x100)
+        info = self.read_memory(self.image_base() + 0x200, 0x100).decode("ascii")
         for config in configs:
             if config.match(info):
                 self.config = config

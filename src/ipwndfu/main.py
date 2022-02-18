@@ -50,6 +50,7 @@ Advanced options:
   --dev=<filter>\t\tTarget a specific device. e.g. `--dev=8015` or `--dev=<ecid>`
   --demote\t\t\tdemote device to enable JTAG
   --boot\t\t\tboot device
+  --repair-heap\t\t\trepair device heap
   --dump=address,length\t\tdump memory to stdout
   --hexdump=address,length\thexdump memory to stdout
   --dump-rom\t\t\tdump SecureROM
@@ -74,6 +75,8 @@ def main():
     parser.add_argument("-l", dest="list", action="store_true")
 
     parser.add_argument("--demote", dest="demote", action="store_true")
+    parser.add_argument("--repair-heap", dest="repair_heap", action="store_true")
+    parser.add_argument("--patch-sigchecks", dest="patch_sigchecks", action="store_true")
     parser.add_argument("--boot", dest="boot", action="store_true")
     parser.add_argument("--dev", dest="match_device")
     parser.add_argument("--dump", dest="dump")
@@ -119,6 +122,12 @@ def main():
 
     elif args.demote:
         demote(device)
+
+    elif args.repair_heap:
+        repair_heap(device, match_device=args.match_device)
+
+    elif args.patch_sigchecks:
+        patch_sigchecks(device, match_device=args.match_device)
 
     elif args.boot:
         boot(device)
@@ -509,6 +518,72 @@ def list_devices():
         return 1
     else:
         return 0
+
+
+def repair_heap(device=None, match_device=None):
+    if not device:
+        device = dfu.acquire_device(match=match_device)
+    serial = get_serial(device.serial_number)
+    if serial.pwned:
+        pwned = usbexec.PwnedUSBDevice()
+        heap_base = pwned.heap_base()
+        heap_offset = pwned.heap_offset()
+        heap_state = pwned.platform.heap_state
+        heap_write_hash = pwned.platform.heap_write_hash
+        heap_check_all = pwned.platform.heap_check_all
+        if heap_base == 0 or heap_offset == 0 or heap_state == 0 or heap_write_hash == 0 or heap_check_all == 0:
+            print("Device not supported for --repair-heap")
+            return
+        block1 = pack("<8Q", 0, 0, 0, heap_state, 2, 132, 128, 0)
+        block2 = pack("<8Q", 0, 0, 0, heap_state, 2, 8, 128, 0)
+        pwned.write_memory(heap_base + heap_offset, block1)
+        pwned.write_memory(heap_base + heap_offset + 0x80, block2)
+        pwned.write_memory(heap_base + heap_offset + 0x100, block2)
+        pwned.write_memory(heap_base + heap_offset + 0x180, block2)
+        pwned.execute(0, heap_write_hash, heap_base + heap_offset)
+        pwned.execute(0, heap_write_hash, heap_base + heap_offset + 0x80)
+        pwned.execute(0, heap_write_hash, heap_base + heap_offset + 0x100)
+        pwned.execute(0, heap_write_hash, heap_base + heap_offset + 0x180)
+        pwned.execute(0, heap_check_all)
+        dfu.request_image_validation(device)
+        dfu.release_device(device)
+        print("Heap repaired.")
+    else:
+        print("Device not in pwndfu mode!")
+
+
+def patch_sigchecks(device=None, match_device=None):
+    if not device:
+        device = dfu.acquire_device(match=match_device)
+    serial = get_serial(device.serial_number)
+    if serial.pwned:
+        pwned = usbexec.PwnedUSBDevice()
+        sigcheck_addr = pwned.platform.sigcheck_addr
+        sigcheck_patch = pwned.platform.sigcheck_patch
+        result = pwned.read_memory_uint32(sigcheck_addr)
+        if sigcheck_addr == 0 or sigcheck_patch == 0:
+            print("Device not supported for --patch-sigchecks")
+            return
+        if result == sigcheck_patch:
+            print("Signature checks are already patched out!")
+            return
+        trampoline_base = pwned.trampoline_base()
+        trampoline_offset = pwned.trampoline_offset()
+        page_offset = pwned.page_offset()
+        addr_list = [page_offset]
+        shellcode = checkm8.prepare_shellcode("patch_ttbr_page_arm64", addr_list)
+        pwned.write_memory(trampoline_base + trampoline_offset, shellcode)
+        pwned.execute(0, trampoline_base + trampoline_offset)
+        pwned.write_memory_uint32(sigcheck_addr, sigcheck_patch)
+        pwned.execute(0, trampoline_base + trampoline_offset + 0x30)  # offset of _inv_tlbi
+        result = pwned.read_memory_uint32(sigcheck_addr)
+        # print(f"DEBUG: pwned.read_memory_uint32(sigcheck_addr)): {hex(result)}")
+        if result == sigcheck_patch:
+            print("Successfully patched signature checks!")
+        else:
+            print("Failed to patch signature checks!")
+    else:
+        print("Device not in pwndfu mode!")
 
 
 def boot(device=None):
