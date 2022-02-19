@@ -5,7 +5,7 @@ import getopt
 import sys
 from contextlib import suppress
 
-import usb
+import usb  # type: ignore
 from ipwndfu import recovery
 
 

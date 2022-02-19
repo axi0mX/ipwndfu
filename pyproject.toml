@@ -6,7 +6,6 @@ readme = "README.md"
 
 packages = [
     { include = "ipwndfu", from="src" },
-    { include = "usb", from="src" },
     { include = "libusbfinder", from="src" }
 ]
 
@@ -21,6 +20,7 @@ ipwndfu = "ipwndfu.main:main"
 [tool.poetry.dependencies]
 python = "^3.8"
 cryptography = "^36.0.1"
+pyusb = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.12.2"

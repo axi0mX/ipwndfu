@@ -300,7 +300,7 @@ class PwnedUSBDevice:
         for i in range(len(args)):
             if isinstance(args[i], int):
                 cmd += struct.pack(f"<{self.cmd_arg_type()}", args[i])
-            elif isinstance(args[i], str) and i == len(args) - 1:
+            elif isinstance(args[i], bytes) and i == len(args) - 1:
                 cmd += args[i]
             else:
                 print(f"ERROR: usbexec.execute: invalid argument at position {i}")

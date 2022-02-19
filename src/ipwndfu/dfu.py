@@ -6,11 +6,11 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 import libusbfinder
-import usb
-import usb.backend.libusb1
+import usb  # type: ignore
+import usb.backend.libusb1  # type: ignore
 
 if TYPE_CHECKING:
-    from usb.core import Device
+    from usb.core import Device  # type: ignore
 
 MAX_PACKET_SIZE = 0x800
 

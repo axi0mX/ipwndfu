@@ -12,7 +12,7 @@ from struct import pack
 from sys import stderr, stdout
 
 import libusbfinder
-import usb.backend.libusb1
+import usb.backend.libusb1  # type: ignore
 from ipwndfu import (
     SHAtter,
     alloc8,
@@ -76,7 +76,9 @@ def main():
 
     parser.add_argument("--demote", dest="demote", action="store_true")
     parser.add_argument("--repair-heap", dest="repair_heap", action="store_true")
-    parser.add_argument("--patch-sigchecks", dest="patch_sigchecks", action="store_true")
+    parser.add_argument(
+        "--patch-sigchecks", dest="patch_sigchecks", action="store_true"
+    )
     parser.add_argument("--boot", dest="boot", action="store_true")
     parser.add_argument("--dev", dest="match_device")
     parser.add_argument("--dump", dest="dump")
@@ -412,8 +414,8 @@ def decrypt_gid(device, arg, match=None):
         print(f"Decrypting with {pwned.platform.name()} GID key.")
         print(
             pwned.aes(
-                arg.decode("hex"), usbexec.AES_DECRYPT, usbexec.AES_GID_KEY
-            ).encode("hex")
+                bytes.fromhex(arg), usbexec.AES_DECRYPT, usbexec.AES_GID_KEY
+            ).hex()
         )
     else:
         device = PwnedDFUDevice()
@@ -435,8 +437,8 @@ def encrypt_gid(device, arg):
         print(f"Encrypting with {pwned.platform.name()} GID key.")
         print(
             pwned.aes(
-                arg.decode("hex"), usbexec.AES_ENCRYPT, usbexec.AES_GID_KEY
-            ).encode("hex")
+                bytes.fromhex(arg), usbexec.AES_ENCRYPT, usbexec.AES_GID_KEY
+            ).hex()
         )
     else:
         device = PwnedDFUDevice()
@@ -458,8 +460,8 @@ def decrypt_uid(device, arg):
         print(f"Decrypting with {pwned.platform.name()} device-specific UID key.")
         print(
             pwned.aes(
-                arg.decode("hex"), usbexec.AES_DECRYPT, usbexec.AES_UID_KEY
-            ).encode("hex")
+                bytes.fromhex(arg), usbexec.AES_DECRYPT, usbexec.AES_UID_KEY
+            ).hex()
         )
     else:
         device = PwnedDFUDevice()
@@ -481,8 +483,8 @@ def encrypt_uid(device, arg):
         print(f"Encrypting with {pwned.platform.name()} device-specific UID key.")
         print(
             pwned.aes(
-                arg.decode("hex"), usbexec.AES_ENCRYPT, usbexec.AES_UID_KEY
-            ).encode("hex")
+                bytes.fromhex(arg), usbexec.AES_ENCRYPT, usbexec.AES_UID_KEY
+            ).hex()
         )
     else:
         device = PwnedDFUDevice()
@@ -531,7 +533,13 @@ def repair_heap(device=None, match_device=None):
         heap_state = pwned.platform.heap_state
         heap_write_hash = pwned.platform.heap_write_hash
         heap_check_all = pwned.platform.heap_check_all
-        if heap_base == 0 or heap_offset == 0 or heap_state == 0 or heap_write_hash == 0 or heap_check_all == 0:
+        if (
+            heap_base == 0
+            or heap_offset == 0
+            or heap_state == 0
+            or heap_write_hash == 0
+            or heap_check_all == 0
+        ):
             print("Device not supported for --repair-heap")
             return
         block1 = pack("<8Q", 0, 0, 0, heap_state, 2, 132, 128, 0)
@@ -575,7 +583,9 @@ def patch_sigchecks(device=None, match_device=None):
         pwned.write_memory(trampoline_base + trampoline_offset, shellcode)
         pwned.execute(0, trampoline_base + trampoline_offset)
         pwned.write_memory_uint32(sigcheck_addr, sigcheck_patch)
-        pwned.execute(0, trampoline_base + trampoline_offset + 0x30)  # offset of _inv_tlbi
+        pwned.execute(
+            0, trampoline_base + trampoline_offset + 0x30
+        )  # offset of _inv_tlbi
         result = pwned.read_memory_uint32(sigcheck_addr)
         # print(f"DEBUG: pwned.read_memory_uint32(sigcheck_addr)): {hex(result)}")
         if result == sigcheck_patch:

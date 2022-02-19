@@ -7,7 +7,7 @@ import sys
 import time
 from contextlib import suppress
 
-import usb
+import usb  # type: ignore
 from ipwndfu import dfu, image3, recovery, utilities
 
 EXEC_MAGIC = "exec"[::-1]

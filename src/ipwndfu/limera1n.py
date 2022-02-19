@@ -8,7 +8,7 @@ import struct
 import sys
 import time
 
-import usb  # pyusb: use 'pip install pyusb' to install this module
+import usb  # type: ignore
 from ipwndfu import dfu
 
 # Must be global so garbage collector never frees it

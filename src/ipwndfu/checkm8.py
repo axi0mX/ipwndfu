@@ -10,11 +10,11 @@ import time
 from contextlib import suppress
 from typing import TYPE_CHECKING, Optional, Tuple, Union
 
-import usb
+import usb  # type: ignore
 from ipwndfu import dfu
 
 if TYPE_CHECKING:
-    from usb.core import Device
+    from usb.core import Device  # type: ignore
 
 # Must be global so garbage collector never frees it
 request = None
