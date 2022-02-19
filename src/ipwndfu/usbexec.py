@@ -68,6 +68,14 @@ configs = [
     ),
     ExecConfig(
         (
+            "SecureROM for t7000si, Copyright 2013, Apple Inc.",
+            "RELEASE",
+            "iBoot-1992.0.0.1.19"
+        ),
+        aes_crypto_cmd=0x10000DA90
+    ),
+    ExecConfig(
+        (
             "SecureROM for s8000si, Copyright 2007-2014, Apple Inc.",
             "RELEASE",
             "iBoot-2234.0.0.3.3",
