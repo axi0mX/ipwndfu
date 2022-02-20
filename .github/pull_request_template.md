@@ -15,4 +15,4 @@
   setting up `pre-commit` in your local workspace.  GitHub actions will also verify quality and will
   prevent you from merging without it.
 
-💔Thank you!
+❤️Thank you!
