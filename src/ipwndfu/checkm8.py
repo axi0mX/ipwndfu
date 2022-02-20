@@ -809,13 +809,13 @@ def exploit_config(serial_number: str) -> Tuple[bytes, DeviceConfig]:
     for config in all_exploit_configs():
         if f"SRTG:[{config.version}]" in serial_number:
             return payload(config.cpid), config
-    for config in all_exploit_configs():
-        if f"CPID:{config.cpid}" in serial_number:
+        elif f"CPID:{config.cpid:02x}" in serial_number:
             print("ERROR: CPID is compatible, but serial number string does not match.")
             print(
                 "Make sure device is in SecureROM DFU Mode and not LLB/iBSS DFU Mode. Exiting."
             )
             sys.exit(1)
+
     print("ERROR: This is not a compatible device. Exiting.")
     sys.exit(1)
 
@@ -897,7 +897,7 @@ def exploit_a8_a9(match=None):
         return
     padding = 0x400 + 0x80 + 0x80
     overwrite = struct.pack("<32xQQ", 0x180380000, 0)
-    if "CPID:8000" in device.serial_number or "CPID:8003" in device.serial_number:
+    if any(cpid in device.serial_number for cpid in ["CPID:8000", "CPID:8003"]):
         payload_a8_a9 = payload(0x8003)
     elif "CPID:7000" in device.serial_number:
         payload_a8_a9 = payload(0x7000)
