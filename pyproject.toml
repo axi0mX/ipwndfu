@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ipwndfu"
-version = "2.0.0b3"
+version = "2.0.0b5"
 description = "The DFU exploitation toolkit for Apple devices"
 readme = "README.md"
 
