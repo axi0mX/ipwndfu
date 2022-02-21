@@ -8,7 +8,7 @@
 #
 # After that are offsets used for various exploits
 
-usb:
+constants:
   - &checkm8_payload_arm64
     payload_offset: 0x180
     payload_size: 0x240
@@ -25,6 +25,43 @@ usb:
     done_magic: 0x646F6E65646F6E65
     memc_magic: 0x6D656D636D656D63
     mems_magic: 0x6D656D736D656D73
+  - &dfu_load_s894x
+    dfu_image_base: 0x34000000
+    dfu_load_base: 0x9FF00000
+    recovery_image_base: 0x9FF00000
+    recovery_load_base: 0x80000000
+  - &dfu_load_s895x
+    dfu_image_base: 0x10000000
+    dfu_load_base: 0xBFF00000
+    recovery_image_base: 0xBFF00000
+    recovery_load_base: 0x80000000
+  - &dfu_load_t8002_t8004
+    dfu_image_base: 0x48818000
+    dfu_load_base: 0x80000000
+    recovery_image_base: 0x48818000
+    recovery_load_base: 0x80000000
+  - &dfu_load_t8010_t8011
+    dfu_image_base: 0x1800B0000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x1800B0000
+    recovery_load_base: 0x800000000
+  - &dfu_load_t8012_t8015
+    dfu_image_base: 0x18001C000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x18001C000
+    recovery_load_base: 0x800000000
+    heap_base: 0x1801E8000
+    heap_offset: 0x5000
+    trampoline_base: 0x180018000
+    trampoline_offset: 0x620
+    page_offset: 0x400
+  - &dfu_load_t800x
+    dfu_image_base: 0x180380000
+    dfu_load_base: 0x180000000
+    recovery_image_base: 0x83D7F7000
+    recovery_load_base: 0x800000000
+    trampoline_base: 0x00000001800c0000
+
 
 modern_platforms:
 - cpid: 0x7000
@@ -43,6 +80,8 @@ modern_platforms:
   sram_size: 0x400000
   dram_base: 0x800000000
   demotion_reg: 0x20e02a000
+
+  <<: *dfu_load_t800x
 
   sigcheck_addr: 0x100007e98
   sigcheck_patch: 0xd2800000
@@ -90,6 +129,8 @@ modern_platforms:
   dram_base: 0x800000000
   demotion_reg: 0x2102bc000
 
+  <<: *dfu_load_t800x
+
   sigcheck_addr: 0x10000812c
   sigcheck_patch: 0xd2800000
 
@@ -129,6 +170,8 @@ modern_platforms:
   sram_size: 0x120000
   dram_base: 0x80000000
   demotion_reg: 0x481bc000
+
+  <<: *dfu_load_t8002_t8004
 
   sigcheck_addr: 0x4452
   sigcheck_patch: 0x20
@@ -173,6 +216,8 @@ modern_platforms:
   dram_base: 0x800000000
   demotion_reg: 0x2102bc000
 
+  <<: *dfu_load_t800x
+
   sigcheck_addr: 0x10000812c
   sigcheck_patch: 0xd2800000
 
@@ -214,6 +259,8 @@ modern_platforms:
   dram_base: 0x80000000
   demotion_reg: 0x481bc000
 
+  <<: *dfu_load_t8002_t8004
+
   sigcheck_addr: 0x4452
   sigcheck_patch: 0x20
 
@@ -253,6 +300,8 @@ modern_platforms:
   sram_size: 0x200000
   dram_base: 0x800000000
   demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_t8010_t8011
 
   sigcheck_addr: 0x1000074ac
   sigcheck_patch: 0xd2800000
@@ -312,6 +361,8 @@ modern_platforms:
   sram_size: 0x200000
   demotion_reg: 0x2102bc000
   dram_base: 0x800000000
+
+  <<: *dfu_load_t8010_t8011
 
   sigcheck_addr: 0x100007630
   sigcheck_patch: 0xd2800000
@@ -374,6 +425,8 @@ modern_platforms:
   heap_state: 0x180008b60
   heap_write_hash: 0x10000d4e8
 
+  <<: *dfu_load_t8012_t8015
+
   sigcheck_addr: 0x100004854
   sigcheck_patch: 0xd2800000
 
@@ -429,6 +482,8 @@ modern_platforms:
   heap_check_all: 0x10000db98
   heap_state: 0x1800086a0
   heap_write_hash: 0x10000d4ec
+
+  <<: *dfu_load_t8012_t8015
 
   sigcheck_addr: 0x10000624c
   sigcheck_patch: 0xd2800000
@@ -489,6 +544,8 @@ modern_platforms:
   dram_base: 0x80000000
   demotion_reg: 0x3f500000
 
+  <<: *dfu_load_s894x
+
   sigcheck_addr: 0x451e
   sigcheck_patch: 0x20
 
@@ -536,6 +593,8 @@ modern_platforms:
   heap_state: 0x0
   heap_write_hash: 0x0
 
+  <<: *dfu_load_s895x
+
   sigcheck_addr: 0x4d28
   sigcheck_patch: 0x20
 
@@ -579,6 +638,8 @@ modern_platforms:
   dram_base: 0x80000000
   demotion_reg: 0x3f500000
 
+  <<: *dfu_load_s895x
+
   sigcheck_addr: 0x4d28
   sigcheck_patch: 0x20
 
@@ -617,6 +678,11 @@ modern_platforms:
   sram_size: 0x400000
   dram_base: 0x800000000
   demotion_reg: 0x20e02a000
+
+  dfu_image_base: 0x180380000
+  dfu_load_base: 0x180000000
+  recovery_image_base: 0x83D7F7000
+  recovery_load_base: 0x800000000
 
   sigcheck_addr: 0x100005be8
   sigcheck_patch: 0xd2800000

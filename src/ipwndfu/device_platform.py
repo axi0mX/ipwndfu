@@ -38,7 +38,16 @@ class DevicePlatform:
     demotion_reg: int
     sigcheck_addr: int
     sigcheck_patch: int
+    dfu_image_base: int
+    dfu_load_base: int
+    recovery_image_base: int
+    recovery_load_base: int
     usb: USBConstants
+    heap_base: int = 0
+    heap_offset: int = 0
+    trampoline_base: int = 0
+    trampoline_offset: int = 0
+    page_offset: int = 0
     heap_state: int = 0
     heap_write_hash: int = 0
     heap_check_all: int = 0
