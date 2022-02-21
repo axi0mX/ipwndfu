@@ -7,12 +7,12 @@ import argparse
 import hashlib
 import sys
 import time
-from collections import namedtuple
 from struct import pack
 from sys import stderr, stdout
 
-import libusbfinder
 import usb.backend.libusb1  # type: ignore
+
+import libusbfinder
 from ipwndfu import (
     SHAtter,
     alloc8,
@@ -32,7 +32,7 @@ from ipwndfu.dfuexec import (
     AES_UID_KEY,
     PwnedDFUDevice,
 )
-from ipwndfu.utilities import hex_dump
+from ipwndfu.utilities import get_serial, hex_dump
 
 TARGET_SOC = None
 
@@ -189,19 +189,20 @@ def pwn(device=None, match_device=None):
     elif serial.cpid in ["8930"]:
         SHAtter.exploit()
     elif serial.cpid in [
-        "8947",
-        "8950",
-        "8960",
+        "7000",
+        "8000",
         "8002",
+        "8003",
         "8004",
         "8010",
         "8011",
         "8012",
         "8015",
+        "8947",
+        "8950",
+        "8960",
     ]:
         checkm8.exploit(match=match_device)
-    elif serial.cpid in ["7000", "8000", "8003"]:
-        checkm8.exploit_a8_a9(match=match_device)
     else:
         print("Found: " + serial_number, file=stderr)
         print("ERROR: This device is not supported.", file=stderr)
@@ -594,7 +595,7 @@ def patch_sigchecks(device=None, match_device=None):
             0, trampoline_base + trampoline_offset + 0x30
         )  # offset of _inv_tlbi
         result = pwned.read_memory_uint32(sigcheck_addr)
-        # print(f"DEBUG: pwned.read_memory_uint32(sigcheck_addr)): {hex(result)}")
+
         if result == sigcheck_patch:
             print("Successfully patched signature checks!")
         else:
@@ -816,50 +817,6 @@ def remove_alloc8(device=None):
     print("Preparing modified NOR without alloc8 exploit.")
     new_nor = alloc8.remove_exploit(nor_data)
     device.flash_nor(new_nor.dump())
-
-
-# this bit nicely divvys up a standard DFU usb serial string into a usable 'object' representing its fields
-
-SerialNumber = namedtuple(
-    "SerialNumber",
-    ["cpid", "cprv", "cpfm", "scep", "bdid", "ecid", "ibfl", "srtg", "pwned"],
-)
-
-
-def get_serial(_serial) -> SerialNumber:
-    """Parse a serial number (from the USB device) into its key-value pairings."""
-
-    tokens = _serial.split(" ")
-    cpid = ""
-    cprv = ""
-    cpfm = ""
-    scep = ""
-    bdid = ""
-    ecid = ""
-    ibfl = ""
-    srtg = ""
-    pwned = False
-    for t in tokens:
-        v = t.split(":")[-1]
-        if "CPID:" in t:
-            cpid = v
-        elif "CPRV" in t:
-            cprv = v
-        elif "CPFM" in t:
-            cpfm = v
-        elif "SCEP" in t:
-            scep = v
-        elif "BDID" in t:
-            bdid = v
-        elif "ECID" in t:
-            ecid = v
-        elif "IBFL" in t:
-            ibfl = v
-        elif "SRTG" in t:
-            srtg = v
-        elif "PWND" in t:
-            pwned = True
-    return SerialNumber(cpid, cprv, cpfm, scep, bdid, ecid, ibfl, srtg, pwned)
 
 
 if __name__ == "__main__":

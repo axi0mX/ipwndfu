@@ -8,9 +8,10 @@ import time
 from contextlib import suppress
 
 import usb  # type: ignore
+
 from ipwndfu import dfu, image3, recovery, utilities
 
-EXEC_MAGIC = "exec"[::-1]
+EXEC_MAGIC = b"exec"
 AES_BLOCK_SIZE = 16
 AES_GID_KEY = 0x20000200
 AES_UID_KEY = 0x20000201

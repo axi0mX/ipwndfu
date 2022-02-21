@@ -1,9 +1,11 @@
+import functools
 import platform
 import struct
 import sys
+from functools import singledispatchmethod
 from typing import Tuple
 
-from ipwndfu import device_platform, dfu
+from ipwndfu import device_platform, dfu, utilities
 
 
 class ExecConfig:
@@ -124,10 +126,10 @@ configs = [
     ),
 ]
 
-EXEC_MAGIC = b"execexec"[::-1]
-DONE_MAGIC = b"donedone"[::-1]
-MEMC_MAGIC = b"memcmemc"[::-1]
-MEMS_MAGIC = b"memsmems"[::-1]
+EXEC_MAGIC = b"execexec"
+DONE_MAGIC = b"donedone"
+MEMC_MAGIC = b"memcmemc"
+MEMS_MAGIC = b"memsmems"
 if platform.system() == "Linux":
     USB_READ_LIMIT = 0xFFF
 else:
@@ -247,7 +249,12 @@ class PwnedUSBDevice:
                     return int(v, 16)
         return None
 
-    def aes(self, data, action, key):
+    @singledispatchmethod
+    def aes(self, data, action: int, key: int):
+        raise NotImplementedError(f"Unable to handle data type {type(data)}")
+
+    @aes.register
+    def _aes_bytes(self, data: bytes, action: int, key: int) -> bytes:
         assert len(data) % AES_BLOCK_SIZE == 0
         (retval, received) = self.execute(
             len(data),
@@ -263,6 +270,19 @@ class PwnedUSBDevice:
         )
         assert retval & 0xFFFFFFFF == 0
         return received[: len(data)]
+
+    @aes.register
+    def _(self, data: str, action: int, key: int) -> str:
+        input_data = utilities.from_hex_str(data)
+        return self._aes_bytes(input_data, action, key).hex()
+
+    aes_encrypt = functools.partialmethod(aes, AES_ENCRYPT)
+    aes_encrypt_uid = functools.partialmethod(aes, AES_ENCRYPT, AES_UID_KEY)
+    aes_encrypt_gid = functools.partialmethod(aes, AES_ENCRYPT, AES_GID_KEY)
+
+    aes_decrypt = functools.partialmethod(aes, AES_DECRYPT)
+    aes_decrypt_uid = functools.partialmethod(aes, AES_DECRYPT, AES_UID_KEY)
+    aes_decrypt_gid = functools.partialmethod(aes, AES_DECRYPT, AES_GID_KEY)
 
     def read_memory(self, address, length):
         data = bytes()
@@ -284,7 +304,7 @@ class PwnedUSBDevice:
         assert 0 <= response_length <= USB_READ_LIMIT
         device = dfu.acquire_device(match=self.match)
         assert self.serial_number == device.serial_number
-        dfu.send_data(device, "\0" * 16)
+        dfu.send_data(device, b"\0" * 16)
         device.ctrl_transfer(0x21, 1, 0, 0, 0, 100)
         device.ctrl_transfer(0xA1, 3, 0, 0, 6, 100)
         device.ctrl_transfer(0xA1, 3, 0, 0, 6, 100)
@@ -292,9 +312,13 @@ class PwnedUSBDevice:
 
         # HACK
         if response_length == 0:
-            response = device.ctrl_transfer(
-                0xA1, 2, 0xFFFF, 0, response_length + 1, CMD_TIMEOUT
-            ).tobytes().decode("ascii")[1:]
+            response = (
+                device.ctrl_transfer(
+                    0xA1, 2, 0xFFFF, 0, response_length + 1, CMD_TIMEOUT
+                )
+                .tobytes()
+                .decode("ascii")[1:]
+            )
         else:
             response = device.ctrl_transfer(
                 0xA1, 2, 0xFFFF, 0, response_length, CMD_TIMEOUT

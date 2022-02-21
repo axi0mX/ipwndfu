@@ -1,4 +1,4 @@
-from ipwndfu.main import SerialNumber, get_serial
+from ipwndfu.utilities import SerialNumber, get_serial
 
 
 def test_always_passes():
