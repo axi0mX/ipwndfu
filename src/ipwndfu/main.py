@@ -189,10 +189,7 @@ def pwn(device=None, match_device=None):
     elif serial.cpid in ["8930"]:
         SHAtter.exploit()
     elif serial.cpid in [
-        "7000",
-        "8000",
         "8002",
-        "8003",
         "8004",
         "8010",
         "8011",
@@ -203,6 +200,8 @@ def pwn(device=None, match_device=None):
         "8960",
     ]:
         checkm8.exploit(match=match_device)
+    elif serial.cpid in ["7000", "8000", "8003"]:
+        checkm8.exploit_a8_a9(match=match_device)
     else:
         print("Found: " + serial_number, file=stderr)
         print("ERROR: This device is not supported.", file=stderr)

@@ -54,7 +54,7 @@ class DevicePlatform:
     gadgets: typing.Dict[str, int] = field(default_factory=dict)
     exploit_configs: typing.Dict[str, dict] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if isinstance(self.usb, dict):
             self.usb = USBConstants(**self.usb)
 
@@ -62,9 +62,8 @@ class DevicePlatform:
         if 0x8720 <= self.cpid <= 0x8960:
             return f"s5l{self.cpid:02x}xsi"
         elif self.cpid in [0x7002, 0x8000, 0x8001, 0x8003]:
-            return f"s{self.cpid:x}si"
+            return f"s{self.cpid:02x}si"
         else:
-            return f"t{self.cpid:x}si"
             return f"t{self.cpid:02x}si"
 
     @classmethod

