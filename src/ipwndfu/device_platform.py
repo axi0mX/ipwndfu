@@ -65,6 +65,7 @@ class DevicePlatform:
             return f"s{self.cpid:x}si"
         else:
             return f"t{self.cpid:x}si"
+            return f"t{self.cpid:02x}si"
 
     @classmethod
     def platforms(cls) -> typing.Dict[int, "DevicePlatform"]:
