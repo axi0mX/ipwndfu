@@ -1,5 +1,5 @@
 data-update:
 - 'src/ipwndfu/data/**'
 
-test-code
+test-code:
 - 'tests/**'
