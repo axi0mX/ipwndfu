@@ -78,6 +78,14 @@ configs = [
     ),
     ExecConfig(
         (
+            "SecureROM for t7001si, Copyright 2013, Apple Inc.",
+            "RELEASE",
+            "iBoot-1991.0.0.2.16",
+        ),
+        aes_crypto_cmd=0x100010A90,
+    ),
+    ExecConfig(
+        (
             "SecureROM for s8000si, Copyright 2007-2014, Apple Inc.",
             "RELEASE",
             "iBoot-2234.0.0.3.3",
@@ -126,10 +134,10 @@ configs = [
     ),
 ]
 
-EXEC_MAGIC = b"execexec"
-DONE_MAGIC = b"donedone"
-MEMC_MAGIC = b"memcmemc"
-MEMS_MAGIC = b"memsmems"
+EXEC_MAGIC = utilities.magic_to_cigam(b"execexec")
+DONE_MAGIC = utilities.magic_to_cigam(b"donedone")
+MEMC_MAGIC = utilities.magic_to_cigam(b"memcmemc")
+MEMS_MAGIC = utilities.magic_to_cigam(b"memsmems")
 if platform.system() == "Linux":
     USB_READ_LIMIT = 0xFFF
 else:

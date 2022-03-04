@@ -200,7 +200,7 @@ def pwn(device=None, match_device=None):
         "8960",
     ]:
         checkm8.exploit(match=match_device)
-    elif serial.cpid in ["7000", "8000", "8003"]:
+    elif serial.cpid in ["7000", "7001", "8000", "8003"]:
         checkm8.exploit_a8_a9(match=match_device)
     else:
         print("Found: " + serial_number, file=stderr)
@@ -420,7 +420,6 @@ def decrypt_gid(device, arg, match=None):
         print(f"Decrypting with S5L{device.config.cpid} GID key.")
         aes = device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
 
-    print(aes)
     return aes
 
 
@@ -444,7 +443,6 @@ def encrypt_gid(device, arg):
         print(f"Encrypting with S5L{device.config.cpid} GID key.")
         aes = device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
 
-    print(aes)
     return aes
 
 
@@ -468,7 +466,6 @@ def decrypt_uid(device, arg):
         print("Decrypting with device-specific UID key.")
         aes = device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
 
-    print(aes)
     return aes
 
 
@@ -492,7 +489,6 @@ def encrypt_uid(device, arg):
         print("Encrypting with device-specific UID key.")
         aes = device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
 
-    print(aes)
     return aes
 
 

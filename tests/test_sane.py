@@ -1,4 +1,4 @@
-from ipwndfu.utilities import SerialNumber, get_serial
+from ipwndfu.utilities import SerialNumber, get_serial, magic_to_cigam
 
 
 def test_always_passes():
@@ -10,3 +10,8 @@ def test_serial_number():
 
     serial = get_serial(sample)
     assert isinstance(serial, SerialNumber)
+
+def test_magic_to_cigam():
+    sample = b"execexec"
+    cigam = magic_to_cigam(sample)
+    assert cigam == b"execexec"[::-1]

@@ -78,3 +78,8 @@ def get_serial(_serial) -> SerialNumber:
         elif "PWND" in t:
             pwned = True
     return SerialNumber(cpid, cprv, cpfm, scep, bdid, ecid, ibfl, srtg, pwned)
+
+def magic_to_cigam(magic: bytes) -> bytes:
+    if len(magic) not in (4, 8):
+        raise ValueError("Invalid magic")
+    return magic[::-1]  # reverse magic

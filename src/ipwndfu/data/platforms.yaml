@@ -112,6 +112,48 @@ modern_platforms:
           - 0x000000000
 
 
+- cpid: 0x7001
+  cprv: 0x01
+  scep: 0x01
+  srtg: iBoot-1991.0.0.2.16
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 4c17f3566ea2db554d8cd43fa333fa9de15ab0a3
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x0
+
+  <<: *dfu_load_t800x
+
+  sigcheck_addr: 0x10000AD04
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180380000
+    usb_core_do_io: 0x100011BB4
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180088CE0
+        usb_serial_number: 0x180088E48
+        usb_create_string_descriptor: 0x100011074
+        usb_srnm_string_descriptor: 0x180080C2A
+        payload_destination: 0x1800E0C00
+        payload_pointer: 0x180088DF8
+      large_leak: 0x800
+      hole:
+      leak:
+      overwrite: *overwrite_t7000
+
 - cpid: 0x8000
   cprv: 0x20
   scep: 0x01
