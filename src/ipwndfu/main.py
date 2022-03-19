@@ -71,7 +71,7 @@ def main():
 
     parser.add_argument("-p", dest="pwn", action="store_true")
     parser.add_argument("-x", dest="xploit", action="store_true")
-    parser.add_argument("-f", dest="send_file")
+    parser.add_argument("-f", dest="send_file", action="store")
     parser.add_argument("-l", dest="list", action="store_true")
 
     parser.add_argument("--demote", dest="demote", action="store_true")
@@ -120,7 +120,7 @@ def main():
         xploit()
 
     elif args.send_file:
-        send_file(args.send_file)
+        send_file(device, args.send_file)
 
     elif args.demote:
         demote(device)
@@ -256,12 +256,12 @@ def xploit():
     device.flash_nor(new_nor.dump())
 
 
-def send_file(device=None, filename=""):
+def send_file(device: usb.Device, filename: str):
     try:
         with open(filename, "rb") as f:
             data = f.read()
-    except IOError:
-        print("ERROR: Could not read file: " + filename, file=stderr)
+    except IOError as e:
+        print(f"ERROR: Could not read file: {filename}\n\n{e}", file=stderr)
         sys.exit(1)
 
     if not device:
