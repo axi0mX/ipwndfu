@@ -102,6 +102,14 @@ configs = [
     ),
     ExecConfig(
         (
+            "SecureROM for s8001si, Copyright 2007-2014, Apple Inc.",
+            "ROMRELEASE",
+            "iBoot-2481.0.0.2.1",
+        ),
+        aes_crypto_cmd=0x10000C9D4,
+    ),
+    ExecConfig(
+        (
             "SecureROM for t8010si, Copyright 2007-2015, Apple Inc.",
             "ROMRELEASE",
             "iBoot-2696.0.0.1.33",

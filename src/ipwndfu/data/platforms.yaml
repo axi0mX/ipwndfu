@@ -40,6 +40,11 @@ constants:
     dfu_load_base: 0x80000000
     recovery_image_base: 0x48818000
     recovery_load_base: 0x80000000
+  - &dfu_load_s8001
+    dfu_image_base: 0x180000000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x180000000
+    recovery_load_base: 0x800000000
   - &dfu_load_t8010_t8011
     dfu_image_base: 0x1800B0000
     dfu_load_base: 0x800000000
@@ -324,6 +329,62 @@ modern_platforms:
       hole: 0x05
       leak: 0x01
       overwrite: *overwrite_t800x
+
+
+- cpid: 0x8001
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-2481.0.0.2.1
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 60e4717ecc1831be10b1618bc0463412551a7870
+  rom_size: 0x20000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  dram_base: 0x800000000
+  demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_s8001
+
+  sigcheck_addr: 0x100007668
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x10000CD60
+    func: 0x10000CD40
+    enter_critical: 0x100009B24
+    exit_critical: 0x100009B88
+    dc_civac: 0x10000043C
+    write_ttbr0: 0x1000003B4
+    tlbi: 0x100000404
+    dmb: 0x100000448
+    handle_interface_request: 0x10000E0B4
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180000000
+    usb_core_do_io: 0x10000DDA4
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x18004C260
+        usb_serial_number: 0x180047578
+        usb_create_string_descriptor: 0x10000D280
+        usb_srnm_string_descriptor: 0x18004486A
+        payload_destination: 0x180078000
+        payload_pointer: 0x18004C378
+      overwrite:
+        preamble: 0
+        pack: "<32x2Q"
+        args:
+          - nop
+          - 0x180000800
 
 
 - cpid: 0x8010

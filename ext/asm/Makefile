@@ -51,6 +51,10 @@ arm64:
 	gobjcopy -O binary -j .text bin/t8010_t8011_disable_wxn_arm64.o bin/t8010_t8011_disable_wxn_arm64.bin
 	rm bin/t8010_t8011_disable_wxn_arm64.o
 
+	xcrun -sdk iphoneos clang src/s8001_disable_wxn_arm64.S -target arm64-apple-darwin -Wall -o bin/s8001_disable_wxn_arm64.o
+	gobjcopy -O binary -j .text bin/s8001_disable_wxn_arm64.o bin/s8001_disable_wxn_arm64.bin
+	rm bin/s8001_disable_wxn_arm64.o
+
 	xcrun -sdk iphoneos clang src/t8015_shellcode_arm64.S -target arm64-apple-darwin -Wall -o bin/t8015_shellcode_arm64.o
 	gobjcopy -O binary -j .text bin/t8015_shellcode_arm64.o bin/t8015_shellcode_arm64.bin
 	rm bin/t8015_shellcode_arm64.o
