@@ -88,8 +88,8 @@ class DevicePlatform:
             self.dfu_load_base = 0x800000000
             self.recovery_image_base = 0x1800B0000
             self.recovery_load_base = 0x800000000
-            self.heap_base = 0
-            self.heap_offset = 0
+            self.heap_base = 0x1801B4000
+            self.heap_offset = 0x5180
             self.trampoline_base = 0
             self.trampoline_offset = 0
             self.page_offset = 0
@@ -268,8 +268,8 @@ all_platforms = [
         sigcheck_addr=0x1000074AC,
         sigcheck_patch=0xD2800000,
         heap_state=0,
-        heap_write_hash=0,
-        heap_check_all=0,
+        heap_write_hash=0x10000F364,
+        heap_check_all=0x10000F8B4,
     ),
     DevicePlatform(
         cpid=0x8011,

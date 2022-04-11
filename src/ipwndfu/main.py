@@ -542,7 +542,6 @@ def repair_heap(device=None, match_device=None):
             for addr in [
                 heap_base,
                 heap_offset,
-                heap_state,
                 heap_write_hash,
                 heap_check_all,
             ]
