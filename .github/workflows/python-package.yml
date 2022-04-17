@@ -26,6 +26,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        git submodule init && git submodule update
         python -m pip install --upgrade pip
         python -m pip install poetry
         poetry install
