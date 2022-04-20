@@ -1,0 +1,909 @@
+# Entries are sorted by CPID - all values are expected to be expressed in hex
+#
+# Each entry begins with `cpid`, `cprv`, `scep` and `srtg` as these come from the device and are immutable (targeting)
+#
+# Following that are "facts" about the device such as arch, nonce size
+#
+# Next are values about the known layout
+#
+# After that are offsets used for various exploits
+
+constants:
+  - &checkm8_payload_arm64
+    payload_offset: 0x180
+    payload_size: 0x240
+  - &checkm8_payload_armv7
+    payload_offset: 0x180
+    payload_size: 0x140
+  - &usb_magic_32
+    exec_magic: 0x65786563
+    done_magic: 0x646F6E65
+    memc_magic: 0x6D656D63
+    mems_magic: 0x6D656D73
+  - &usb_magic_64
+    exec_magic: 0x6578656365786563
+    done_magic: 0x646F6E65646F6E65
+    memc_magic: 0x6D656D636D656D63
+    mems_magic: 0x6D656D736D656D73
+  - &dfu_load_s894x
+    dfu_image_base: 0x34000000
+    dfu_load_base: 0x9FF00000
+    recovery_image_base: 0x9FF00000
+    recovery_load_base: 0x80000000
+  - &dfu_load_s895x
+    dfu_image_base: 0x10000000
+    dfu_load_base: 0xBFF00000
+    recovery_image_base: 0xBFF00000
+    recovery_load_base: 0x80000000
+  - &dfu_load_t8002_t8004
+    dfu_image_base: 0x48818000
+    dfu_load_base: 0x80000000
+    recovery_image_base: 0x48818000
+    recovery_load_base: 0x80000000
+  - &dfu_load_s8001
+    dfu_image_base: 0x180000000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x180000000
+    recovery_load_base: 0x800000000
+  - &dfu_load_t8010_t8011
+    dfu_image_base: 0x1800B0000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x1800B0000
+    recovery_load_base: 0x800000000
+  - &dfu_load_t8012_t8015
+    dfu_image_base: 0x18001C000
+    dfu_load_base: 0x800000000
+    recovery_image_base: 0x18001C000
+    recovery_load_base: 0x800000000
+    heap_base: 0x1801E8000
+    heap_offset: 0x5000
+    trampoline_base: 0x180018000
+    trampoline_offset: 0x620
+    page_offset: 0x400
+  - &dfu_load_t800x
+    dfu_image_base: 0x180380000
+    dfu_load_base: 0x180000000
+    recovery_image_base: 0x83D7F7000
+    recovery_load_base: 0x800000000
+    trampoline_base: 0x00000001800c0000
+
+
+modern_platforms:
+- cpid: 0x7000
+  cprv: 0x11
+  scep: 0x01
+  srtg: iBoot-1992.0.0.1.19
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: c4dcd22ae135c14244fc2b62165c85effa566bfe
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x20e02a000
+
+  <<: *dfu_load_t800x
+
+  sigcheck_addr: 0x100007e98
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180380000
+    usb_core_do_io: 0x10000EBB4
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180088760
+        usb_serial_number: 0x1800888C8
+        usb_create_string_descriptor: 0x10000E074
+        usb_srnm_string_descriptor: 0x18008062A
+        payload_destination: 0x1800E0C00
+        payload_pointer: 0x180088878
+      large_leak: 0x800
+      hole:
+      leak:
+      overwrite: &overwrite_t7000
+        preamble: 0x560
+        pack: "<32xQQ"
+        args:
+          - 0x180380000
+          - 0x000000000
+
+
+- cpid: 0x7001
+  cprv: 0x01
+  scep: 0x01
+  srtg: iBoot-1991.0.0.2.16
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 4c17f3566ea2db554d8cd43fa333fa9de15ab0a3
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x0
+
+  <<: *dfu_load_t800x
+
+  sigcheck_addr: 0x10000AD04
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180380000
+    usb_core_do_io: 0x100011BB4
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180088CE0
+        usb_serial_number: 0x180088E48
+        usb_create_string_descriptor: 0x100011074
+        usb_srnm_string_descriptor: 0x180080C2A
+        payload_destination: 0x1800E0C00
+        payload_pointer: 0x180088DF8
+      large_leak: 0x800
+      hole:
+      leak:
+      overwrite: *overwrite_t7000
+
+- cpid: 0x8000
+  cprv: 0x20
+  scep: 0x01
+  srtg: iBoot-2234.0.0.3.3
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 9979dce30e913c888cf77234c7a7e2a7fa676f4c
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_t800x
+
+  sigcheck_addr: 0x10000812c
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x10000000
+    usb_core_do_io: 0x7621
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x3402D87C
+        usb_serial_number: 0x3402DDF8
+        usb_create_string_descriptor: 0x72A9
+        usb_srnm_string_descriptor: 0x3402C2DA
+        payload_destination: 0x34039800
+        payload_pointer: 0x3402D92C
+      large_leak: 0x800
+      hole:
+      leak:
+      overwrite: *overwrite_t7000
+
+- cpid: 0x8002
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-2651.0.0.1.31
+
+  arch: armv7k
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x40000000
+  rom_sha1: 46c14a17f54ec6079260e9253e813084ab1e634b
+  rom_size: 0x100000
+  sram_base: 0x48800000
+  sram_size: 0x120000
+  dram_base: 0x80000000
+  demotion_reg: 0x481bc000
+
+  <<: *dfu_load_t8002_t8004
+
+  sigcheck_addr: 0x4452
+  sigcheck_patch: 0x20
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x48818000
+    usb_core_do_io: 0x9411
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_armv7
+        usb_descriptors: 0x4880629C
+        usb_serial_number: 0x48802AB8
+        usb_create_string_descriptor: 0x8CA5
+        usb_srnm_string_descriptor: 0x4880037A
+        payload_destination: 0x48806E00
+        payload_pointer: 0x48806344
+      hole: 0x05
+      leak: 0x01
+      overwrite: &overwrite_t800x
+        preamble: 0x640
+        pack: "<20xI4x"
+        args:
+        - 0x10000000
+
+- cpid: 0x8003
+  cprv: 0x01
+  scep: 0x01
+  srtg: iBoot-2234.0.0.2.22
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 93d69e2430e2f0c161e3e1144b69b4da1859169b
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_t800x
+
+  sigcheck_addr: 0x10000812c
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180380000
+    usb_core_do_io: 0x10000EE78
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x1800877E0
+        usb_serial_number: 0x180087958
+        usb_create_string_descriptor: 0x10000E354
+        usb_srnm_string_descriptor: 0x1800807DA
+        payload_destination: 0x1800E0C00
+        payload_pointer: 0x1800878F8
+      large_leak: 0x800
+      hole:
+      leak:
+      overwrite: *overwrite_t7000
+
+
+- cpid: 0x8004
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-2651.0.0.3.3
+
+  arch: armv7k
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x40000000
+  rom_sha1: 8afdcd6c147ac63fddadd1b92536d1f80c0b8a21
+  rom_size: 0x20000
+  sram_base: 0x48800000
+  sram_size: 0x140000
+  dram_base: 0x80000000
+  demotion_reg: 0x481bc000
+
+  <<: *dfu_load_t8002_t8004
+
+  sigcheck_addr: 0x4452
+  sigcheck_patch: 0x20
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x48818000
+    usb_core_do_io: 0x85A1
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_armv7
+        usb_descriptors: 0x488062DC
+        usb_serial_number: 0x48802AE8
+        usb_create_string_descriptor: 0x7E35
+        usb_srnm_string_descriptor: 0x488003CA
+        payload_destination: 0x48806E00
+        payload_pointer: 0x48806384
+      hole: 0x05
+      leak: 0x01
+      overwrite: *overwrite_t800x
+
+
+- cpid: 0x8001
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-2481.0.0.2.1
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 60e4717ecc1831be10b1618bc0463412551a7870
+  rom_size: 0x20000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  dram_base: 0x800000000
+  demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_s8001
+
+  sigcheck_addr: 0x100007668
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x10000CD60
+    func: 0x10000CD40
+    enter_critical: 0x100009B24
+    exit_critical: 0x100009B88
+    dc_civac: 0x10000043C
+    write_ttbr0: 0x1000003B4
+    tlbi: 0x100000404
+    dmb: 0x100000448
+    handle_interface_request: 0x10000E0B4
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180000000
+    usb_core_do_io: 0x10000DDA4
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x18004C260
+        usb_serial_number: 0x180047578
+        usb_create_string_descriptor: 0x10000D280
+        usb_srnm_string_descriptor: 0x18004486A
+        payload_destination: 0x180078000
+        payload_pointer: 0x18004C378
+      overwrite:
+        preamble: 0
+        pack: "<32x2Q"
+        args:
+          - nop
+          - 0x180000800
+
+
+- cpid: 0x8010
+  cprv: 0x11
+  scep: 0x01
+  srtg: iBoot-2696.0.0.1.33
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 41a488b3c46ff06c1a2376f3405b079fb0f15316
+  rom_size: 0x20000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  dram_base: 0x800000000
+  demotion_reg: 0x2102bc000
+
+  <<: *dfu_load_t8010_t8011
+
+  sigcheck_addr: 0x1000074ac
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x10000CC6C
+    func: 0x10000CC4C
+    enter_critical: 0x10000A4B8
+    exit_critical: 0x10000A514
+    dc_civac: 0x10000046C
+    write_ttbr0: 0x1000003E4
+    tlbi: 0x100000434
+    dmb: 0x100000478
+    handle_interface_request: 0x10000DFB8
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x1800B0000
+    usb_core_do_io: 0x10000DC98
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180088A30
+        usb_serial_number: 0x180083CF8
+        usb_create_string_descriptor: 0x10000D150
+        usb_srnm_string_descriptor: 0x1800805DA
+        payload_destination: 0x1800AFC00
+        payload_pointer: 0x180088B48
+      hole: 0x06
+      leak: 0x01
+      overwrite:
+        preamble: 0x580
+        pack: "<32x2Q16x32x2QI"
+        args:
+          - nop
+          - 0x1800B0800
+          - nop
+          - 0x1800B0800
+          - 0xBEEFBEEF
+
+
+- cpid: 0x8011
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-3135.0.0.2.3
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 2fae20a11860b0e3ce1d8a6df7d3961f610ab70d
+  rom_size: 0x100000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  demotion_reg: 0x2102bc000
+  dram_base: 0x800000000
+
+  <<: *dfu_load_t8010_t8011
+
+  sigcheck_addr: 0x100007630
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x10000CD0C
+    func: 0x10000CCEC
+    dc_civac: 0x10000047C
+    write_ttbr0: 0x1000003F4
+    tlbi: 0x100000444
+    dmb: 0x100000488
+    handle_interface_request: 0x10000E08C
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x1800B0000
+    usb_core_do_io: 0x10000DD64
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180088948
+        usb_serial_number: 0x180083D28
+        usb_create_string_descriptor: 0x10000D234
+        usb_srnm_string_descriptor: 0x18008062A
+        payload_destination: 0x1800AFC00
+        payload_pointer: 0x180088A58
+      hole: 0x06
+      leak: 0x01
+      overwrite:
+        preamble: 0x500
+        pack: "<32x2Q16x32x2QI"
+        args:
+          - nop
+          - 0x1800B0800
+          - nop
+          - 0x1800B0800
+          - 0xBEEFBEEF
+
+
+- cpid: 0x8012
+  cprv: 0x10
+  scep: 0x01
+  srtg: iBoot-3401.0.0.1.16
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 68be532dea4cc05b393ef5f49962aef3f99d629d
+  rom_size: 0x100000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  dram_base: 0x800000000
+  demotion_reg: 0x2112bc000
+
+  heap_check_all: 0x10000db88
+  heap_state: 0x180008b60
+  heap_write_hash: 0x10000d4e8
+
+  <<: *dfu_load_t8012_t8015
+
+  sigcheck_addr: 0x100004854
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x100008DB8
+    func: 0x100008DA0
+    write_ttbr0: 0x100000444
+    tlbi: 0x100000494
+    handle_interface_request: 0x10000BFFC
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x18001C000
+    usb_core_do_io: 0x10000BD20
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x1800089F8
+        usb_serial_number: 0x180003AF8
+        usb_create_string_descriptor: 0x10000B1CC
+        usb_srnm_string_descriptor: 0x18000082A
+        payload_destination: 0x18001BC00
+        payload_pointer: 0x180008B08
+      hole: 0x06
+      leak: 0x01
+      overwrite:
+        preamble: 0x540
+        pack: "<32x2Q"
+        args:
+          - nop
+          - 0x18001C800
+
+
+- cpid: 0x8015
+  cprv: 0x11
+  scep: 0x01
+  srtg: iBoot-3332.0.0.1.23
+
+  arch: arm64
+  nonce_length: 0x20
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 96fccb1a63de1a2d50ff14555d3898a5af46e9b1
+  rom_size: 0x100000
+  sram_base: 0x180000000
+  sram_size: 0x200000
+  dram_base: 0x800000000
+  demotion_reg: 0x2352bc000
+
+  heap_check_all: 0x10000db98
+  heap_state: 0x1800086a0
+  heap_write_hash: 0x10000d4ec
+
+  <<: *dfu_load_t8012_t8015
+
+  sigcheck_addr: 0x10000624c
+  sigcheck_patch: 0xd2800000
+
+  gadgets:
+    nop: 0x10000A9C4
+    load_write: 0x10000945C
+    write_sctlr: 0x1000003EC
+    func: 0x10000A9AC
+    write_ttbr0: 0x10000045C
+    tlbi: 0x1000004AC
+    dc_civac: 0x1000004D0
+    dmb: 0x1000004F0
+    handle_interface_request: 0x10000BCCC
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x18001C000
+    usb_core_do_io: 0x10000B9A8
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180008528
+        usb_serial_number: 0x180003A78
+        usb_create_string_descriptor: 0x10000AE80
+        usb_srnm_string_descriptor: 0x1800008FA
+        payload_destination: 0x18001BC00
+        payload_pointer: 0x180008638
+      hole: 0x06
+      leak: 0x01
+      overwrite:
+        preamble: 0x500
+        pack: "<32x2Q16x32x2Q12xI"
+        args:
+          - nop
+          - 0x18001C020
+          - nop
+          - 0x18001C020
+          - 0xBEEFBEEF
+
+
+- cpid: 0x8947
+  cprv: 0x0
+  scep: 0x10
+  srtg: iBoot-1458.2
+
+  arch: armv7
+  nonce_length: 0x14
+  sep_nonce_length: null
+
+  rom_base: 0x3f000000
+  rom_sha1: d9320ddd4bdb1de79ae0601f20e7db23441ab1a7
+  rom_size: 0x10000
+  sram_base: 0x34000000
+  sram_size: 0x40000
+  dram_base: 0x80000000
+  demotion_reg: 0x3f500000
+
+  <<: *dfu_load_s894x
+
+  sigcheck_addr: 0x451e
+  sigcheck_patch: 0x20
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x34000000
+    usb_core_do_io: 0x79ED
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_armv7
+        usb_descriptors: 0x3402D87C
+        usb_serial_number:  0x3402DDF8
+        usb_create_string_descriptor: 0x72A9
+        usb_srnm_string_descriptor: 0x3402C2DA
+        payload_destination: 0x34039800
+        payload_pointer: 0x3402D92C
+      large_leak: 0x272
+      overwrite:
+        preamble: 0x660
+        pack: "<20xI4x"
+        args:
+          - 0x34000000
+
+
+- cpid: 0x8950
+  cprv: 0x20
+  scep: 0x10
+  srtg: iBoot-1145.3
+
+  arch: armv7s
+  nonce_length: 0x14
+  sep_nonce_length: null
+
+  rom_base: 0x3f000000
+  rom_sha1: 50a8dd9863868c971aaf95a96e5152378784e4db
+  rom_size: 0x10000
+  sram_base: 0x10000000
+  sram_size: 0x80000
+  dram_base: 0x80000000
+  demotion_reg: 0x3f500000
+
+  heap_check_all: 0x0
+  heap_state: 0x0
+  heap_write_hash: 0x0
+
+  <<: *dfu_load_s895x
+
+  sigcheck_addr: 0x4d28
+  sigcheck_patch: 0x20
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x10000000
+    usb_core_do_io: 0x7621
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_armv7
+        usb_descriptors: 0x10061988
+        usb_serial_number: 0x10061F80
+        usb_create_string_descriptor: 0x7C55
+        usb_srnm_string_descriptor: 0x100600D8
+        payload_destination: 0x10079800
+        payload_pointer: 0x10061A24
+      large_leak: 0x293
+      overwrite: &overwrite_895x
+        preamble: 0x640
+        pack: "<20xI4x"
+        args:
+          - 0x10000000
+
+
+- cpid: 0x8955
+  cprv: 0x20
+  scep: 0x10
+  srtg: iBoot-1145.3.3
+
+  arch: armv7s
+  nonce_length: 0x14
+  sep_nonce_length: null
+
+  rom_base: 0x3f000000
+  rom_sha1: 3af575cc84e54f951db2a83227737664abdc8f40
+  rom_size: 0x10000
+  sram_base: 0x10000000
+  sram_size: 0x80000
+  dram_base: 0x80000000
+  demotion_reg: 0x3f500000
+
+  <<: *dfu_load_s895x
+
+  sigcheck_addr: 0x4d28
+  sigcheck_patch: 0x20
+
+  usb:
+    <<: *usb_magic_32
+    load_address: 0x10000000
+    usb_core_do_io: 0x7661
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_armv7
+        usb_descriptors: 0x10061988
+        usb_serial_number: 0x10061F80
+        usb_create_string_descriptor: 0x7C95
+        usb_srnm_string_descriptor: 0x100600D8
+        payload_destination: 0x10079800
+        payload_pointer: 0x10061A24
+      large_leak: 0x293
+      overwrite: *overwrite_895x
+
+
+- cpid: 0x8960
+  cprv: 0x11
+  scep: 0x01
+  srtg: iBoot-1704.10
+
+  arch: arm64
+  nonce_length: 0x14
+  sep_nonce_length: 0x14
+
+  rom_base: 0x100000000
+  rom_sha1: 2ae035c46e02ca40ae777f89a6637be694558f0a
+  rom_size: 0x80000
+  sram_base: 0x180000000
+  sram_size: 0x400000
+  dram_base: 0x800000000
+  demotion_reg: 0x20e02a000
+
+  dfu_image_base: 0x180380000
+  dfu_load_base: 0x180000000
+  recovery_image_base: 0x83D7F7000
+  recovery_load_base: 0x800000000
+
+  sigcheck_addr: 0x100005be8
+  sigcheck_patch: 0xd2800000
+
+  usb:
+    <<: *usb_magic_64
+    load_address: 0x180380000
+    usb_core_do_io: 0x10000CC78
+
+  exploit_configs:
+    checkm8:
+      constants:
+        <<: *checkm8_payload_arm64
+        usb_descriptors: 0x180086B58
+        usb_serial_number: 0x180086CDC
+        usb_create_string_descriptor: 0x10000BFEC
+        usb_srnm_string_descriptor: 0x180080562
+        payload_destination: 0x18037FC00
+        payload_pointer: 0x180086C70
+      large_leak: 0x1F00
+      overwrite:
+        preamble: 0x580
+        pack: "<32xQ8x"
+        args:
+          - 0x180380000
+
+
+legacy_platforms:
+- cpid: 0x8920
+  version: 359.3
+  aes_crypto_cmd: 0x925
+  memmove: 0x83D4
+  get_block_device: 0x1351
+  load_address: 0x84000000
+  rom_address: 0xBF000000
+  rom_size: 0x10000
+  rom_sha256: 99fd16f919a506c7f0701620e132e18c0e6f4025a57a85807960ca092e5e3587
+
+  alloc8:
+  - 0x84034000,  # 1 - MAIN_STACK_ADDRESS
+  - 0x544,  # 2 - clean_invalidate_data_cache
+  - 0x84024020,  # 3 - gNorImg3List
+  - 0x1CCD,  # 4 - free
+  - 0x3CA1,  # 5 - exit_critical_section
+  - 0x451D,  # 6 - home_button_pressed
+  - 0x450D,  # 7 - power_button_pressed
+  - 0x44E1,  # 8 - cable_connected
+  - 0x696C6C62,  # 9 - ILLB_MAGIC
+  - 0x1F6F,  # 10 - get_nor_image
+  - 0x84000000,  # 11 - LOAD_ADDRESS
+  - 0x24000,  # 12 - MAX_SIZE
+  - 0x3969,  # 13 - jump_to
+  - 0x38A1,  # 14 - usb_create_serial_number_string
+  - 0x8E7D,  # 15 - strlcat
+  - 0x349D,  # 16 - usb_wait_for_image
+  - 0x84024228,  # 17 - gLeakingDFUBuffer
+  - 0x65786563,  # 18 - EXEC_MAGIC
+  - 0x1F79,  # 19 - memz_create
+  - 0x1FA1,  # 20 - memz_destroy
+  - 0x696D6733,  # 21 - IMG3_STRUCT_MAGIC
+  - 0x4D656D7A,  # 22 - MEMZ_STRUCT_MAGIC
+  - 0x1FE5,  # 23 - image3_create_struct
+  - 0x2655,  # 24 - image3_load_continue
+  - 0x277B,  # 25 - image3_load_fail
+
+- cpid: 0x8920
+  version: 359.3.2
+  aes_crypto_cmd: 0x925
+  memmove: 0x83DC
+  get_block_device: 0x1351
+  load_address: 0x84000000
+  rom_address: 0xBF000000
+  rom_size: 0x10000
+  rom_sha256: 0e6feb1144c95b1ee088ecd6c45bfdc2ed17191167555b6ca513d6572e463c86
+
+  alloc8:
+  - 0x84034000,  # 1 - MAIN_STACK_ADDRESS
+  - 0x544,  # 2 - clean_invalidate_data_cache
+  - 0x84024020,  # 3 - gNorImg3List
+  - 0x1CCD,  # 4 - free
+  - 0x3CA9,  # 5 - exit_critical_section
+  - 0x4525,  # 6 - home_button_pressed
+  - 0x4515,  # 7 - power_button_pressed
+  - 0x44E9,  # 8 - cable_connected
+  - 0x696C6C62,  # 9 - ILLB_MAGIC
+  - 0x1F77,  # 10 - get_nor_image
+  - 0x84000000,  # 11 - LOAD_ADDRESS
+  - 0x24000,  # 12 - MAX_SIZE
+  - 0x3971,  # 13 - jump_to
+  - 0x38A9,  # 14 - usb_create_serial_number_string
+  - 0x8E85,  # 15 - strlcat
+  - 0x34A5,  # 16 - usb_wait_for_image
+  - 0x84024228,  # 17 - gLeakingDFUBuffer
+  - 0x65786563,  # 18 - EXEC_MAGIC
+  - 0x1F81,  # 19 - memz_create
+  - 0x1FA9,  # 20 - memz_destroy
+  - 0x696D6733,  # 21 - IMG3_STRUCT_MAGIC
+  - 0x4D656D7A,  # 22 - MEMZ_STRUCT_MAGIC
+  - 0x1FED,  # 23 - image3_create_struct
+  - 0x265D,  # 24 - image3_load_continue
+  - 0x2783,  # 25 - image3_load_fail
+
+- cpid: 0x8922
+  version: 359.5
+  aes_crypto_cmd: 0x919
+  memmove: 0x8564
+  get_block_device: 0x1851
+  load_address: 0x84000000
+  rom_address: 0xBF000000
+  rom_size: 0x10000
+  rom_sha256: 07b8a615f00961c5802451b5717c344db287b68c5f6d2331ac6ba7a6acdbac9d
+
+- cpid: 0x8930
+  version: 574.4
+  aes_crypto_cmd: 0x686D
+  memmove: 0x84DC
+  get_block_device: 0x81D5
+  load_address: 0x84000000
+  rom_address: 0xBF000000
+  rom_size: 0x10000
+  rom_sha256: 4f34652a238a57ae0018b6e66c20a240cdbee8b4cca59a99407d09f83ea8082d

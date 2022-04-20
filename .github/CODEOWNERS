@@ -1,0 +1,7 @@
+* @checkra1n @legit
+
+*.toml @checkra1n
+
+*.py @checkra1n @legit @ipwndfu
+
+docs/**/* @checkra1n @legit @ipwndfu

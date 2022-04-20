@@ -1,0 +1,49 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Minimum Python flake8 / mypy / pytest
+
+on:
+  push:
+    branches: [ main, next ]
+  pull_request:
+    branches: [ main, next ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        git submodule init && git submodule update
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+        poetry install
+    - name: Lint with flake8
+      run: |
+        # Look for agregious mistakes and block
+        poetry run flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Run the full flake8 config
+        poetry run flake8 src/ --exit-zero --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Type check with MyPi
+      run: |
+        poetry run mypy src/
+    - name: Test with pytest
+      run: |
+        poetry run pytest
+    - name: Create package
+      run: |
+        poetry build

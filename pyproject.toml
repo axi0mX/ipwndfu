@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "ipwndfu"
+version = "2.0.0b7"
+description = "The DFU exploitation toolkit for Apple devices"
+readme = "README.md"
+
+packages = [
+    { include = "ipwndfu", from="src" },
+    { include = "libusbfinder", from="src" }
+]
+
+authors = ["axi0mX <axi0mXor@gmail.com>"]
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry.scripts]
+ipwndfu = "ipwndfu.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+cryptography = "^36"
+pyusb = "^1"
+PyYAML = "^6"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2"
+pytest = "^7"
+mypy = "^0"
+pre-commit = "^2"
+pytest-cov = "^3"
+pytest-mypy = "^0"
+black = "^22"
+flake8 = "^4"
+flake8-broken-line = "^0"
+flake8-bugbear = "^22"
+flake8-comprehensions = "^3"
+flake8-eradicate = "^1"
+flake8-no-pep420 = "^2"
+flake8-quotes = "^3"
+flake8-simplify = "^0"
+flake8-tidy-imports = "^4"
+flake8-typing-imports = "^1"
+flake8-use-fstring = "^1"
+pep8-naming = "^0"
+types-cryptography = "^3"
+MonkeyType = "^21"
+types-PyYAML = "^6"
+unicorn = "2.0.0.rc7"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,3 @@
+[submodule "ext/roms"]
+	path = ext/roms
+	url = https://github.com/hack-different/apple-roms.git

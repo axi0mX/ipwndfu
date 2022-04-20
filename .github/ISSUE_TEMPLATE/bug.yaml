@@ -1,0 +1,71 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - legit
+  - checkra1n
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    id: device
+    attributes:
+      label: What device? (Specify CHIP/CPID)
+      description: What is the SoC / Chip ID for the device you are using?
+      multiple: true
+      options:
+        - "7000"
+        - "8000"
+        - "8001"
+        - "8002"
+        - "8003"
+        - "8004"
+        - "8010"
+        - "8011"
+        - "8012"
+        - "8015"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: textarea
+    id: version
+    attributes:
+      label: Version
+      description: What version of our software are you running?
+    validations:
+      required: true
+  - type: dropdown
+    id: python
+    attributes:
+      label: What version of Python?
+      multiple: true
+      options:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant console
+      render: shell
+  - type: checkboxes
+    id: sudo
+    attributes:
+      label: Sudo
+      description: I ran this as the super user
+      options:
+        - label: I did run this as su or sudo
+          required: true
