@@ -59,6 +59,17 @@ This tool should be compatible with Mac and Linux. It won't work in a virtual ma
 * libusb, `If you are using Linux: install libusb using your package manager.`
 * [iPhone 3GS iOS 4.3.5 iBSS](#ibss)
 
+## Fix for running ipwndfu for macOS 
+
+It has been known in newer versions of macOS since 12.3 python2 (what ipwndfu depends on) is removed, even when you run `brew install python` ipwndfu will **not** work. [Pyenv](https://github.com/pyenv/pyenv) is used to fix this problem, and the commands to fix the problem is: 
+```
+brew install pyenv
+pyenv install 2.7.18
+pyenv install 3.10.4
+pyenv global 2.7.18 3.10.4
+```
+
+Once all four commands are ran succesfully, then you can use ipwndfu. 
 
 ## Tutorial
 
