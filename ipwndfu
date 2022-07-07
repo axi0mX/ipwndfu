@@ -15,6 +15,7 @@ def print_help():
     print '  -x\t\t\t\tinstall alloc8 exploit to NOR'
     print '  -f file\t\t\tsend file to device in DFU Mode'
     print 'Advanced options:'
+    print '  --ecid\t\t\tspecify the device to match'
     print '  --demote\t\t\tdemote device to enable JTAG'
     print '  --boot\t\t\tboot device'
     print '  --dump=address,length\t\tdump memory to stdout'
@@ -32,7 +33,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
+        advanced = ['ecid', 'demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -123,6 +124,11 @@ if __name__ == '__main__':
             dfu.send_data(device, data)
             dfu.request_image_validation(device)
             dfu.release_device(device)
+
+        if opt == '--ecid':
+            ecid = '{:016X}'.format(arg)
+            dfu.set_device_ecid(arg)
+            print 'Match only devices with ECID: ' , ecid
 
         if opt == '--demote':
             device = dfu.acquire_device()
