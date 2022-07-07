@@ -33,7 +33,7 @@ def print_help():
 
 if __name__ == '__main__':
     try:
-        advanced = ['ecid', 'demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
+        advanced = ['ecid=', 'demote', 'boot', 'dump=', 'hexdump=', 'dump-rom', 'dump-nor=', 'flash-nor=', '24kpwn', 'remove-24kpwn', 'remove-alloc8', 'decrypt-gid=', 'encrypt-gid=', 'decrypt-uid=', 'encrypt-uid=']
         opts, args = getopt.getopt(sys.argv[1:], 'pxf:', advanced)
     except getopt.GetoptError:
         print 'ERROR: Invalid arguments provided.'
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             dfu.release_device(device)
 
         if opt == '--ecid':
-            ecid = '{:016X}'.format(arg)
+            ecid = '%016X' % int(arg)
             dfu.set_device_ecid(arg)
             print 'Match only devices with ECID: ' , ecid
 
