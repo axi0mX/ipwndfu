@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
         if opt == '--ecid':
             ecid = '%016X' % int(arg)
-            dfu.set_device_ecid(arg)
+            dfu.set_device_ecid(ecid)
             print 'Match only devices with ECID: ' , ecid
 
         if opt == '--demote':
