@@ -5,6 +5,12 @@ import libusbfinder
 
 MAX_PACKET_SIZE = 0x800
 
+DEVICE_ECID_MATCH=None
+
+def set_device_ecid(ecid):
+    global DEVICE_ECID_MATCH
+    DEVICE_ECID_MATCH = ecid
+
 def acquire_device(timeout=5.0, match=None, fatal=True):
   backend = usb.backend.libusb1.get_backend(find_library=lambda x:libusbfinder.libusb1_path())
   #print 'Acquiring device handle.'
@@ -15,6 +21,8 @@ def acquire_device(timeout=5.0, match=None, fatal=True):
       once = True
       for device in usb.core.find(find_all=True, idVendor=0x5AC, idProduct=0x1227, backend=backend):
           if match is not None and match not in device.serial_number:
+              continue
+          if DEVICE_ECID_MATCH is not None and DEVICE_ECID_MATCH not in device.serial_number:
               continue
           return device
       time.sleep(0.001)
