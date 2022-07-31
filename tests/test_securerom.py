@@ -80,7 +80,24 @@ def test_boot_securerom():
             ">>> Tracing instruction at 0x%x, instruction size = 0x%x" % (address, size)
         )
 
+    def hook_mem_invalid(mu: unicorn.Uc, access, address, size, value, user_data):
+        if access == unicorn.UC_MEM_FETCH:
+            print(">>> FETCH (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
+                  % (address, size, value))
+        elif access == unicorn.UC_MEM_READ:
+            print(">>> READ (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
+                  % (address, size, value))
+        elif access == unicorn.UC_MEM_WRITE:
+            print(">>> WRITE (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
+                  % (address, size, value))
+        else:
+            print(">>> UNKNOWN ACCESS [0x%x] (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
+                    % (access, address, size, value))
+
     mu.hook_add(unicorn.UC_HOOK_BLOCK, hook_block)
+    mu.hook_add(unicorn.UC_HOOK_MEM_FETCH_UNMAPPED, hook_mem_invalid)
+    mu.hook_add(unicorn.UC_HOOK_MEM_READ_UNMAPPED, hook_mem_invalid)
+    mu.hook_add(unicorn.UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_invalid)
 
     mu.hook_add(
         unicorn.UC_HOOK_INSN,
