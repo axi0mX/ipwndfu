@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ipwndfu"
-version = "2.0.0b7"
+version = "2.0.0b9"
 description = "The DFU exploitation toolkit for Apple devices"
 readme = "README.md"
 
@@ -9,7 +9,15 @@ packages = [
     { include = "libusbfinder", from="src" }
 ]
 
-authors = ["axi0mX <axi0mXor@gmail.com>"]
+authors = [
+    "axi0mX <axi0mXor@gmail.com>",
+    "Rick Mark <rickmark@outlook.com>",
+    "cynder <KritantaDevelopment@gmail.com>",
+    "adam <adamhamdi31@gmail.com>",
+    "Liam(Cryptic) <liamwqs@gmail.com>",
+    "h0m3us3r <h0m3us3r@t8012.dev>",
+    "MCMrARM <mcmrarm@gmail.com>"
+]
 
 [tool.isort]
 profile = "black"

@@ -79,6 +79,7 @@ def main():
     parser.add_argument(
         "--patch-sigchecks", dest="patch_sigchecks", action="store_true"
     )
+    parser.add_argument("--safe-dfu", dest="safe_dfu", action="store_true")
     parser.add_argument("--boot", dest="boot", action="store_true")
     parser.add_argument("--dev", dest="match_device")
     parser.add_argument("--dump", dest="dump")
@@ -112,6 +113,9 @@ def main():
     if args.reset:
         dump(device, "0xDEADBEEF,0xFFFFFFF", match=args.match_device)
         sys.exit()
+
+    elif args.safe_dfu:
+        safe_dfu()
 
     elif args.pwn:
         pwn(device, match_device=args.match_device)
@@ -172,6 +176,57 @@ def main():
 
     else:
         print_help()
+
+
+def safe_dfu():
+    recovery_idProduct = 0x1281
+    backend = usb.backend.libusb1.get_backend(
+        find_library=lambda x: libusbfinder.libusb1_path()
+    )
+    timeout = 5.0
+    start = time.time()
+    once = False
+    device = None
+    while not once or time.time() - start < timeout:
+        once = True
+        for _device in usb.core.find(
+            find_all=True, idVendor=0x5AC, idProduct=recovery_idProduct, backend=backend
+        ):
+            device = _device
+            # print(f'Found: {_device.serial_number}')
+            break
+        time.sleep(0.001)
+    if not device:
+        print('No device found in Recovery mode')
+        exit(1)
+    print(f'Found: {device.serial_number}')
+    io_setenv_cmd = b"setenv auto-boot true\x00"
+    io_saveenv_cmd = b"saveenv\x00"
+    io_reboot_cmd = b"reboot\x00"
+    device.ctrl_transfer(0x40, 0, 0, 0, io_setenv_cmd, len(io_setenv_cmd)+1)
+    device.ctrl_transfer(0x40, 0, 0, 0, io_saveenv_cmd, len(io_saveenv_cmd)+1)
+    for i in range(5):
+        print(f' Start in {5-i}\r', end="")
+        time.sleep(1)
+    print('\n')
+    for i in range(5):
+        print(f' Hold Both Buttons ({5-i})\r', end="")
+        if i == 2:
+            try:
+                device.ctrl_transfer(0x40, 0, 0, 0, io_reboot_cmd, len(io_reboot_cmd)+1)
+            except usb.core.USBTimeoutError:
+                pass
+        time.sleep(1)
+    print('\n')
+    dev = None
+    for i in range(10):
+        print(f' Hold Home ({10-i})           \r', end="")
+        dev = dfu.acquire_device(timeout=1.0, fatal=False)
+        if dev:
+            break
+    print('\n')
+    if dev:
+        print(f'Successfuly Entered DFU Mode')
 
 
 def pwn(device=None, match_device=None):
@@ -422,6 +477,7 @@ def decrypt_gid(device, arg, match=None):
         print(f"Decrypting with S5L{device.config.cpid} GID key.")
         aes = device.aes_hex(arg, AES_DECRYPT, AES_GID_KEY)
 
+    print(aes)
     return aes
 
 
@@ -445,6 +501,7 @@ def encrypt_gid(device, arg):
         print(f"Encrypting with S5L{device.config.cpid} GID key.")
         aes = device.aes_hex(arg, AES_ENCRYPT, AES_GID_KEY)
 
+    print(aes)
     return aes
 
 
@@ -468,6 +525,7 @@ def decrypt_uid(device, arg):
         print("Decrypting with device-specific UID key.")
         aes = device.aes_hex(arg, AES_DECRYPT, AES_UID_KEY)
 
+    print(aes)
     return aes
 
 
@@ -491,6 +549,7 @@ def encrypt_uid(device, arg):
         print("Encrypting with device-specific UID key.")
         aes = device.aes_hex(arg, AES_ENCRYPT, AES_UID_KEY)
 
+    print(aes)
     return aes
 
 
@@ -519,6 +578,21 @@ def list_devices():
             "ERROR: No Apple device in DFU Mode 0x1227 detected after %0.2f second timeout. Exiting."
             % timeout
         )
+        busses = usb.busses()
+        for bus in busses:
+            devices = bus.devices
+            for dev in devices:
+                if dev != None:
+                    try:
+                        xdev = usb.core.find(idVendor=dev.idVendor, idProduct=dev.idProduct)
+                        if xdev._manufacturer is None:
+                            xdev._manufacturer = usb.util.get_string(xdev, xdev.iManufacturer)
+                        if xdev._product is None:
+                            xdev._product = usb.util.get_string(xdev, xdev.iProduct)
+                        stx = '%6d %6d: ' + str(xdev._manufacturer).strip() + ' = ' + str(xdev._product).strip()
+                        print(stx % (dev.idVendor, dev.idProduct) + f'- {xdev.serial_number}')
+                    except:
+                        pass
         return 1
     else:
         return 0
@@ -625,7 +699,7 @@ def boot(device=None):
         heap_state = 0x1800086A0
         nand_boot_jump = 0x10000188C
         bootstrap_task_lr = 0x180015F88
-        dfu_bool = 0x1800085B0
+        dfu_bool = 0x180087870
         dfu_notify = 0x1000098B4
         dfu_state = 0x1800085E0
         trampoline = 0x180018000
