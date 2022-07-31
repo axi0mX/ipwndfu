@@ -1,6 +1,8 @@
 import os.path
 import pathlib
+import pkgutil
 
+import yaml
 import unicorn
 
 T8015_SECURE_ROM = (
@@ -11,6 +13,23 @@ T8015_SRAM_BASE = 0x180000000
 T8015_SRAM_SIZE = 0x200000
 
 
+class MSRPrinter:
+    def __init__(self):
+        self.msr_file = pkgutil.get_data("tests", "registers.yaml")
+        self.msr_data = yaml.safe_load(self.msr_file)
+
+    def friendly_name(self, cp_reg: unicorn.unicorn.uc_arm64_cp_reg) -> str:
+        msr_map = self.msr_data['aarch64']['msr']
+        apple_map = self.msr_data['aarch64']['apple_system_registers']
+        reg_descriptor = f"S{cp_reg.op0}_{cp_reg.op1}_c{cp_reg.crn}_c{cp_reg.crm}_{cp_reg.op2}"
+        if reg_descriptor in msr_map:
+            return msr_map[reg_descriptor]
+        if reg_descriptor in apple_map:
+            return apple_map[reg_descriptor]
+
+        return "Unknown"
+
+
 def get_securerom(path: str) -> bytes:
     rom_path = pathlib.Path(os.path.dirname(__file__)).joinpath(path)
     with open(rom_path, mode="rb") as file:
@@ -18,6 +37,7 @@ def get_securerom(path: str) -> bytes:
 
 
 def test_boot_securerom():
+    msr_util = MSRPrinter()
     rom = get_securerom(T8015_SECURE_ROM)
 
     mu = unicorn.Uc(unicorn.UC_ARCH_ARM64, unicorn.UC_MODE_ARM)
@@ -42,8 +62,9 @@ def test_boot_securerom():
 
     def hook_mrs(uc: unicorn.Uc, reg, cp_reg, reg_file) -> bool:
         pc = uc.reg_read(unicorn.arm64_const.UC_ARM64_REG_PC)
+        reg_friendly = msr_util.friendly_name(cp_reg)
         print(
-            f">>> Hook MRS instruction ({pc:x}): reg = 0x{reg:x}(UC_ARM64_REG_X2) cp_reg = {cp_reg}"
+            f">>> Hook MRS read instruction ({pc:x}): reg = 0x{reg:x}(UC_ARM64_REG_X2) cp_reg = {cp_reg}\n>>>\t{reg_friendly}"
         )
         reg_id = cp_reg_to_id(cp_reg)
         if reg_id not in reg_file:
@@ -57,8 +78,9 @@ def test_boot_securerom():
 
     def hook_msr(uc: unicorn.Uc, reg, cp_reg, reg_file) -> bool:
         pc = uc.reg_read(unicorn.arm64_const.UC_ARM64_REG_PC)
+        reg_friendly = msr_util.friendly_name(cp_reg)
         print(
-            f">>> Hook MSR instruction ({pc:x}): reg = 0x{reg:x}(UC_ARM64_REG_X2) cp_reg = {cp_reg}"
+            f">>> Hook MSR store instruction ({pc:x}): reg = 0x{reg:x}(UC_ARM64_REG_X2) cp_reg = {cp_reg}\n>>>\t{reg_friendly}"
         )
         reg_id = cp_reg_to_id(cp_reg)
         reg_value = uc.reg_read(reg)

@@ -1,0 +1,2503 @@
+---
+metadata:
+  description: Representations of registers and instructions for various CPU elements
+  credits:
+    - https://gist.github.com/bazad/42054285391c6e0dcd0ede4b5f969ad2
+aarch64:
+  pstate:
+    0b011: 'UAO'
+    0b100: 'PAN'
+    0b101: 'SPSel'
+    0b110: 'DAIFSet'
+    0b111: 'DAIFClr'
+  msr:
+    S1_0_c7_c1_0:
+      name: 'IC IALLUIS'
+      description: 'Instruction Cache Invalidate All to PoU, Inner Shareable'
+    S1_0_c7_c5_0:
+      name: 'IC IALLU'
+      description: 'Instruction Cache Invalidate All to PoU'
+    S1_0_c7_c6_1:
+      name: 'DC IVAC'
+      description: 'Data or unified Cache line Invalidate by VA to PoC'
+    S1_0_c7_c6_2:
+      name: 'DC ISW'
+      description: 'Data or unified Cache line Invalidate by Set/Way'
+    S1_0_c7_c6_3:
+      name: 'DC IGVAC'
+      description: 'Data, Allocation Tag or unified Cache line Invalidate of Allocation Tags by VA to PoC'
+    S1_0_c7_c6_4:
+      name: 'DC IGSW'
+      description: 'Data, Allocation Tag or unified Cache line Invalidate of Allocation Tags by Set/Way'
+    S1_0_c7_c6_5:
+      name: 'DC IGDVAC'
+      description: 'Data, Allocation Tag or unified Cache line Invalidate of Allocation Tags by VA to PoC'
+    S1_0_c7_c6_6:
+      name: 'DC IGDSW'
+      description: 'Data, Allocation Tag or unified Cache line Invalidate of Data and Allocation Tags by Set/Way'
+    S1_0_c7_c8_0:
+      name: 'AT S1E1R'
+      description: 'Address Translate Stage 1 EL1 Read'
+    S1_0_c7_c8_1:
+      name: 'AT S1E1W'
+      description: 'Address Translate Stage 1 EL1 Write'
+    S1_0_c7_c8_2:
+      name: 'AT S1E0R'
+      description: 'Address Translate Stage 1 EL0 Read'
+    S1_0_c7_c8_3:
+      name: 'AT S1E0W'
+      description: 'Address Translate Stage 1 EL0 Write'
+    S1_0_c7_c9_0:
+      name: 'AT S1E1RP'
+      description: 'Address Translate Stage 1 EL1 Read PAN'
+    S1_0_c7_c9_1:
+      name: 'AT S1E1WP'
+      description: 'Address Translate Stage 1 EL1 Write PAN'
+    S1_0_c7_c10_2:
+      name: 'DC CSW'
+      description: 'Data or unified Cache line Clean by Set/Way'
+    S1_0_c7_c10_4:
+      name: 'DC CGSW'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Allocation Tags by Set/Way'
+    S1_0_c7_c10_6:
+      name: 'DC CGDSW'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Data and Allocation Tags by Set/Way'
+    S1_0_c7_c14_2:
+      name: 'DC CISW'
+      description: 'Data or unified Cache line Clean and Invalidate by Set/Way'
+    S1_0_c7_c14_4:
+      name: 'DC CIGSW'
+      description: 'Data, Allocation Tag or unified Cache line Clean and Invalidate of Allocation Tags by Set/Way'
+    S1_0_c7_c14_6:
+      name: 'DC CIGDSW'
+      description: 'Data, Allocation Tag or unified Cache line Clean and Invalidate of Data and Allocation Tags by Set/Way'
+    S1_0_c8_c1_0:
+      name: 'TLBI VMALLE1OS'
+      description: 'TLB Invalidate by VMID, All at stage 1, EL1, Outer Shareable'
+    S1_0_c8_c1_1:
+      name: 'TLBI VAE1OS'
+      description: 'TLB Invalidate by VA, EL1, Outer Shareable'
+    S1_0_c8_c1_2:
+      name: 'TLBI ASIDE1OS'
+      description: 'TLB Invalidate by ASID, EL1, Outer Shareable'
+    S1_0_c8_c1_3:
+      name: 'TLBI VAAE1OS'
+      description: 'TLB Invalidate by VA, All ASID, EL1, Outer Shareable'
+    S1_0_c8_c1_5:
+      name: 'TLBI VALE1OS'
+      description: 'TLB Invalidate by VA, Last level, EL1, Outer Shareable'
+    S1_0_c8_c1_7:
+      name: 'TLBI VAALE1OS'
+      description: 'TLB Invalidate by VA, All ASID, Last Level, EL1, Outer Shareable'
+    S1_0_c8_c2_1:
+      name: 'TLBI RVAE1IS'
+      description: 'TLB Range Invalidate by VA, EL1, Inner Shareable'
+    S1_0_c8_c2_3:
+      name: 'TLBI RVAAE1IS'
+      description: 'TLB Range Invalidate by VA, All ASID, EL1, Inner Shareable'
+    S1_0_c8_c2_5:
+      name: 'TLBI RVALE1IS'
+      description: 'TLB Range Invalidate by VA, Last level, EL1, Inner Shareable'
+    S1_0_c8_c2_7:
+      name: 'TLBI RVAALE1IS'
+      description: 'TLB Range Invalidate by VA, All ASID, Last Level, EL1, Inner Shareable'
+    S1_0_c8_c3_0:
+      name: 'TLBI VMALLE1IS'
+      description: 'TLB Invalidate by VMID, All at stage 1, EL1, Inner Shareable'
+    S1_0_c8_c3_1:
+      name: 'TLBI VAE1IS'
+      description: 'TLB Invalidate by VA, EL1, Inner Shareable'
+    S1_0_c8_c3_2:
+      name: 'TLBI ASIDE1IS'
+      description: 'TLB Invalidate by ASID, EL1, Inner Shareable'
+    S1_0_c8_c3_3:
+      name: 'TLBI VAAE1IS'
+      description: 'TLB Invalidate by VA, All ASID, EL1, Inner Shareable'
+    S1_0_c8_c3_5:
+      name: 'TLBI VALE1IS'
+      description: 'TLB Invalidate by VA, Last level, EL1, Inner Shareable'
+    S1_0_c8_c3_7:
+      name: 'TLBI VAALE1IS'
+      description: 'TLB Invalidate by VA, All ASID, Last Level, EL1, Inner Shareable'
+    S1_0_c8_c5_1:
+      name: 'TLBI RVAE1OS'
+      description: 'TLB Range Invalidate by VA, EL1, Outer Shareable'
+    S1_0_c8_c5_3:
+      name: 'TLBI RVAAE1OS'
+      description: 'TLB Range Invalidate by VA, All ASID, EL1, Outer Shareable'
+    S1_0_c8_c5_5:
+      name: 'TLBI RVALE1OS'
+      description: 'TLB Range Invalidate by VA, Last level, EL1, Outer Shareable'
+    S1_0_c8_c5_7:
+      name: 'TLBI RVAALE1OS'
+      description: 'TLB Range Invalidate by VA, All ASID, Last Level, EL1, Outer Shareable'
+    S1_0_c8_c6_1:
+      name: 'TLBI RVAE1'
+      description: 'TLB Range Invalidate by VA, EL1'
+    S1_0_c8_c6_3:
+      name: 'TLBI RVAAE1'
+      description: 'TLB Range Invalidate by VA, All ASID, EL1'
+    S1_0_c8_c6_5:
+      name: 'TLBI RVALE1'
+      description: 'TLB Range Invalidate by VA, Last level, EL1'
+    S1_0_c8_c6_7:
+      name: 'TLBI RVAALE1'
+      description: 'TLB Range Invalidate by VA, All ASID, Last level, EL1'
+    S1_0_c8_c7_0:
+      name: 'TLBI VMALLE1'
+      description: 'TLB Invalidate by VMID, All at stage 1, EL1'
+    S1_0_c8_c7_1:
+      name: 'TLBI VAE1'
+      description: 'TLB Invalidate by VA, EL1'
+    S1_0_c8_c7_2:
+      name: 'TLBI ASIDE1'
+      description: 'TLB Invalidate by ASID, EL1'
+    S1_0_c8_c7_3:
+      name: 'TLBI VAAE1'
+      description: 'TLB Invalidate by VA, All ASID, EL1'
+    S1_0_c8_c7_5:
+      name: 'TLBI VALE1'
+      description: 'TLB Invalidate by VA, Last level, EL1'
+    S1_0_c8_c7_7:
+      name: 'TLBI VAALE1'
+      description: 'TLB Invalidate by VA, All ASID, Last level, EL1'
+    S1_3_c7_c3_4:
+      name: 'CFP RCTX'
+      description: 'Control Flow Prediction Restriction by Context'
+    S1_3_c7_c3_5:
+      name: 'DVP RCTX'
+      description: 'Data Value Prediction Restriction by Context'
+    S1_3_c7_c3_7:
+      name: 'CPP RCTX'
+      description: 'Cache Prefetch Prediction Restriction by Context'
+    S1_3_c7_c4_1:
+      name: 'DC ZVA'
+      description: 'Data Cache Zero by VA'
+    S1_3_c7_c4_3:
+      name: 'DC GVA'
+      description: 'Data Cache set Allocation Tag by VA'
+    S1_3_c7_c4_4:
+      name: 'DC GZVA'
+      description: 'Data Cache set Allocation Tags and Zero by VA'
+    S1_3_c7_c5_1:
+      name: 'IC IVAU'
+      description: 'Instruction Cache line Invalidate by VA to PoU'
+    S1_3_c7_c10_1:
+      name: 'DC CVAC'
+      description: 'Data or unified Cache line Clean by VA to PoC'
+    S1_3_c7_c10_3:
+      name: 'DC CGVAC'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Allocation Tags by VA to PoC'
+    S1_3_c7_c10_5:
+      name: 'DC CGDVAC'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Allocation Tags by VA to PoC'
+    S1_3_c7_c11_1:
+      name: 'DC CVAU'
+      description: 'Data or unified Cache line Clean by VA to PoU'
+    S1_3_c7_c12_1:
+      name: 'DC CVAP'
+      description: 'Data or unified Cache line Clean by VA to PoP'
+    S1_3_c7_c12_3:
+      name: 'DC CGVAP'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Allocation Tags by VA to PoP'
+    S1_3_c7_c12_5:
+      name: 'DC CGDVAP'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Data and Allocation Tags by VA to PoP'
+    S1_3_c7_c13_1:
+      name: 'DC CVADP'
+      description: 'Data or unified Cache line Clean by VA to PoDP'
+    S1_3_c7_c13_3:
+      name: 'DC CGVADP'
+      description: 'Clean of Allocation Tags by VA to PoDP'
+    S1_3_c7_c13_5:
+      name: 'DC CGDVADP'
+      description: 'Data, Allocation Tag or unified Cache line Clean of Allocation Tags by VA to PoDP'
+    S1_3_c7_c14_1:
+      name: 'DC CIVAC'
+      description: 'Data or unified Cache line Clean and Invalidate by VA to PoC'
+    S1_3_c7_c14_3:
+      name: 'DC CIGVAC'
+      description: 'Data, Allocation Tag or unified Cache line Clean and Invalidate of Allocation Tags by VA to PoC'
+    S1_3_c7_c14_5:
+      name: 'DC CIGDVAC'
+      description: 'Data, Allocation Tag or unified Cache line Clean and Invalidate of Data and Allocation Tags by VA to PoC'
+    S1_4_c7_c8_0:
+      name: 'AT S1E2R'
+      description: 'Address Translate Stage 1 EL2 Read'
+    S1_4_c7_c8_1:
+      name: 'AT S1E2W'
+      description: 'Address Translate Stage 1 EL2 Write'
+    S1_4_c7_c8_4:
+      name: 'AT S12E1R'
+      description: 'Address Translate Stages 1 and 2 EL1 Read'
+    S1_4_c7_c8_5:
+      name: 'AT S12E1W'
+      description: 'Address Translate Stages 1 and 2 EL1 Write'
+    S1_4_c7_c8_6:
+      name: 'AT S12E0R'
+      description: 'Address Translate Stages 1 and 2 EL0 Read'
+    S1_4_c7_c8_7:
+      name: 'AT S12E0W'
+      description: 'Address Translate Stages 1 and 2 EL0 Write'
+    S1_4_c8_c0_1:
+      name: 'TLBI IPAS2E1IS'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, EL1, Inner Shareable'
+    S1_4_c8_c0_2:
+      name: 'TLBI RIPAS2E1IS'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, EL1, Inner Shareable'
+    S1_4_c8_c0_5:
+      name: 'TLBI IPAS2LE1IS'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1, Inner Shareable'
+    S1_4_c8_c0_6:
+      name: 'TLBI RIPAS2LE1IS'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1, Inner Shareable'
+    S1_4_c8_c1_0:
+      name: 'TLBI ALLE2OS'
+      description: 'TLB Invalidate All, EL2, Outer Shareable'
+    S1_4_c8_c1_1:
+      name: 'TLBI VAE2OS'
+      description: 'TLB Invalidate by VA, EL2, Outer Shareable'
+    S1_4_c8_c1_4:
+      name: 'TLBI ALLE1OS'
+      description: 'TLB Invalidate All, EL1, Outer Shareable'
+    S1_4_c8_c1_5:
+      name: 'TLBI VALE2OS'
+      description: 'TLB Invalidate by VA, Last level, EL2, Outer Shareable'
+    S1_4_c8_c1_6:
+      name: 'TLBI VMALLS12E1OS'
+      description: 'TLB Invalidate by VMID, All at Stage 1 and 2, EL1, Outer Shareable'
+    S1_4_c8_c2_1:
+      name: 'TLBI RVAE2IS'
+      description: 'TLB Range Invalidate by VA, EL2, Inner Shareable'
+    S1_4_c8_c2_5:
+      name: 'TLBI RVALE2IS'
+      description: 'TLB Range Invalidate by VA, Last level, EL2, Inner Shareable'
+    S1_4_c8_c3_0:
+      name: 'TLBI ALLE2IS'
+      description: 'TLB Invalidate All, EL2, Inner Shareable'
+    S1_4_c8_c3_1:
+      name: 'TLBI VAE2IS'
+      description: 'TLB Invalidate by VA, EL2, Inner Shareable'
+    S1_4_c8_c3_4:
+      name: 'TLBI ALLE1IS'
+      description: 'TLB Invalidate All, EL1, Inner Shareable'
+    S1_4_c8_c3_5:
+      name: 'TLBI VALE2IS'
+      description: 'TLB Invalidate by VA, Last level, EL2, Inner Shareable'
+    S1_4_c8_c3_6:
+      name: 'TLBI VMALLS12E1IS'
+      description: 'TLB Invalidate by VMID, All at Stage 1 and 2, EL1, Inner Shareable'
+    S1_4_c8_c4_0:
+      name: 'TLBI IPAS2E1OS'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, EL1, Outer Shareable'
+    S1_4_c8_c4_1:
+      name: 'TLBI IPAS2E1'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, EL1'
+    S1_4_c8_c4_2:
+      name: 'TLBI RIPAS2E1'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, EL1'
+    S1_4_c8_c4_3:
+      name: 'TLBI RIPAS2E1OS'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, EL1, Outer Shareable'
+    S1_4_c8_c4_4:
+      name: 'TLBI IPAS2LE1OS'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1, Outer Shareable'
+    S1_4_c8_c4_5:
+      name: 'TLBI IPAS2LE1'
+      description: 'TLB Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1'
+    S1_4_c8_c4_6:
+      name: 'TLBI RIPAS2LE1'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1'
+    S1_4_c8_c4_7:
+      name: 'TLBI RIPAS2LE1OS'
+      description: 'TLB Range Invalidate by Intermediate Physical Address, Stage 2, Last level, EL1, Outer Shareable'
+    S1_4_c8_c5_1:
+      name: 'TLBI RVAE2OS'
+      description: 'TLB Range Invalidate by VA, EL2, Outer Shareable'
+    S1_4_c8_c5_5:
+      name: 'TLBI RVALE2OS'
+      description: 'TLB Range Invalidate by VA, Last level, EL2, Outer Shareable'
+    S1_4_c8_c6_1:
+      name: 'TLBI RVAE2'
+      description: 'TLB Range Invalidate by VA, EL2'
+    S1_4_c8_c6_5:
+      name: 'TLBI RVALE2'
+      description: 'TLB Range Invalidate by VA, Last level, EL2'
+    S1_4_c8_c7_0:
+      name: 'TLBI ALLE2'
+      description: 'TLB Invalidate All, EL2'
+    S1_4_c8_c7_1:
+      name: 'TLBI VAE2'
+      description: 'TLB Invalidate by VA, EL2'
+    S1_4_c8_c7_4:
+      name: 'TLBI ALLE1'
+      description: 'TLB Invalidate All, EL1'
+    S1_4_c8_c7_5:
+      name: 'TLBI VALE2'
+      description: 'TLB Invalidate by VA, Last level, EL2'
+    S1_4_c8_c7_6:
+      name: 'TLBI VMALLS12E1'
+      description: 'TLB Invalidate by VMID, All at Stage 1 and 2, EL1'
+    S1_6_c7_c8_0:
+      name: 'AT S1E3R'
+      description: 'Address Translate Stage 1 EL3 Read'
+    S1_6_c7_c8_1:
+      name: 'AT S1E3W'
+      description: 'Address Translate Stage 1 EL3 Write'
+    S1_6_c8_c1_0:
+      name: 'TLBI ALLE3OS'
+      description: 'TLB Invalidate All, EL3, Outer Shareable'
+    S1_6_c8_c1_1:
+      name: 'TLBI VAE3OS'
+      description: 'TLB Invalidate by VA, EL3, Outer Shareable'
+    S1_6_c8_c1_5:
+      name: 'TLBI VALE3OS'
+      description: 'TLB Invalidate by VA, Last level, EL3, Outer Shareable'
+    S1_6_c8_c2_1:
+      name: 'TLBI RVAE3IS'
+      description: 'TLB Range Invalidate by VA, EL3, Inner Shareable'
+    S1_6_c8_c2_5:
+      name: 'TLBI RVALE3IS'
+      description: 'TLB Range Invalidate by VA, Last level, EL3, Inner Shareable'
+    S1_6_c8_c3_0:
+      name: 'TLBI ALLE3IS'
+      description: 'TLB Invalidate All, EL3, Inner Shareable'
+    S1_6_c8_c3_1:
+      name: 'TLBI VAE3IS'
+      description: 'TLB Invalidate by VA, EL3, Inner Shareable'
+    S1_6_c8_c3_5:
+      name: 'TLBI VALE3IS'
+      description: 'TLB Invalidate by VA, Last level, EL3, Inner Shareable'
+    S1_6_c8_c5_1:
+      name: 'TLBI RVAE3OS'
+      description: 'TLB Range Invalidate by VA, EL3, Outer Shareable'
+    S1_6_c8_c5_5:
+      name: 'TLBI RVALE3OS'
+      description: 'TLB Range Invalidate by VA, Last level, EL3, Outer Shareable'
+    S1_6_c8_c6_1:
+      name: 'TLBI RVAE3'
+      description: 'TLB Range Invalidate by VA, EL3'
+    S1_6_c8_c6_5:
+      name: 'TLBI RVALE3'
+      description: 'TLB Range Invalidate by VA, Last level, EL3'
+    S1_6_c8_c7_0:
+      name: 'TLBI ALLE3'
+      description: 'TLB Invalidate All, EL3'
+    S1_6_c8_c7_1:
+      name: 'TLBI VAE3'
+      description: 'TLB Invalidate by VA, EL3'
+    S1_6_c8_c7_5:
+      name: 'TLBI VALE3'
+      description: 'TLB Invalidate by VA, Last level, EL3'
+    S2_0_c0_c0_2:
+      name: 'OSDTRRX_EL1'
+      description: 'OS Lock Data Transfer Register, Receive'
+    S2_0_c0_c0_4:
+      name: 'DBGBVR0_EL1'
+      description: 'Debug Breakpoint Value Register 0'
+    S2_0_c0_c0_5:
+      name: 'DBGBCR0_EL1'
+      description: 'Debug Breakpoint Control Register 0'
+    S2_0_c0_c0_6:
+      name: 'DBGWVR0_EL1'
+      description: 'Debug Watchpoint Value Register 0'
+    S2_0_c0_c0_7:
+      name: 'DBGWCR0_EL1'
+      description: 'Debug Watchpoint Control Register 0'
+    S2_0_c0_c1_4:
+      name: 'DBGBVR1_EL1'
+      description: 'Debug Breakpoint Value Register 1'
+    S2_0_c0_c1_5:
+      name: 'DBGBCR1_EL1'
+      description: 'Debug Breakpoint Control Register 1'
+    S2_0_c0_c1_6:
+      name: 'DBGWVR1_EL1'
+      description: 'Debug Watchpoint Value Register 1'
+    S2_0_c0_c1_7:
+      name: 'DBGWCR1_EL1'
+      description: 'Debug Watchpoint Control Register 1'
+    S2_0_c0_c2_0:
+      name: 'MDCCINT_EL1'
+      description: 'Monitor DCC Interrupt Enable Register'
+    S2_0_c0_c2_2:
+      name: 'MDSCR_EL1'
+      description: 'Monitor Debug System Control Register'
+    S2_0_c0_c2_4:
+      name: 'DBGBVR2_EL1'
+      description: 'Debug Breakpoint Value Register 2'
+    S2_0_c0_c2_5:
+      name: 'DBGBCR2_EL1'
+      description: 'Debug Breakpoint Control Register 2'
+    S2_0_c0_c2_6:
+      name: 'DBGWVR2_EL1'
+      description: 'Debug Watchpoint Value Register 2'
+    S2_0_c0_c2_7:
+      name: 'DBGWCR2_EL1'
+      description: 'Debug Watchpoint Control Register 2'
+    S2_0_c0_c3_2:
+      name: 'OSDTRTX_EL1'
+      description: 'OS Lock Data Transfer Register, Transmit'
+    S2_0_c0_c3_4:
+      name: 'DBGBVR3_EL1'
+      description: 'Debug Breakpoint Value Register 3'
+    S2_0_c0_c3_5:
+      name: 'DBGBCR3_EL1'
+      description: 'Debug Breakpoint Control Register 3'
+    S2_0_c0_c3_6:
+      name: 'DBGWVR3_EL1'
+      description: 'Debug Watchpoint Value Register 3'
+    S2_0_c0_c3_7:
+      name: 'DBGWCR3_EL1'
+      description: 'Debug Watchpoint Control Register 3'
+    S2_0_c0_c4_4:
+      name: 'DBGBVR4_EL1'
+      description: 'Debug Breakpoint Value Register 4'
+    S2_0_c0_c4_5:
+      name: 'DBGBCR4_EL1'
+      description: 'Debug Breakpoint Control Register 4'
+    S2_0_c0_c4_6:
+      name: 'DBGWVR4_EL1'
+      description: 'Debug Watchpoint Value Register 4'
+    S2_0_c0_c4_7:
+      name: 'DBGWCR4_EL1'
+      description: 'Debug Watchpoint Control Register 4'
+    S2_0_c0_c5_4:
+      name: 'DBGBVR5_EL1'
+      description: 'Debug Breakpoint Value Register 5'
+    S2_0_c0_c5_5:
+      name: 'DBGBCR5_EL1'
+      description: 'Debug Breakpoint Control Register 5'
+    S2_0_c0_c5_6:
+      name: 'DBGWVR5_EL1'
+      description: 'Debug Watchpoint Value Register 5'
+    S2_0_c0_c5_7:
+      name: 'DBGWCR5_EL1'
+      description: 'Debug Watchpoint Control Register 5'
+    S2_0_c0_c6_2:
+      name: 'OSECCR_EL1'
+      description: 'OS Lock Exception Catch Control Register'
+    S2_0_c0_c6_4:
+      name: 'DBGBVR6_EL1'
+      description: 'Debug Breakpoint Value Register 6'
+    S2_0_c0_c6_5:
+      name: 'DBGBCR6_EL1'
+      description: 'Debug Breakpoint Control Register 6'
+    S2_0_c0_c6_6:
+      name: 'DBGWVR6_EL1'
+      description: 'Debug Watchpoint Value Register 6'
+    S2_0_c0_c6_7:
+      name: 'DBGWCR6_EL1'
+      description: 'Debug Watchpoint Control Register 6'
+    S2_0_c0_c7_4:
+      name: 'DBGBVR7_EL1'
+      description: 'Debug Breakpoint Value Register 7'
+    S2_0_c0_c7_5:
+      name: 'DBGBCR7_EL1'
+      description: 'Debug Breakpoint Control Register 7'
+    S2_0_c0_c7_6:
+      name: 'DBGWVR7_EL1'
+      description: 'Debug Watchpoint Value Register 7'
+    S2_0_c0_c7_7:
+      name: 'DBGWCR7_EL1'
+      description: 'Debug Watchpoint Control Register 7'
+    S2_0_c0_c8_4:
+      name: 'DBGBVR8_EL1'
+      description: 'Debug Breakpoint Value Register 8'
+    S2_0_c0_c8_5:
+      name: 'DBGBCR8_EL1'
+      description: 'Debug Breakpoint Control Register 8'
+    S2_0_c0_c8_6:
+      name: 'DBGWVR8_EL1'
+      description: 'Debug Watchpoint Value Register 8'
+    S2_0_c0_c8_7:
+      name: 'DBGWCR8_EL1'
+      description: 'Debug Watchpoint Control Register 8'
+    S2_0_c0_c9_4:
+      name: 'DBGBVR9_EL1'
+      description: 'Debug Breakpoint Value Register 9'
+    S2_0_c0_c9_5:
+      name: 'DBGBCR9_EL1'
+      description: 'Debug Breakpoint Control Register 9'
+    S2_0_c0_c9_6:
+      name: 'DBGWVR9_EL1'
+      description: 'Debug Watchpoint Value Register 9'
+    S2_0_c0_c9_7:
+      name: 'DBGWCR9_EL1'
+      description: 'Debug Watchpoint Control Register 9'
+    S2_0_c0_c10_4:
+      name: 'DBGBVR10_EL1'
+      description: 'Debug Breakpoint Value Register 10'
+    S2_0_c0_c10_5:
+      name: 'DBGBCR10_EL1'
+      description: 'Debug Breakpoint Control Register 10'
+    S2_0_c0_c10_6:
+      name: 'DBGWVR10_EL1'
+      description: 'Debug Watchpoint Value Register 10'
+    S2_0_c0_c10_7:
+      name: 'DBGWCR10_EL1'
+      description: 'Debug Watchpoint Control Register 10'
+    S2_0_c0_c11_4:
+      name: 'DBGBVR11_EL1'
+      description: 'Debug Breakpoint Value Register 11'
+    S2_0_c0_c11_5:
+      name: 'DBGBCR11_EL1'
+      description: 'Debug Breakpoint Control Register 11'
+    S2_0_c0_c11_6:
+      name: 'DBGWVR11_EL1'
+      description: 'Debug Watchpoint Value Register 11'
+    S2_0_c0_c11_7:
+      name: 'DBGWCR11_EL1'
+      description: 'Debug Watchpoint Control Register 11'
+    S2_0_c0_c12_4:
+      name: 'DBGBVR12_EL1'
+      description: 'Debug Breakpoint Value Register 12'
+    S2_0_c0_c12_5:
+      name: 'DBGBCR12_EL1'
+      description: 'Debug Breakpoint Control Register 12'
+    S2_0_c0_c12_6:
+      name: 'DBGWVR12_EL1'
+      description: 'Debug Watchpoint Value Register 12'
+    S2_0_c0_c12_7:
+      name: 'DBGWCR12_EL1'
+      description: 'Debug Watchpoint Control Register 12'
+    S2_0_c0_c13_4:
+      name: 'DBGBVR13_EL1'
+      description: 'Debug Breakpoint Value Register 13'
+    S2_0_c0_c13_5:
+      name: 'DBGBCR13_EL1'
+      description: 'Debug Breakpoint Control Register 13'
+    S2_0_c0_c13_6:
+      name: 'DBGWVR13_EL1'
+      description: 'Debug Watchpoint Value Register 13'
+    S2_0_c0_c13_7:
+      name: 'DBGWCR13_EL1'
+      description: 'Debug Watchpoint Control Register 13'
+    S2_0_c0_c14_4:
+      name: 'DBGBVR14_EL1'
+      description: 'Debug Breakpoint Value Register 14'
+    S2_0_c0_c14_5:
+      name: 'DBGBCR14_EL1'
+      description: 'Debug Breakpoint Control Register 14'
+    S2_0_c0_c14_6:
+      name: 'DBGWVR14_EL1'
+      description: 'Debug Watchpoint Value Register 14'
+    S2_0_c0_c14_7:
+      name: 'DBGWCR14_EL1'
+      description: 'Debug Watchpoint Control Register 14'
+    S2_0_c0_c15_4:
+      name: 'DBGBVR15_EL1'
+      description: 'Debug Breakpoint Value Register 15'
+    S2_0_c0_c15_5:
+      name: 'DBGBCR15_EL1'
+      description: 'Debug Breakpoint Control Register 15'
+    S2_0_c0_c15_6:
+      name: 'DBGWVR15_EL1'
+      description: 'Debug Watchpoint Value Register 15'
+    S2_0_c0_c15_7:
+      name: 'DBGWCR15_EL1'
+      description: 'Debug Watchpoint Control Register 15'
+    S2_0_c1_c0_0:
+      name: 'MDRAR_EL1'
+      description: 'Monitor Debug ROM Address Register'
+    S2_0_c1_c0_4:
+      name: 'OSLAR_EL1'
+      description: 'OS Lock Access Register'
+    S2_0_c1_c1_4:
+      name: 'OSLSR_EL1'
+      description: 'OS Lock Status Register'
+    S2_0_c1_c3_4:
+      name: 'OSDLR_EL1'
+      description: 'OS Double Lock Register'
+    S2_0_c1_c4_4:
+      name: 'DBGPRCR_EL1'
+      description: 'Debug Power Control Register'
+    S2_0_c7_c8_6:
+      name: 'DBGCLAIMSET_EL1'
+      description: 'Debug CLAIM Tag Set register'
+    S2_0_c7_c9_6:
+      name: 'DBGCLAIMCLR_EL1'
+      description: 'Debug CLAIM Tag Clear register'
+    S2_0_c7_c14_6:
+      name: 'DBGAUTHSTATUS_EL1'
+      description: 'Debug Authentication Status register'
+    S2_3_c0_c1_0:
+      name: 'MDCCSR_EL0'
+      description: 'Monitor DCC Status Register'
+    S2_3_c0_c4_0:
+      name: 'DBGDTR_EL0'
+      description: 'Debug Data Transfer Register, half-duplex'
+    S2_3_c0_c5_0:
+      name: 'DBGDTRRX_EL0'
+      description: 'Debug Data Transfer Register'
+    S2_4_c0_c7_0:
+      name: 'DBGVCR32_EL2'
+      description: 'Debug Vector Catch Register'
+    S3_0_c0_c0_0:
+      name: 'MIDR_EL1'
+      description: 'Main ID Register'
+    S3_0_c0_c0_5:
+      name: 'MPIDR_EL1'
+      description: 'Multiprocessor Affinity Register'
+    S3_0_c0_c0_6:
+      name: 'REVIDR_EL1'
+      description: 'Revision ID Register'
+    S3_0_c0_c1_0:
+      name: 'ID_PFR0_EL1'
+      description: 'AArch32 Processor Feature Register 0'
+    S3_0_c0_c1_1:
+      name: 'ID_PFR1_EL1'
+      description: 'AArch32 Processor Feature Register 1'
+    S3_0_c0_c1_2:
+      name: 'ID_DFR0_EL1'
+      description: 'AArch32 Debug Feature Register 0'
+    S3_0_c0_c1_3:
+      name: 'ID_AFR0_EL1'
+      description: 'AArch32 Auxiliary Feature Register 0'
+    S3_0_c0_c1_4:
+      name: 'ID_MMFR0_EL1'
+      description: 'AArch32 Memory Model Feature Register 0'
+    S3_0_c0_c1_5:
+      name: 'ID_MMFR1_EL1'
+      description: 'AArch32 Memory Model Feature Register 1'
+    S3_0_c0_c1_6:
+      name: 'ID_MMFR2_EL1'
+      description: 'AArch32 Memory Model Feature Register 2'
+    S3_0_c0_c1_7:
+      name: 'ID_MMFR3_EL1'
+      description: 'AArch32 Memory Model Feature Register 3'
+    S3_0_c0_c2_0:
+      name: 'ID_ISAR0_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 0'
+    S3_0_c0_c2_1:
+      name: 'ID_ISAR1_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 1'
+    S3_0_c0_c2_2:
+      name: 'ID_ISAR2_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 2'
+    S3_0_c0_c2_3:
+      name: 'ID_ISAR3_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 3'
+    S3_0_c0_c2_4:
+      name: 'ID_ISAR4_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 4'
+    S3_0_c0_c2_5:
+      name: 'ID_ISAR5_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 5'
+    S3_0_c0_c2_6:
+      name: 'ID_MMFR4_EL1'
+      description: 'AArch32 Memory Model Feature Register 4'
+    S3_0_c0_c2_7:
+      name: 'ID_ISAR6_EL1'
+      description: 'AArch32 Instruction Set Attribute Register 6'
+    S3_0_c0_c3_0:
+      name: 'MVFR0_EL1'
+      description: 'AArch32 Media and VFP Feature Register 0'
+    S3_0_c0_c3_1:
+      name: 'MVFR1_EL1'
+      description: 'AArch32 Media and VFP Feature Register 1'
+    S3_0_c0_c3_2:
+      name: 'MVFR2_EL1'
+      description: 'AArch32 Media and VFP Feature Register 2'
+    S3_0_c0_c3_4:
+      name: 'ID_PFR2_EL1'
+      description: 'AArch32 Processor Feature Register 2'
+    S3_0_c0_c3_5:
+      name: 'ID_DFR1_EL1'
+      description: 'Debug Feature Register 1'
+    S3_0_c0_c3_6:
+      name: 'ID_MMFR5_EL1'
+      description: 'AArch32 Memory Model Feature Register 5'
+    S3_0_c0_c4_0:
+      name: 'ID_AA64PFR0_EL1'
+      description: 'AArch64 Processor Feature Register 0'
+    S3_0_c0_c4_1:
+      name: 'ID_AA64PFR1_EL1'
+      description: 'AArch64 Processor Feature Register 1'
+    S3_0_c0_c4_4:
+      name: 'ID_AA64ZFR0_EL1'
+      description: 'SVE Feature ID register 0'
+    S3_0_c0_c5_0:
+      name: 'ID_AA64DFR0_EL1'
+      description: 'AArch64 Debug Feature Register 0'
+    S3_0_c0_c5_1:
+      name: 'ID_AA64DFR1_EL1'
+      description: 'AArch64 Debug Feature Register 1'
+    S3_0_c0_c5_4:
+      name: 'ID_AA64AFR0_EL1'
+      description: 'AArch64 Auxiliary Feature Register 0'
+    S3_0_c0_c5_5:
+      name: 'ID_AA64AFR1_EL1'
+      description: 'AArch64 Auxiliary Feature Register 1'
+    S3_0_c0_c6_0:
+      name: 'ID_AA64ISAR0_EL1'
+      description: 'AArch64 Instruction Set Attribute Register 0'
+    S3_0_c0_c6_1:
+      name: 'ID_AA64ISAR1_EL1'
+      description: 'AArch64 Instruction Set Attribute Register 1'
+    S3_0_c0_c7_0:
+      name: 'ID_AA64MMFR0_EL1'
+      description: 'AArch64 Memory Model Feature Register 0'
+    S3_0_c0_c7_1:
+      name: 'ID_AA64MMFR1_EL1'
+      description: 'AArch64 Memory Model Feature Register 1'
+    S3_0_c0_c7_2:
+      name: 'ID_AA64MMFR2_EL1'
+      description: 'AArch64 Memory Model Feature Register 2'
+    S3_0_c1_c0_0:
+      name: 'SCTLR_EL1'
+      description: 'System Control Register (EL1)'
+    S3_0_c1_c0_1:
+      name: 'ACTLR_EL1'
+      description: 'Auxiliary Control Register (EL1)'
+    S3_0_c1_c0_2:
+      name: 'CPACR_EL1'
+      description: 'Architectural Feature Access Control Register'
+    S3_0_c1_c0_5:
+      name: 'RGSR_EL1'
+      description: 'Random Allocation Tag Seed Register.'
+    S3_0_c1_c0_6:
+      name: 'GCR_EL1'
+      description: 'Tag Control Register.'
+    S3_0_c1_c2_0:
+      name: 'ZCR_EL1'
+      description: 'SVE Control Register for EL1'
+    S3_0_c1_c2_1:
+      name: 'TRFCR_EL1'
+      description: 'Trace Filter Control Register (EL1)'
+    S3_0_c2_c0_0:
+      name: 'TTBR0_EL1'
+      description: 'Translation Table Base Register 0 (EL1)'
+    S3_0_c2_c0_1:
+      name: 'TTBR1_EL1'
+      description: 'Translation Table Base Register 1 (EL1)'
+    S3_0_c2_c0_2:
+      name: 'TCR_EL1'
+      description: 'Translation Control Register (EL1)'
+    S3_0_c2_c1_0:
+      name: 'APIAKeyLo_EL1'
+      description: 'Pointer Authentication Key A for Instruction (bits[63:0]) '
+    S3_0_c2_c1_1:
+      name: 'APIAKeyHi_EL1'
+      description: 'Pointer Authentication Key A for Instruction (bits[127:64]) '
+    S3_0_c2_c1_2:
+      name: 'APIBKeyLo_EL1'
+      description: 'Pointer Authentication Key B for Instruction (bits[63:0]) '
+    S3_0_c2_c1_3:
+      name: 'APIBKeyHi_EL1'
+      description: 'Pointer Authentication Key B for Instruction (bits[127:64]) '
+    S3_0_c2_c2_0:
+      name: 'APDAKeyLo_EL1'
+      description: 'Pointer Authentication Key A for Data (bits[63:0]) '
+    S3_0_c2_c2_1:
+      name: 'APDAKeyHi_EL1'
+      description: 'Pointer Authentication Key A for Data (bits[127:64]) '
+    S3_0_c2_c2_2:
+      name: 'APDBKeyLo_EL1'
+      description: 'Pointer Authentication Key B for Data (bits[63:0]) '
+    S3_0_c2_c2_3:
+      name: 'APDBKeyHi_EL1'
+      description: 'Pointer Authentication Key B for Data (bits[127:64]) '
+    S3_0_c2_c3_0:
+      name: 'APGAKeyLo_EL1'
+      description: 'Pointer Authentication Key A for Code (bits[63:0]) '
+    S3_0_c2_c3_1:
+      name: 'APGAKeyHi_EL1'
+      description: 'Pointer Authentication Key A for Code (bits[127:64]) '
+    S3_0_c4_c0_0:
+      name: 'SPSR_EL1'
+      description: 'Saved Program Status Register (EL1)'
+    S3_0_c4_c0_1:
+      name: 'ELR_EL1'
+      description: 'Exception Link Register (EL1)'
+    S3_0_c4_c1_0:
+      name: 'SP_EL0'
+      description: 'Stack Pointer (EL0)'
+    S3_0_c4_c2_0:
+      name: 'SPSel'
+      description: 'Stack Pointer Select'
+    S3_0_c4_c2_2:
+      name: 'CurrentEL'
+      description: 'Current Exception Level'
+    S3_0_c4_c2_3:
+      name: 'PAN'
+      description: 'Privileged Access Never'
+    S3_0_c4_c2_4:
+      name: 'UAO'
+      description: 'User Access Override'
+    S3_0_c4_c6_0:
+      name: 'ICC_PMR_EL1'
+      description: Interrupt Controller Interrupt Priority Mask Register
+        Interrupt Controller Virtual Interrupt Priority Mask Register
+    S3_0_c5_c1_0:
+      name: 'AFSR0_EL1'
+      description: 'Auxiliary Fault Status Register 0 (EL1)'
+    S3_0_c5_c1_1:
+      name: 'AFSR1_EL1'
+      description: 'Auxiliary Fault Status Register 1 (EL1)'
+    S3_0_c5_c2_0:
+      name: 'ESR_EL1'
+      description: 'Exception Syndrome Register (EL1)'
+    S3_0_c5_c3_0:
+      name: 'ERRIDR_EL1'
+      description: 'Error Record ID Register'
+    S3_0_c5_c3_1:
+      name: 'ERRSELR_EL1'
+      description: 'Error Record Select Register'
+    S3_0_c5_c4_0:
+      name: 'ERXFR_EL1'
+      description: 'Selected Error Record Feature Register'
+    S3_0_c5_c4_1:
+      name: 'ERXCTLR_EL1'
+      description: 'Selected Error Record Control Register'
+    S3_0_c5_c4_2:
+      name: 'ERXSTATUS_EL1'
+      description: 'Selected Error Record Primary Status Register'
+    S3_0_c5_c4_3:
+      name: 'ERXADDR_EL1'
+      description: 'Selected Error Record Address Register'
+    S3_0_c5_c4_4:
+      name: 'ERXPFGF_EL1'
+      description: 'Selected Pseudo-fault Generation Feature register'
+    S3_0_c5_c4_5:
+      name: 'ERXPFGCTL_EL1'
+      description: 'Selected Pseudo-fault Generation Control register'
+    S3_0_c5_c4_6:
+      name: 'ERXPFGCDN_EL1'
+      description: 'Selected Pseudo-fault Generation Countdown register'
+    S3_0_c5_c5_0:
+      name: 'ERXMISC0_EL1'
+      description: 'Selected Error Record Miscellaneous Register 0'
+    S3_0_c5_c5_1:
+      name: 'ERXMISC1_EL1'
+      description: 'Selected Error Record Miscellaneous Register 1'
+    S3_0_c5_c5_2:
+      name: 'ERXMISC2_EL1'
+      description: 'Selected Error Record Miscellaneous Register 2'
+    S3_0_c5_c5_3:
+      name: 'ERXMISC3_EL1'
+      description: 'Selected Error Record Miscellaneous Register 3'
+    S3_0_c5_c6_0:
+      name: 'TFSR_EL1'
+      description: 'Tag Fault Status Register (EL1)'
+    S3_0_c5_c6_1:
+      name: 'TFSRE0_EL1'
+      description: 'Tag Fault Status Register (EL0).'
+    S3_0_c6_c0_0:
+      name: 'FAR_EL1'
+      description: 'Fault Address Register (EL1)'
+    S3_0_c7_c4_0:
+      name: 'PAR_EL1'
+      description: 'Physical Address Register'
+    S3_0_c9_c9_0:
+      name: 'PMSCR_EL1'
+      description: 'Statistical Profiling Control Register (EL1)'
+    S3_0_c9_c9_2:
+      name: 'PMSICR_EL1'
+      description: 'Sampling Interval Counter Register'
+    S3_0_c9_c9_3:
+      name: 'PMSIRR_EL1'
+      description: 'Sampling Interval Reload Register'
+    S3_0_c9_c9_4:
+      name: 'PMSFCR_EL1'
+      description: 'Sampling Filter Control Register'
+    S3_0_c9_c9_5:
+      name: 'PMSEVFR_EL1'
+      description: 'Sampling Event Filter Register'
+    S3_0_c9_c9_6:
+      name: 'PMSLATFR_EL1'
+      description: 'Sampling Latency Filter Register'
+    S3_0_c9_c9_7:
+      name: 'PMSIDR_EL1'
+      description: 'Sampling Profiling ID Register'
+    S3_0_c9_c10_0:
+      name: 'PMBLIMITR_EL1'
+      description: 'Profiling Buffer Limit Address Register'
+    S3_0_c9_c10_1:
+      name: 'PMBPTR_EL1'
+      description: 'Profiling Buffer Write Pointer Register'
+    S3_0_c9_c10_3:
+      name: 'PMBSR_EL1'
+      description: 'Profiling Buffer Status/syndrome Register'
+    S3_0_c9_c10_7:
+      name: 'PMBIDR_EL1'
+      description: 'Profiling Buffer ID Register'
+    S3_0_c9_c14_1:
+      name: 'PMINTENSET_EL1'
+      description: 'Performance Monitors Interrupt Enable Set register'
+    S3_0_c9_c14_2:
+      name: 'PMINTENCLR_EL1'
+      description: 'Performance Monitors Interrupt Enable Clear register'
+    S3_0_c9_c14_6:
+      name: 'PMMIR_EL1'
+      description: 'Performance Monitors Machine Identification Register'
+    S3_0_c10_c2_0:
+      name: 'MAIR_EL1'
+      description: 'Memory Attribute Indirection Register (EL1)'
+    S3_0_c10_c3_0:
+      name: 'AMAIR_EL1'
+      description: 'Auxiliary Memory Attribute Indirection Register (EL1)'
+    S3_0_c10_c4_0:
+      name: 'LORSA_EL1'
+      description: 'LORegion Start Address (EL1)'
+    S3_0_c10_c4_1:
+      name: 'LOREA_EL1'
+      description: 'LORegion End Address (EL1)'
+    S3_0_c10_c4_2:
+      name: 'LORN_EL1'
+      description: 'LORegion Number (EL1)'
+    S3_0_c10_c4_3:
+      name: 'LORC_EL1'
+      description: 'LORegion Control (EL1)'
+    S3_0_c10_c4_4:
+      name: 'MPAMIDR_EL1'
+      description: 'MPAM ID Register (EL1)'
+    S3_0_c10_c4_7:
+      name: 'LORID_EL1'
+      description: 'LORegionID (EL1)'
+    S3_0_c10_c5_0:
+      name: 'MPAM1_EL1'
+      description: 'MPAM1 Register (EL1)'
+    S3_0_c10_c5_1:
+      name: 'MPAM0_EL1'
+      description: 'MPAM0 Register (EL1)'
+    S3_0_c12_c0_0:
+      name: 'VBAR_EL1'
+      description: 'Vector Base Address Register (EL1)'
+    S3_0_c12_c0_1:
+      name: 'RVBAR_EL1'
+      description: 'Reset Vector Base Address Register (if EL2 and EL3 not implemented)'
+    S3_0_c12_c0_2:
+      name: 'RMR_EL1'
+      description: 'Reset Management Register (EL1)'
+    S3_0_c12_c1_0:
+      name: 'ISR_EL1'
+      description: 'Interrupt Status Register'
+    S3_0_c12_c1_1:
+      name: 'DISR_EL1'
+      description: 'Deferred Interrupt Status Register'
+    S3_0_c12_c8_0:
+      name: 'ICC_IAR0_EL1'
+      description: Interrupt Controller Interrupt Acknowledge Register 0
+        Interrupt Controller Virtual Interrupt Acknowledge Register 0
+    S3_0_c12_c8_1:
+      name: 'ICC_EOIR0_EL1'
+      description: Interrupt Controller End Of Interrupt Register 0
+        Interrupt Controller Virtual End Of Interrupt Register 0
+    S3_0_c12_c8_2:
+      name: 'ICC_HPPIR0_EL1'
+      description: Interrupt Controller Highest Priority Pending Interrupt Register 0
+        Interrupt Controller Virtual Highest Priority Pending Interrupt Register 0
+    S3_0_c12_c8_3:
+      name: 'ICC_BPR0_EL1'
+      description: Interrupt Controller Binary Point Register 0
+        Interrupt Controller Virtual Binary Point Register 0
+    S3_0_c12_c8_4:
+      name: 'ICC_AP0R0_EL1'
+      description: Interrupt Controller Active Priorities Group 0 Register 0
+        Interrupt Controller Virtual Active Priorities Group 0 Register 0
+    S3_0_c12_c8_5:
+      name: 'ICC_AP0R1_EL1'
+      description: Interrupt Controller Active Priorities Group 0 Register 1
+        Interrupt Controller Virtual Active Priorities Group 0 Register 1
+    S3_0_c12_c8_6:
+      name: 'ICC_AP0R2_EL1'
+      description: Interrupt Controller Active Priorities Group 0 Register 2
+        Interrupt Controller Virtual Active Priorities Group 0 Register 2
+    S3_0_c12_c8_7:
+      name: 'ICC_AP0R3_EL1'
+      description: Interrupt Controller Active Priorities Group 0 Register 3
+        Interrupt Controller Virtual Active Priorities Group 0 Register 3
+    S3_0_c12_c9_0:
+      name: 'ICC_AP1R0_EL1'
+      description: Interrupt Controller Active Priorities Group 1 Register 0
+        Interrupt Controller Virtual Active Priorities Group 1 Register 0
+    S3_0_c12_c9_1:
+      name: 'ICC_AP1R1_EL1'
+      description: Interrupt Controller Active Priorities Group 1 Register 1
+        Interrupt Controller Virtual Active Priorities Group 1 Register 1
+    S3_0_c12_c9_2:
+      name: 'ICC_AP1R2_EL1'
+      description: Interrupt Controller Active Priorities Group 1 Register 2
+        Interrupt Controller Virtual Active Priorities Group 1 Register 2
+    S3_0_c12_c9_3:
+      name: 'ICC_AP1R3_EL1'
+      description: Interrupt Controller Active Priorities Group 1 Register 3
+        Interrupt Controller Virtual Active Priorities Group 1 Register 3
+    S3_0_c12_c11_1:
+      name: 'ICC_DIR_EL1'
+      description: Interrupt Controller Deactivate Interrupt Register
+        Interrupt Controller Deactivate Virtual Interrupt Register
+    S3_0_c12_c11_3:
+      name: 'ICC_RPR_EL1'
+      description: Interrupt Controller Running Priority Register
+        Interrupt Controller Virtual Running Priority Register
+    S3_0_c12_c11_5:
+      name: 'ICC_SGI1R_EL1'
+      description: 'Interrupt Controller Software Generated Interrupt Group 1 Register'
+    S3_0_c12_c11_6:
+      name: 'ICC_ASGI1R_EL1'
+      description: 'Interrupt Controller Alias Software Generated Interrupt Group 1 Register'
+    S3_0_c12_c11_7:
+      name: 'ICC_SGI0R_EL1'
+      description: 'Interrupt Controller Software Generated Interrupt Group 0 Register'
+    S3_0_c12_c12_0:
+      name: 'ICC_IAR1_EL1'
+      description: Interrupt Controller Interrupt Acknowledge Register 1
+        Interrupt Controller Virtual Interrupt Acknowledge Register 1
+    S3_0_c12_c12_1:
+      name: 'ICC_EOIR1_EL1'
+      description: Interrupt Controller End Of Interrupt Register 1
+        Interrupt Controller Virtual End Of Interrupt Register 1
+    S3_0_c12_c12_2:
+      name: 'ICC_HPPIR1_EL1'
+      description: Interrupt Controller Highest Priority Pending Interrupt Register 1
+        Interrupt Controller Virtual Highest Priority Pending Interrupt Register 1
+    S3_0_c12_c12_3:
+      name: 'ICC_BPR1_EL1'
+      description: Interrupt Controller Binary Point Register 1
+        Interrupt Controller Virtual Binary Point Register 1
+    S3_0_c12_c12_4:
+      name: 'ICC_CTLR_EL1'
+      description: Interrupt Controller Control Register (EL1)
+        Interrupt Controller Virtual Control Register
+    S3_0_c12_c12_5:
+      name: 'ICC_SRE_EL1'
+      description: 'Interrupt Controller System Register Enable register (EL1)'
+    S3_0_c12_c12_6:
+      name: 'ICC_IGRPEN0_EL1'
+      description: Interrupt Controller Interrupt Group 0 Enable register
+        Interrupt Controller Virtual Interrupt Group 0 Enable register
+    S3_0_c12_c12_7:
+      name: 'ICC_IGRPEN1_EL1'
+      description: Interrupt Controller Interrupt Group 1 Enable register
+        Interrupt Controller Virtual Interrupt Group 1 Enable register
+    S3_0_c13_c0_1:
+      name: 'CONTEXTIDR_EL1'
+      description: 'Context ID Register (EL1)'
+    S3_0_c13_c0_4:
+      name: 'TPIDR_EL1'
+      description: 'EL1 Software Thread ID Register'
+    S3_0_c13_c0_7:
+      name: 'SCXTNUM_EL1'
+      description: 'EL1 Read/Write Software Context Number'
+    S3_0_c14_c1_0:
+      name: 'CNTKCTL_EL1'
+      description: 'Counter-timer Kernel Control register'
+    S3_1_c0_c0_0:
+      name: 'CCSIDR_EL1'
+      description: 'Current Cache Size ID Register'
+    S3_1_c0_c0_1:
+      name: 'CLIDR_EL1'
+      description: 'Cache Level ID Register'
+    S3_1_c0_c0_2:
+      name: 'CCSIDR2_EL1'
+      description: 'Current Cache Size ID Register 2'
+    S3_1_c0_c0_4:
+      name: 'GMID_EL1'
+      description: ' Multiple tag transfer ID register'
+    S3_1_c0_c0_7:
+      name: 'AIDR_EL1'
+      description: 'Auxiliary ID Register'
+    S3_2_c0_c0_0:
+      name: 'CSSELR_EL1'
+      description: 'Cache Size Selection Register'
+    S3_3_c0_c0_1:
+      name: 'CTR_EL0'
+      description: 'Cache Type Register'
+    S3_3_c0_c0_7:
+      name: 'DCZID_EL0'
+      description: 'Data Cache Zero ID register'
+    S3_3_c2_c4_0:
+      name: 'RNDR'
+      description: 'Random Number'
+    S3_3_c2_c4_1:
+      name: 'RNDRRS'
+      description: 'Reseeded Random Number'
+    S3_3_c4_c2_0:
+      name: 'NZCV'
+      description: 'Condition Flags'
+    S3_3_c4_c2_1:
+      name: 'DAIF'
+      description: 'Interrupt Mask Bits'
+    S3_3_c4_c2_5:
+      name: 'DIT'
+      description: 'Data Independent Timing'
+    S3_3_c4_c2_6:
+      name: 'SSBS'
+      description: 'Speculative Store Bypass Safe'
+    S3_3_c4_c2_7:
+      name: 'TCO'
+      description: 'Tag Check Override'
+    S3_3_c4_c4_0:
+      name: 'FPCR'
+      description: 'Floating-point Control Register'
+    S3_3_c4_c4_1:
+      name: 'FPSR'
+      description: 'Floating-point Status Register'
+    S3_3_c4_c5_0:
+      name: 'DSPSR_EL0'
+      description: 'Debug Saved Program Status Register'
+    S3_3_c4_c5_1:
+      name: 'DLR_EL0'
+      description: 'Debug Link Register'
+    S3_3_c9_c12_0:
+      name: 'PMCR_EL0'
+      description: 'Performance Monitors Control Register'
+    S3_3_c9_c12_1:
+      name: 'PMCNTENSET_EL0'
+      description: 'Performance Monitors Count Enable Set register'
+    S3_3_c9_c12_2:
+      name: 'PMCNTENCLR_EL0'
+      description: 'Performance Monitors Count Enable Clear register'
+    S3_3_c9_c12_3:
+      name: 'PMOVSCLR_EL0'
+      description: 'Performance Monitors Overflow Flag Status Clear Register'
+    S3_3_c9_c12_4:
+      name: 'PMSWINC_EL0'
+      description: 'Performance Monitors Software Increment register'
+    S3_3_c9_c12_5:
+      name: 'PMSELR_EL0'
+      description: 'Performance Monitors Event Counter Selection Register'
+    S3_3_c9_c12_6:
+      name: 'PMCEID0_EL0'
+      description: 'Performance Monitors Common Event Identification register 0'
+    S3_3_c9_c12_7:
+      name: 'PMCEID1_EL0'
+      description: 'Performance Monitors Common Event Identification register 1'
+    S3_3_c9_c13_0:
+      name: 'PMCCNTR_EL0'
+      description: 'Performance Monitors Cycle Count Register'
+    S3_3_c9_c13_1:
+      name: 'PMXEVTYPER_EL0'
+      description: 'Performance Monitors Selected Event Type Register'
+    S3_3_c9_c13_2:
+      name: 'PMXEVCNTR_EL0'
+      description: 'Performance Monitors Selected Event Count Register'
+    S3_3_c9_c14_0:
+      name: 'PMUSERENR_EL0'
+      description: 'Performance Monitors User Enable Register'
+    S3_3_c9_c14_3:
+      name: 'PMOVSSET_EL0'
+      description: 'Performance Monitors Overflow Flag Status Set register'
+    S3_3_c13_c0_2:
+      name: 'TPIDR_EL0'
+      description: 'EL0 Read/Write Software Thread ID Register'
+    S3_3_c13_c0_3:
+      name: 'TPIDRRO_EL0'
+      description: 'EL0 Read-Only Software Thread ID Register'
+    S3_3_c13_c0_7:
+      name: 'SCXTNUM_EL0'
+      description: 'EL0 Read/Write Software Context Number'
+    S3_3_c13_c2_0:
+      name: 'AMCR_EL0'
+      description: 'Activity Monitors Control Register'
+    S3_3_c13_c2_1:
+      name: 'AMCFGR_EL0'
+      description: 'Activity Monitors Configuration Register'
+    S3_3_c13_c2_2:
+      name: 'AMCGCR_EL0'
+      description: 'Activity Monitors Counter Group Configuration Register'
+    S3_3_c13_c2_3:
+      name: 'AMUSERENR_EL0'
+      description: 'Activity Monitors User Enable Register'
+    S3_3_c13_c2_4:
+      name: 'AMCNTENCLR0_EL0'
+      description: 'Activity Monitors Count Enable Clear Register 0'
+    S3_3_c13_c2_5:
+      name: 'AMCNTENSET0_EL0'
+      description: 'Activity Monitors Count Enable Set Register 0'
+    S3_3_c13_c2_6:
+      name: 'AMCG1IDR_EL0'
+      description: 'Activity Monitors Counter Group 1 Identification Register'
+    S3_3_c13_c3_0:
+      name: 'AMCNTENCLR1_EL0'
+      description: 'Activity Monitors Count Enable Clear Register 1'
+    S3_3_c13_c3_1:
+      name: 'AMCNTENSET1_EL0'
+      description: 'Activity Monitors Count Enable Set Register 1'
+    S3_3_c13_c4_0:
+      name: 'AMEVCNTR00_EL0'
+      description: 'Activity Monitors Event Counter Register 0 0'
+    S3_3_c13_c4_1:
+      name: 'AMEVCNTR01_EL0'
+      description: 'Activity Monitors Event Counter Register 0 1'
+    S3_3_c13_c4_2:
+      name: 'AMEVCNTR02_EL0'
+      description: 'Activity Monitors Event Counter Register 0 2'
+    S3_3_c13_c4_3:
+      name: 'AMEVCNTR03_EL0'
+      description: 'Activity Monitors Event Counter Register 0 3'
+    S3_3_c13_c4_4:
+      name: 'AMEVCNTR04_EL0'
+      description: 'Activity Monitors Event Counter Register 0 4'
+    S3_3_c13_c4_5:
+      name: 'AMEVCNTR05_EL0'
+      description: 'Activity Monitors Event Counter Register 0 5'
+    S3_3_c13_c4_6:
+      name: 'AMEVCNTR06_EL0'
+      description: 'Activity Monitors Event Counter Register 0 6'
+    S3_3_c13_c4_7:
+      name: 'AMEVCNTR07_EL0'
+      description: 'Activity Monitors Event Counter Register 0 7'
+    S3_3_c13_c5_0:
+      name: 'AMEVCNTR08_EL0'
+      description: 'Activity Monitors Event Counter Register 0 8'
+    S3_3_c13_c5_1:
+      name: 'AMEVCNTR09_EL0'
+      description: 'Activity Monitors Event Counter Register 0 9'
+    S3_3_c13_c5_2:
+      name: 'AMEVCNTR010_EL0'
+      description: 'Activity Monitors Event Counter Register 0 10'
+    S3_3_c13_c5_3:
+      name: 'AMEVCNTR011_EL0'
+      description: 'Activity Monitors Event Counter Register 0 11'
+    S3_3_c13_c5_4:
+      name: 'AMEVCNTR012_EL0'
+      description: 'Activity Monitors Event Counter Register 0 12'
+    S3_3_c13_c5_5:
+      name: 'AMEVCNTR013_EL0'
+      description: 'Activity Monitors Event Counter Register 0 13'
+    S3_3_c13_c5_6:
+      name: 'AMEVCNTR014_EL0'
+      description: 'Activity Monitors Event Counter Register 0 14'
+    S3_3_c13_c5_7:
+      name: 'AMEVCNTR015_EL0'
+      description: 'Activity Monitors Event Counter Register 0 15'
+    S3_3_c13_c6_0:
+      name: 'AMEVTYPER00_EL0'
+      description: 'Activity Monitors Event Type Register 0 0'
+    S3_3_c13_c6_1:
+      name: 'AMEVTYPER01_EL0'
+      description: 'Activity Monitors Event Type Register 0 1'
+    S3_3_c13_c6_2:
+      name: 'AMEVTYPER02_EL0'
+      description: 'Activity Monitors Event Type Register 0 2'
+    S3_3_c13_c6_3:
+      name: 'AMEVTYPER03_EL0'
+      description: 'Activity Monitors Event Type Register 0 3'
+    S3_3_c13_c6_4:
+      name: 'AMEVTYPER04_EL0'
+      description: 'Activity Monitors Event Type Register 0 4'
+    S3_3_c13_c6_5:
+      name: 'AMEVTYPER05_EL0'
+      description: 'Activity Monitors Event Type Register 0 5'
+    S3_3_c13_c6_6:
+      name: 'AMEVTYPER06_EL0'
+      description: 'Activity Monitors Event Type Register 0 6'
+    S3_3_c13_c6_7:
+      name: 'AMEVTYPER07_EL0'
+      description: 'Activity Monitors Event Type Register 0 7'
+    S3_3_c13_c7_0:
+      name: 'AMEVTYPER08_EL0'
+      description: 'Activity Monitors Event Type Register 0 8'
+    S3_3_c13_c7_1:
+      name: 'AMEVTYPER09_EL0'
+      description: 'Activity Monitors Event Type Register 0 9'
+    S3_3_c13_c7_2:
+      name: 'AMEVTYPER010_EL0'
+      description: 'Activity Monitors Event Type Register 0 10'
+    S3_3_c13_c7_3:
+      name: 'AMEVTYPER011_EL0'
+      description: 'Activity Monitors Event Type Register 0 11'
+    S3_3_c13_c7_4:
+      name: 'AMEVTYPER012_EL0'
+      description: 'Activity Monitors Event Type Register 0 12'
+    S3_3_c13_c7_5:
+      name: 'AMEVTYPER013_EL0'
+      description: 'Activity Monitors Event Type Register 0 13'
+    S3_3_c13_c7_6:
+      name: 'AMEVTYPER014_EL0'
+      description: 'Activity Monitors Event Type Register 0 14'
+    S3_3_c13_c7_7:
+      name: 'AMEVTYPER015_EL0'
+      description: 'Activity Monitors Event Type Register 0 15'
+    S3_3_c13_c12_0:
+      name: 'AMEVCNTR10_EL0'
+      description: 'Activity Monitors Event Counter Register 1 0'
+    S3_3_c13_c12_1:
+      name: 'AMEVCNTR11_EL0'
+      description: 'Activity Monitors Event Counter Register 1 1'
+    S3_3_c13_c12_2:
+      name: 'AMEVCNTR12_EL0'
+      description: 'Activity Monitors Event Counter Register 1 2'
+    S3_3_c13_c12_3:
+      name: 'AMEVCNTR13_EL0'
+      description: 'Activity Monitors Event Counter Register 1 3'
+    S3_3_c13_c12_4:
+      name: 'AMEVCNTR14_EL0'
+      description: 'Activity Monitors Event Counter Register 1 4'
+    S3_3_c13_c12_5:
+      name: 'AMEVCNTR15_EL0'
+      description: 'Activity Monitors Event Counter Register 1 5'
+    S3_3_c13_c12_6:
+      name: 'AMEVCNTR16_EL0'
+      description: 'Activity Monitors Event Counter Register 1 6'
+    S3_3_c13_c12_7:
+      name: 'AMEVCNTR17_EL0'
+      description: 'Activity Monitors Event Counter Register 1 7'
+    S3_3_c13_c13_0:
+      name: 'AMEVCNTR18_EL0'
+      description: 'Activity Monitors Event Counter Register 1 8'
+    S3_3_c13_c13_1:
+      name: 'AMEVCNTR19_EL0'
+      description: 'Activity Monitors Event Counter Register 1 9'
+    S3_3_c13_c13_2:
+      name: 'AMEVCNTR110_EL0'
+      description: 'Activity Monitors Event Counter Register 1 10'
+    S3_3_c13_c13_3:
+      name: 'AMEVCNTR111_EL0'
+      description: 'Activity Monitors Event Counter Register 1 11'
+    S3_3_c13_c13_4:
+      name: 'AMEVCNTR112_EL0'
+      description: 'Activity Monitors Event Counter Register 1 12'
+    S3_3_c13_c13_5:
+      name: 'AMEVCNTR113_EL0'
+      description: 'Activity Monitors Event Counter Register 1 13'
+    S3_3_c13_c13_6:
+      name: 'AMEVCNTR114_EL0'
+      description: 'Activity Monitors Event Counter Register 1 14'
+    S3_3_c13_c13_7:
+      name: 'AMEVCNTR115_EL0'
+      description: 'Activity Monitors Event Counter Register 1 15'
+    S3_3_c13_c14_0:
+      name: 'AMEVTYPER10_EL0'
+      description: 'Activity Monitors Event Type Register 1 0'
+    S3_3_c13_c14_1:
+      name: 'AMEVTYPER11_EL0'
+      description: 'Activity Monitors Event Type Register 1 1'
+    S3_3_c13_c14_2:
+      name: 'AMEVTYPER12_EL0'
+      description: 'Activity Monitors Event Type Register 1 2'
+    S3_3_c13_c14_3:
+      name: 'AMEVTYPER13_EL0'
+      description: 'Activity Monitors Event Type Register 1 3'
+    S3_3_c13_c14_4:
+      name: 'AMEVTYPER14_EL0'
+      description: 'Activity Monitors Event Type Register 1 4'
+    S3_3_c13_c14_5:
+      name: 'AMEVTYPER15_EL0'
+      description: 'Activity Monitors Event Type Register 1 5'
+    S3_3_c13_c14_6:
+      name: 'AMEVTYPER16_EL0'
+      description: 'Activity Monitors Event Type Register 1 6'
+    S3_3_c13_c14_7:
+      name: 'AMEVTYPER17_EL0'
+      description: 'Activity Monitors Event Type Register 1 7'
+    S3_3_c13_c15_0:
+      name: 'AMEVTYPER18_EL0'
+      description: 'Activity Monitors Event Type Register 1 8'
+    S3_3_c13_c15_1:
+      name: 'AMEVTYPER19_EL0'
+      description: 'Activity Monitors Event Type Register 1 9'
+    S3_3_c13_c15_2:
+      name: 'AMEVTYPER110_EL0'
+      description: 'Activity Monitors Event Type Register 1 10'
+    S3_3_c13_c15_3:
+      name: 'AMEVTYPER111_EL0'
+      description: 'Activity Monitors Event Type Register 1 11'
+    S3_3_c13_c15_4:
+      name: 'AMEVTYPER112_EL0'
+      description: 'Activity Monitors Event Type Register 1 12'
+    S3_3_c13_c15_5:
+      name: 'AMEVTYPER113_EL0'
+      description: 'Activity Monitors Event Type Register 1 13'
+    S3_3_c13_c15_6:
+      name: 'AMEVTYPER114_EL0'
+      description: 'Activity Monitors Event Type Register 1 14'
+    S3_3_c13_c15_7:
+      name: 'AMEVTYPER115_EL0'
+      description: 'Activity Monitors Event Type Register 1 15'
+    S3_3_c14_c0_0:
+      name: 'CNTFRQ_EL0'
+      description: 'Counter-timer Frequency register'
+    S3_3_c14_c0_1:
+      name: 'CNTPCT_EL0'
+      description: 'Counter-timer Physical Count register'
+    S3_3_c14_c0_2:
+      name: 'CNTVCT_EL0'
+      description: 'Counter-timer Virtual Count register'
+    S3_3_c14_c0_5:
+      name: 'CNTPCTSS_EL0'
+      description: 'Counter-timer Self-Synchronized Physical Count register'
+    S3_3_c14_c0_6:
+      name: 'CNTVCTSS_EL0'
+      description: 'Counter-timer Self-Synchronized Virtual Count register'
+    S3_3_c14_c2_0:
+      name: 'CNTP_TVAL_EL0'
+      description: 'Counter-timer Physical Timer TimerValue register'
+    S3_3_c14_c2_1:
+      name: 'CNTP_CTL_EL0'
+      description: 'Counter-timer Physical Timer Control register'
+    S3_3_c14_c2_2:
+      name: 'CNTP_CVAL_EL0'
+      description: 'Counter-timer Physical Timer CompareValue register'
+    S3_3_c14_c3_0:
+      name: 'CNTV_TVAL_EL0'
+      description: 'Counter-timer Virtual Timer TimerValue register'
+    S3_3_c14_c3_1:
+      name: 'CNTV_CTL_EL0'
+      description: 'Counter-timer Virtual Timer Control register'
+    S3_3_c14_c3_2:
+      name: 'CNTV_CVAL_EL0'
+      description: 'Counter-timer Virtual Timer CompareValue register'
+    S3_3_c14_c8_0:
+      name: 'PMEVCNTR0_EL0'
+      description: 'Performance Monitors Event Count Register 0'
+    S3_3_c14_c8_1:
+      name: 'PMEVCNTR1_EL0'
+      description: 'Performance Monitors Event Count Register 1'
+    S3_3_c14_c8_2:
+      name: 'PMEVCNTR2_EL0'
+      description: 'Performance Monitors Event Count Register 2'
+    S3_3_c14_c8_3:
+      name: 'PMEVCNTR3_EL0'
+      description: 'Performance Monitors Event Count Register 3'
+    S3_3_c14_c8_4:
+      name: 'PMEVCNTR4_EL0'
+      description: 'Performance Monitors Event Count Register 4'
+    S3_3_c14_c8_5:
+      name: 'PMEVCNTR5_EL0'
+      description: 'Performance Monitors Event Count Register 5'
+    S3_3_c14_c8_6:
+      name: 'PMEVCNTR6_EL0'
+      description: 'Performance Monitors Event Count Register 6'
+    S3_3_c14_c8_7:
+      name: 'PMEVCNTR7_EL0'
+      description: 'Performance Monitors Event Count Register 7'
+    S3_3_c14_c9_0:
+      name: 'PMEVCNTR8_EL0'
+      description: 'Performance Monitors Event Count Register 8'
+    S3_3_c14_c9_1:
+      name: 'PMEVCNTR9_EL0'
+      description: 'Performance Monitors Event Count Register 9'
+    S3_3_c14_c9_2:
+      name: 'PMEVCNTR10_EL0'
+      description: 'Performance Monitors Event Count Register 10'
+    S3_3_c14_c9_3:
+      name: 'PMEVCNTR11_EL0'
+      description: 'Performance Monitors Event Count Register 11'
+    S3_3_c14_c9_4:
+      name: 'PMEVCNTR12_EL0'
+      description: 'Performance Monitors Event Count Register 12'
+    S3_3_c14_c9_5:
+      name: 'PMEVCNTR13_EL0'
+      description: 'Performance Monitors Event Count Register 13'
+    S3_3_c14_c9_6:
+      name: 'PMEVCNTR14_EL0'
+      description: 'Performance Monitors Event Count Register 14'
+    S3_3_c14_c9_7:
+      name: 'PMEVCNTR15_EL0'
+      description: 'Performance Monitors Event Count Register 15'
+    S3_3_c14_c10_0:
+      name: 'PMEVCNTR16_EL0'
+      description: 'Performance Monitors Event Count Register 16'
+    S3_3_c14_c10_1:
+      name: 'PMEVCNTR17_EL0'
+      description: 'Performance Monitors Event Count Register 17'
+    S3_3_c14_c10_2:
+      name: 'PMEVCNTR18_EL0'
+      description: 'Performance Monitors Event Count Register 18'
+    S3_3_c14_c10_3:
+      name: 'PMEVCNTR19_EL0'
+      description: 'Performance Monitors Event Count Register 19'
+    S3_3_c14_c10_4:
+      name: 'PMEVCNTR20_EL0'
+      description: 'Performance Monitors Event Count Register 20'
+    S3_3_c14_c10_5:
+      name: 'PMEVCNTR21_EL0'
+      description: 'Performance Monitors Event Count Register 21'
+    S3_3_c14_c10_6:
+      name: 'PMEVCNTR22_EL0'
+      description: 'Performance Monitors Event Count Register 22'
+    S3_3_c14_c10_7:
+      name: 'PMEVCNTR23_EL0'
+      description: 'Performance Monitors Event Count Register 23'
+    S3_3_c14_c11_0:
+      name: 'PMEVCNTR24_EL0'
+      description: 'Performance Monitors Event Count Register 24'
+    S3_3_c14_c11_1:
+      name: 'PMEVCNTR25_EL0'
+      description: 'Performance Monitors Event Count Register 25'
+    S3_3_c14_c11_2:
+      name: 'PMEVCNTR26_EL0'
+      description: 'Performance Monitors Event Count Register 26'
+    S3_3_c14_c11_3:
+      name: 'PMEVCNTR27_EL0'
+      description: 'Performance Monitors Event Count Register 27'
+    S3_3_c14_c11_4:
+      name: 'PMEVCNTR28_EL0'
+      description: 'Performance Monitors Event Count Register 28'
+    S3_3_c14_c11_5:
+      name: 'PMEVCNTR29_EL0'
+      description: 'Performance Monitors Event Count Register 29'
+    S3_3_c14_c11_6:
+      name: 'PMEVCNTR30_EL0'
+      description: 'Performance Monitors Event Count Register 30'
+    S3_3_c14_c11_7:
+      name: 'PMEVCNTR31_EL0'
+      description: 'Performance Monitors Event Count Register 31'
+    S3_3_c14_c12_0:
+      name: 'PMEVTYPER0_EL0'
+      description: 'Performance Monitors Event Type Register 0'
+    S3_3_c14_c12_1:
+      name: 'PMEVTYPER1_EL0'
+      description: 'Performance Monitors Event Type Register 1'
+    S3_3_c14_c12_2:
+      name: 'PMEVTYPER2_EL0'
+      description: 'Performance Monitors Event Type Register 2'
+    S3_3_c14_c12_3:
+      name: 'PMEVTYPER3_EL0'
+      description: 'Performance Monitors Event Type Register 3'
+    S3_3_c14_c12_4:
+      name: 'PMEVTYPER4_EL0'
+      description: 'Performance Monitors Event Type Register 4'
+    S3_3_c14_c12_5:
+      name: 'PMEVTYPER5_EL0'
+      description: 'Performance Monitors Event Type Register 5'
+    S3_3_c14_c12_6:
+      name: 'PMEVTYPER6_EL0'
+      description: 'Performance Monitors Event Type Register 6'
+    S3_3_c14_c12_7:
+      name: 'PMEVTYPER7_EL0'
+      description: 'Performance Monitors Event Type Register 7'
+    S3_3_c14_c13_0:
+      name: 'PMEVTYPER8_EL0'
+      description: 'Performance Monitors Event Type Register 8'
+    S3_3_c14_c13_1:
+      name: 'PMEVTYPER9_EL0'
+      description: 'Performance Monitors Event Type Register 9'
+    S3_3_c14_c13_2:
+      name: 'PMEVTYPER10_EL0'
+      description: 'Performance Monitors Event Type Register 10'
+    S3_3_c14_c13_3:
+      name: 'PMEVTYPER11_EL0'
+      description: 'Performance Monitors Event Type Register 11'
+    S3_3_c14_c13_4:
+      name: 'PMEVTYPER12_EL0'
+      description: 'Performance Monitors Event Type Register 12'
+    S3_3_c14_c13_5:
+      name: 'PMEVTYPER13_EL0'
+      description: 'Performance Monitors Event Type Register 13'
+    S3_3_c14_c13_6:
+      name: 'PMEVTYPER14_EL0'
+      description: 'Performance Monitors Event Type Register 14'
+    S3_3_c14_c13_7:
+      name: 'PMEVTYPER15_EL0'
+      description: 'Performance Monitors Event Type Register 15'
+    S3_3_c14_c14_0:
+      name: 'PMEVTYPER16_EL0'
+      description: 'Performance Monitors Event Type Register 16'
+    S3_3_c14_c14_1:
+      name: 'PMEVTYPER17_EL0'
+      description: 'Performance Monitors Event Type Register 17'
+    S3_3_c14_c14_2:
+      name: 'PMEVTYPER18_EL0'
+      description: 'Performance Monitors Event Type Register 18'
+    S3_3_c14_c14_3:
+      name: 'PMEVTYPER19_EL0'
+      description: 'Performance Monitors Event Type Register 19'
+    S3_3_c14_c14_4:
+      name: 'PMEVTYPER20_EL0'
+      description: 'Performance Monitors Event Type Register 20'
+    S3_3_c14_c14_5:
+      name: 'PMEVTYPER21_EL0'
+      description: 'Performance Monitors Event Type Register 21'
+    S3_3_c14_c14_6:
+      name: 'PMEVTYPER22_EL0'
+      description: 'Performance Monitors Event Type Register 22'
+    S3_3_c14_c14_7:
+      name: 'PMEVTYPER23_EL0'
+      description: 'Performance Monitors Event Type Register 23'
+    S3_3_c14_c15_0:
+      name: 'PMEVTYPER24_EL0'
+      description: 'Performance Monitors Event Type Register 24'
+    S3_3_c14_c15_1:
+      name: 'PMEVTYPER25_EL0'
+      description: 'Performance Monitors Event Type Register 25'
+    S3_3_c14_c15_2:
+      name: 'PMEVTYPER26_EL0'
+      description: 'Performance Monitors Event Type Register 26'
+    S3_3_c14_c15_3:
+      name: 'PMEVTYPER27_EL0'
+      description: 'Performance Monitors Event Type Register 27'
+    S3_3_c14_c15_4:
+      name: 'PMEVTYPER28_EL0'
+      description: 'Performance Monitors Event Type Register 28'
+    S3_3_c14_c15_5:
+      name: 'PMEVTYPER29_EL0'
+      description: 'Performance Monitors Event Type Register 29'
+    S3_3_c14_c15_6:
+      name: 'PMEVTYPER30_EL0'
+      description: 'Performance Monitors Event Type Register 30'
+    S3_3_c14_c15_7:
+      name: 'PMCCFILTR_EL0'
+      description: Performance Monitors Cycle Count Filter Register
+        Performance Monitors Event Type Register 31
+    S3_4_c0_c0_0:
+      name: 'VPIDR_EL2'
+      description: 'Virtualization Processor ID Register'
+    S3_4_c0_c0_5:
+      name: 'VMPIDR_EL2'
+      description: 'Virtualization Multiprocessor ID Register'
+    S3_4_c1_c0_0:
+      name: 'SCTLR_EL2'
+      description: 'System Control Register (EL2)'
+    S3_4_c1_c0_1:
+      name: 'ACTLR_EL2'
+      description: 'Auxiliary Control Register (EL2)'
+    S3_4_c1_c1_0:
+      name: 'HCR_EL2'
+      description: 'Hypervisor Configuration Register'
+    S3_4_c1_c1_1:
+      name: 'MDCR_EL2'
+      description: 'Monitor Debug Configuration Register (EL2)'
+    S3_4_c1_c1_2:
+      name: 'CPTR_EL2'
+      description: 'Architectural Feature Trap Register (EL2)'
+    S3_4_c1_c1_3:
+      name: 'HSTR_EL2'
+      description: 'Hypervisor System Trap Register'
+    S3_4_c1_c1_4:
+      name: 'HFGRTR_EL2'
+      description: 'Hypervisor Fine-Grained Read Trap Register'
+    S3_4_c1_c1_5:
+      name: 'HFGWTR_EL2'
+      description: 'Hypervisor Fine-Grained Write Trap Register'
+    S3_4_c1_c1_6:
+      name: 'HFGITR_EL2'
+      description: 'Hypervisor Fine-Grained Instruction Trap Register'
+    S3_4_c1_c1_7:
+      name: 'HACR_EL2'
+      description: 'Hypervisor Auxiliary Control Register'
+    S3_4_c1_c2_0:
+      name: 'ZCR_EL2'
+      description: 'SVE Control Register for EL2'
+    S3_4_c1_c2_1:
+      name: 'TRFCR_EL2'
+      description: 'Trace Filter Control Register (EL2)'
+    S3_4_c1_c3_1:
+      name: 'SDER32_EL2'
+      description: 'AArch32 Secure Debug Enable Register'
+    S3_4_c2_c0_0:
+      name: 'TTBR0_EL2'
+      description: 'Translation Table Base Register 0 (EL2)'
+    S3_4_c2_c0_1:
+      name: 'TTBR1_EL2'
+      description: 'Translation Table Base Register 1 (EL2)'
+    S3_4_c2_c0_2:
+      name: 'TCR_EL2'
+      description: 'Translation Control Register (EL2)'
+    S3_4_c2_c1_0:
+      name: 'VTTBR_EL2'
+      description: 'Virtualization Translation Table Base Register'
+    S3_4_c2_c1_2:
+      name: 'VTCR_EL2'
+      description: 'Virtualization Translation Control Register'
+    S3_4_c2_c2_0:
+      name: 'VNCR_EL2'
+      description: 'Virtual Nested Control Register'
+    S3_4_c2_c6_0:
+      name: 'VSTTBR_EL2'
+      description: 'Virtualization Secure Translation Table Base Register'
+    S3_4_c2_c6_2:
+      name: 'VSTCR_EL2'
+      description: 'Virtualization Secure Translation Control Register'
+    S3_4_c3_c0_0:
+      name: 'DACR32_EL2'
+      description: 'Domain Access Control Register'
+    S3_4_c3_c1_4:
+      name: 'HDFGRTR_EL2'
+      description: 'Hypervisor Debug Fine-Grained Read Trap Register'
+    S3_4_c3_c1_5:
+      name: 'HDFGWTR_EL2'
+      description: 'Hypervisor Debug Fine-Grained Write Trap Register'
+    S3_4_c3_c1_6:
+      name: 'HAFGRTR_EL2'
+      description: 'Hypervisor Activity Monitors Fine-Grained Read Trap Register'
+    S3_4_c4_c0_0:
+      name: 'SPSR_EL2'
+      description: 'Saved Program Status Register (EL2)'
+    S3_4_c4_c0_1:
+      name: 'ELR_EL2'
+      description: 'Exception Link Register (EL2)'
+    S3_4_c4_c1_0:
+      name: 'SP_EL1'
+      description: 'Stack Pointer (EL1)'
+    S3_4_c4_c3_0:
+      name: 'SPSR_irq'
+      description: 'Saved Program Status Register (IRQ mode)'
+    S3_4_c4_c3_1:
+      name: 'SPSR_abt'
+      description: 'Saved Program Status Register (Abort mode)'
+    S3_4_c4_c3_2:
+      name: 'SPSR_und'
+      description: 'Saved Program Status Register (Undefined mode)'
+    S3_4_c4_c3_3:
+      name: 'SPSR_fiq'
+      description: 'Saved Program Status Register (FIQ mode)'
+    S3_4_c5_c0_1:
+      name: 'IFSR32_EL2'
+      description: 'Instruction Fault Status Register (EL2)'
+    S3_4_c5_c1_0:
+      name: 'AFSR0_EL2'
+      description: 'Auxiliary Fault Status Register 0 (EL2)'
+    S3_4_c5_c1_1:
+      name: 'AFSR1_EL2'
+      description: 'Auxiliary Fault Status Register 1 (EL2)'
+    S3_4_c5_c2_0:
+      name: 'ESR_EL2'
+      description: 'Exception Syndrome Register (EL2)'
+    S3_4_c5_c2_3:
+      name: 'VSESR_EL2'
+      description: 'Virtual SError Exception Syndrome Register'
+    S3_4_c5_c3_0:
+      name: 'FPEXC32_EL2'
+      description: 'Floating-Point Exception Control register'
+    S3_4_c5_c6_0:
+      name: 'TFSR_EL2'
+      description: 'Tag Fault Status Register (EL2)'
+    S3_4_c6_c0_0:
+      name: 'FAR_EL2'
+      description: 'Fault Address Register (EL2)'
+    S3_4_c6_c0_4:
+      name: 'HPFAR_EL2'
+      description: 'Hypervisor IPA Fault Address Register'
+    S3_4_c9_c9_0:
+      name: 'PMSCR_EL2'
+      description: 'Statistical Profiling Control Register (EL2)'
+    S3_4_c10_c2_0:
+      name: 'MAIR_EL2'
+      description: 'Memory Attribute Indirection Register (EL2)'
+    S3_4_c10_c3_0:
+      name: 'AMAIR_EL2'
+      description: 'Auxiliary Memory Attribute Indirection Register (EL2)'
+    S3_4_c10_c4_0:
+      name: 'MPAMHCR_EL2'
+      description: 'MPAM Hypervisor Control Register (EL2)'
+    S3_4_c10_c4_1:
+      name: 'MPAMVPMV_EL2'
+      description: 'MPAM Virtual Partition Mapping Valid Register'
+    S3_4_c10_c5_0:
+      name: 'MPAM2_EL2'
+      description: 'MPAM2 Register (EL2)'
+    S3_4_c10_c6_0:
+      name: 'MPAMVPM0_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 0'
+    S3_4_c10_c6_1:
+      name: 'MPAMVPM1_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 1'
+    S3_4_c10_c6_2:
+      name: 'MPAMVPM2_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 2'
+    S3_4_c10_c6_3:
+      name: 'MPAMVPM3_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 3'
+    S3_4_c10_c6_4:
+      name: 'MPAMVPM4_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 4'
+    S3_4_c10_c6_5:
+      name: 'MPAMVPM5_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 5'
+    S3_4_c10_c6_6:
+      name: 'MPAMVPM6_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 6'
+    S3_4_c10_c6_7:
+      name: 'MPAMVPM7_EL2'
+      description: 'MPAM Virtual PARTID Mapping Register 7'
+    S3_4_c12_c0_0:
+      name: 'VBAR_EL2'
+      description: 'Vector Base Address Register (EL2)'
+    S3_4_c12_c0_1:
+      name: 'RVBAR_EL2'
+      description: 'Reset Vector Base Address Register (if EL3 not implemented)'
+    S3_4_c12_c0_2:
+      name: 'RMR_EL2'
+      description: 'Reset Management Register (EL2)'
+    S3_4_c12_c1_1:
+      name: 'VDISR_EL2'
+      description: 'Virtual Deferred Interrupt Status Register'
+    S3_4_c12_c8_0:
+      name: 'ICH_AP0R0_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 0 Register 0'
+    S3_4_c12_c8_1:
+      name: 'ICH_AP0R1_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 0 Register 1'
+    S3_4_c12_c8_2:
+      name: 'ICH_AP0R2_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 0 Register 2'
+    S3_4_c12_c8_3:
+      name: 'ICH_AP0R3_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 0 Register 3'
+    S3_4_c12_c9_0:
+      name: 'ICH_AP1R0_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 1 Register 0'
+    S3_4_c12_c9_1:
+      name: 'ICH_AP1R1_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 1 Register 1'
+    S3_4_c12_c9_2:
+      name: 'ICH_AP1R2_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 1 Register 2'
+    S3_4_c12_c9_3:
+      name: 'ICH_AP1R3_EL2'
+      description: 'Interrupt Controller Hyp Active Priorities Group 1 Register 3'
+    S3_4_c12_c9_5:
+      name: 'ICC_SRE_EL2'
+      description: 'Interrupt Controller System Register Enable register (EL2)'
+    S3_4_c12_c11_0:
+      name: 'ICH_HCR_EL2'
+      description: 'Interrupt Controller Hyp Control Register'
+    S3_4_c12_c11_1:
+      name: 'ICH_VTR_EL2'
+      description: 'Interrupt Controller VGIC Type Register'
+    S3_4_c12_c11_2:
+      name: 'ICH_MISR_EL2'
+      description: 'Interrupt Controller Maintenance Interrupt State Register'
+    S3_4_c12_c11_3:
+      name: 'ICH_EISR_EL2'
+      description: 'Interrupt Controller End of Interrupt Status Register'
+    S3_4_c12_c11_5:
+      name: 'ICH_ELRSR_EL2'
+      description: 'Interrupt Controller Empty List Register Status Register'
+    S3_4_c12_c11_7:
+      name: 'ICH_VMCR_EL2'
+      description: 'Interrupt Controller Virtual Machine Control Register'
+    S3_4_c12_c12_0:
+      name: 'ICH_LR0_EL2'
+      description: 'Interrupt Controller List Register 0'
+    S3_4_c12_c12_1:
+      name: 'ICH_LR1_EL2'
+      description: 'Interrupt Controller List Register 1'
+    S3_4_c12_c12_2:
+      name: 'ICH_LR2_EL2'
+      description: 'Interrupt Controller List Register 2'
+    S3_4_c12_c12_3:
+      name: 'ICH_LR3_EL2'
+      description: 'Interrupt Controller List Register 3'
+    S3_4_c12_c12_4:
+      name: 'ICH_LR4_EL2'
+      description: 'Interrupt Controller List Register 4'
+    S3_4_c12_c12_5:
+      name: 'ICH_LR5_EL2'
+      description: 'Interrupt Controller List Register 5'
+    S3_4_c12_c12_6:
+      name: 'ICH_LR6_EL2'
+      description: 'Interrupt Controller List Register 6'
+    S3_4_c12_c12_7:
+      name: 'ICH_LR7_EL2'
+      description: 'Interrupt Controller List Register 7'
+    S3_4_c12_c13_0:
+      name: 'ICH_LR8_EL2'
+      description: 'Interrupt Controller List Register 8'
+    S3_4_c12_c13_1:
+      name: 'ICH_LR9_EL2'
+      description: 'Interrupt Controller List Register 9'
+    S3_4_c12_c13_2:
+      name: 'ICH_LR10_EL2'
+      description: 'Interrupt Controller List Register 10'
+    S3_4_c12_c13_3:
+      name: 'ICH_LR11_EL2'
+      description: 'Interrupt Controller List Register 11'
+    S3_4_c12_c13_4:
+      name: 'ICH_LR12_EL2'
+      description: 'Interrupt Controller List Register 12'
+    S3_4_c12_c13_5:
+      name: 'ICH_LR13_EL2'
+      description: 'Interrupt Controller List Register 13'
+    S3_4_c12_c13_6:
+      name: 'ICH_LR14_EL2'
+      description: 'Interrupt Controller List Register 14'
+    S3_4_c12_c13_7:
+      name: 'ICH_LR15_EL2'
+      description: 'Interrupt Controller List Register 15'
+    S3_4_c13_c0_1:
+      name: 'CONTEXTIDR_EL2'
+      description: 'Context ID Register (EL2)'
+    S3_4_c13_c0_2:
+      name: 'TPIDR_EL2'
+      description: 'EL2 Software Thread ID Register'
+    S3_4_c13_c0_7:
+      name: 'SCXTNUM_EL2'
+      description: 'EL2 Read/Write Software Context Number'
+    S3_4_c13_c8_0:
+      name: 'AMEVCNTVOFF00_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 0'
+    S3_4_c13_c8_1:
+      name: 'AMEVCNTVOFF01_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 1'
+    S3_4_c13_c8_2:
+      name: 'AMEVCNTVOFF02_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 2'
+    S3_4_c13_c8_3:
+      name: 'AMEVCNTVOFF03_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 3'
+    S3_4_c13_c8_4:
+      name: 'AMEVCNTVOFF04_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 4'
+    S3_4_c13_c8_5:
+      name: 'AMEVCNTVOFF05_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 5'
+    S3_4_c13_c8_6:
+      name: 'AMEVCNTVOFF06_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 6'
+    S3_4_c13_c8_7:
+      name: 'AMEVCNTVOFF07_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 7'
+    S3_4_c13_c9_0:
+      name: 'AMEVCNTVOFF08_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 8'
+    S3_4_c13_c9_1:
+      name: 'AMEVCNTVOFF09_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 9'
+    S3_4_c13_c9_2:
+      name: 'AMEVCNTVOFF010_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 10'
+    S3_4_c13_c9_3:
+      name: 'AMEVCNTVOFF011_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 11'
+    S3_4_c13_c9_4:
+      name: 'AMEVCNTVOFF012_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 12'
+    S3_4_c13_c9_5:
+      name: 'AMEVCNTVOFF013_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 13'
+    S3_4_c13_c9_6:
+      name: 'AMEVCNTVOFF014_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 14'
+    S3_4_c13_c9_7:
+      name: 'AMEVCNTVOFF015_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 0 15'
+    S3_4_c13_c10_0:
+      name: 'AMEVCNTVOFF10_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 0'
+    S3_4_c13_c10_1:
+      name: 'AMEVCNTVOFF11_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 1'
+    S3_4_c13_c10_2:
+      name: 'AMEVCNTVOFF12_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 2'
+    S3_4_c13_c10_3:
+      name: 'AMEVCNTVOFF13_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 3'
+    S3_4_c13_c10_4:
+      name: 'AMEVCNTVOFF14_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 4'
+    S3_4_c13_c10_5:
+      name: 'AMEVCNTVOFF15_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 5'
+    S3_4_c13_c10_6:
+      name: 'AMEVCNTVOFF16_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 6'
+    S3_4_c13_c10_7:
+      name: 'AMEVCNTVOFF17_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 7'
+    S3_4_c13_c11_0:
+      name: 'AMEVCNTVOFF18_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 8'
+    S3_4_c13_c11_1:
+      name: 'AMEVCNTVOFF19_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 9'
+    S3_4_c13_c11_2:
+      name: 'AMEVCNTVOFF110_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 10'
+    S3_4_c13_c11_3:
+      name: 'AMEVCNTVOFF111_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 11'
+    S3_4_c13_c11_4:
+      name: 'AMEVCNTVOFF112_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 12'
+    S3_4_c13_c11_5:
+      name: 'AMEVCNTVOFF113_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 13'
+    S3_4_c13_c11_6:
+      name: 'AMEVCNTVOFF114_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 14'
+    S3_4_c13_c11_7:
+      name: 'AMEVCNTVOFF115_EL2'
+      description: 'Activity Monitors Event Counter Virtual Offset Register 1 15'
+    S3_4_c14_c0_3:
+      name: 'CNTVOFF_EL2'
+      description: 'Counter-timer Virtual Offset register'
+    S3_4_c14_c0_6:
+      name: 'CNTPOFF_EL2'
+      description: 'Counter-timer Physical Offset register'
+    S3_4_c14_c1_0:
+      name: 'CNTHCTL_EL2'
+      description: 'Counter-timer Hypervisor Control register'
+    S3_4_c14_c2_0:
+      name: 'CNTHP_TVAL_EL2'
+      description: 'Counter-timer Physical Timer TimerValue register (EL2)'
+    S3_4_c14_c2_1:
+      name: 'CNTHP_CTL_EL2'
+      description: 'Counter-timer Hypervisor Physical Timer Control register'
+    S3_4_c14_c2_2:
+      name: 'CNTHP_CVAL_EL2'
+      description: 'Counter-timer Physical Timer CompareValue register (EL2)'
+    S3_4_c14_c3_0:
+      name: 'CNTHV_TVAL_EL2'
+      description: 'Counter-timer Virtual Timer TimerValue Register (EL2)'
+    S3_4_c14_c3_1:
+      name: 'CNTHV_CTL_EL2'
+      description: 'Counter-timer Virtual Timer Control register (EL2)'
+    S3_4_c14_c3_2:
+      name: 'CNTHV_CVAL_EL2'
+      description: 'Counter-timer Virtual Timer CompareValue register (EL2)'
+    S3_4_c14_c4_0:
+      name: 'CNTHVS_TVAL_EL2'
+      description: 'Counter-timer Secure Virtual Timer TimerValue register (EL2)'
+    S3_4_c14_c4_1:
+      name: 'CNTHVS_CTL_EL2'
+      description: 'Counter-timer Secure Virtual Timer Control register (EL2)'
+    S3_4_c14_c4_2:
+      name: 'CNTHVS_CVAL_EL2'
+      description: 'Counter-timer Secure Virtual Timer CompareValue register (EL2)'
+    S3_4_c14_c5_0:
+      name: 'CNTHPS_TVAL_EL2'
+      description: 'Counter-timer Secure Physical Timer TimerValue register (EL2)'
+    S3_4_c14_c5_1:
+      name: 'CNTHPS_CTL_EL2'
+      description: 'Counter-timer Secure Physical Timer Control register (EL2)'
+    S3_4_c14_c5_2:
+      name: 'CNTHPS_CVAL_EL2'
+      description: 'Counter-timer Secure Physical Timer CompareValue register (EL2)'
+    S3_6_c1_c0_0:
+      name: 'SCTLR_EL3'
+      description: 'System Control Register (EL3)'
+    S3_6_c1_c0_1:
+      name: 'ACTLR_EL3'
+      description: 'Auxiliary Control Register (EL3)'
+    S3_6_c1_c1_0:
+      name: 'SCR_EL3'
+      description: 'Secure Configuration Register'
+    S3_6_c1_c1_1:
+      name: 'SDER32_EL3'
+      description: 'AArch32 Secure Debug Enable Register'
+    S3_6_c1_c1_2:
+      name: 'CPTR_EL3'
+      description: 'Architectural Feature Trap Register (EL3)'
+    S3_6_c1_c2_0:
+      name: 'ZCR_EL3'
+      description: 'SVE Control Register for EL3'
+    S3_6_c1_c3_1:
+      name: 'MDCR_EL3'
+      description: 'Monitor Debug Configuration Register (EL3)'
+    S3_6_c2_c0_0:
+      name: 'TTBR0_EL3'
+      description: 'Translation Table Base Register 0 (EL3)'
+    S3_6_c2_c0_2:
+      name: 'TCR_EL3'
+      description: 'Translation Control Register (EL3)'
+    S3_6_c4_c0_0:
+      name: 'SPSR_EL3'
+      description: 'Saved Program Status Register (EL3)'
+    S3_6_c4_c0_1:
+      name: 'ELR_EL3'
+      description: 'Exception Link Register (EL3)'
+    S3_6_c4_c1_0:
+      name: 'SP_EL2'
+      description: 'Stack Pointer (EL2)'
+    S3_6_c5_c1_0:
+      name: 'AFSR0_EL3'
+      description: 'Auxiliary Fault Status Register 0 (EL3)'
+    S3_6_c5_c1_1:
+      name: 'AFSR1_EL3'
+      description: 'Auxiliary Fault Status Register 1 (EL3)'
+    S3_6_c5_c2_0:
+      name: 'ESR_EL3'
+      description: 'Exception Syndrome Register (EL3)'
+    S3_6_c5_c6_0:
+      name: 'TFSR_EL3'
+      description: 'Tag Fault Status Register (EL3)'
+    S3_6_c6_c0_0:
+      name: 'FAR_EL3'
+      description: 'Fault Address Register (EL3)'
+    S3_6_c10_c2_0:
+      name: 'MAIR_EL3'
+      description: 'Memory Attribute Indirection Register (EL3)'
+    S3_6_c10_c3_0:
+      name: 'AMAIR_EL3'
+      description: 'Auxiliary Memory Attribute Indirection Register (EL3)'
+    S3_6_c10_c5_0:
+      name: 'MPAM3_EL3'
+      description: 'MPAM3 Register (EL3)'
+    S3_6_c12_c0_0:
+      name: 'VBAR_EL3'
+      description: 'Vector Base Address Register (EL3)'
+    S3_6_c12_c0_1:
+      name: 'RVBAR_EL3'
+      description: 'Reset Vector Base Address Register (if EL3 implemented)'
+    S3_6_c12_c0_2:
+      name: 'RMR_EL3'
+      description: 'Reset Management Register (EL3)'
+    S3_6_c12_c12_4:
+      name: 'ICC_CTLR_EL3'
+      description: 'Interrupt Controller Control Register (EL3)'
+    S3_6_c12_c12_5:
+      name: 'ICC_SRE_EL3'
+      description: 'Interrupt Controller System Register Enable register (EL3)'
+    S3_6_c12_c12_7:
+      name: 'ICC_IGRPEN1_EL3'
+      description: 'Interrupt Controller Interrupt Group 1 Enable register (EL3)'
+    S3_6_c13_c0_2:
+      name: 'TPIDR_EL3'
+      description: 'EL3 Software Thread ID Register'
+    S3_6_c13_c0_7:
+      name: 'SCXTNUM_EL3'
+      description: 'EL3 Read/Write Software Context Number'
+    S3_7_c14_c2_0:
+      name: 'CNTPS_TVAL_EL1'
+      description: 'Counter-timer Physical Secure Timer TimerValue register'
+    S3_7_c14_c2_1:
+      name: 'CNTPS_CTL_EL1'
+      description: 'Counter-timer Physical Secure Timer Control register'
+    S3_7_c14_c2_2:
+      name: 'CNTPS_CVAL_EL1'
+      description: 'Counter-timer Physical Secure Timer CompareValue register'
+  apple_system_registers:
+    S3_0_c15_c0_0:
+      name: 'HID0'
+      description: ''
+    S3_0_c15_c0_1:
+      name: 'EHID0'
+      description: ''
+    S3_0_c15_c1_0:
+      name: 'HID1'
+      description: ''
+    S3_0_c15_c1_1:
+      name: 'EHID1'
+      description: ''
+    S3_0_c15_c2_0:
+      name: 'HID2'
+      description: ''
+    S3_0_c15_c2_1:
+      name: 'EHID2'
+      description: ''
+    S3_0_c15_c3_0:
+      name: 'HID3'
+      description: ''
+    S3_0_c15_c3_1:
+      name: 'EHID3'
+      description: ''
+    S3_0_c15_c4_0:
+      name: 'HID4'
+      description: ''
+    S3_0_c15_c4_1:
+      name: 'EHID4'
+      description: ''
+    S3_0_c15_c5_0:
+      name: 'HID5'
+      description: 'L2 cache load/store prefetcher'
+    S3_0_c15_c5_1:
+      name: 'EHID5'
+      description: ''
+    S3_0_c15_c6_0:
+      name: 'HID6'
+      description: ''
+    S3_0_c15_c7_0:
+      name: 'L2_CRAMCONFIG'
+      description: ''
+    S3_0_c15_c8_0:
+      name: 'HID8'
+      description: ''
+    S3_0_c15_c9_0:
+      name: 'HID9'
+      description: ''
+    S3_0_c15_c10_0:
+      name: 'HID10'
+      description: ''
+    S3_0_c15_c10_1:
+      name: 'EHID10'
+      description: ''
+    S3_0_c15_c11_0:
+      name: 'HID11'
+      description: ''
+    S3_0_c15_c11_1:
+      name: 'EHID11'
+      description: ''
+    S3_0_c15_c14_0:
+      name: 'HID13'
+      description: ''
+    S3_0_c15_c15_0:
+      name: 'HID14'
+      description: ''
+    S3_0_c15_c15_2:
+      name: 'HID16'
+      description: ''
+    S3_1_c15_c0_0:
+      name: 'PMCR0'
+      description: 'Apple Performance Monitor Control Register 0'
+    S3_1_c15_c1_0:
+      name: 'PMCR1'
+      description: 'Controls which execution modes count events'
+    S3_1_c15_c2_0:
+      name: 'PMCR2'
+      description: 'Controls watchpoint registers'
+    S3_1_c15_c3_0:
+      name: 'PMCR3'
+      description: 'Controls breakpoints and address matching'
+    S3_1_c15_c4_0:
+      name: 'PMCR4'
+      description: 'Controls opcode matching'
+    S3_1_c15_c5_0:
+      name: 'PMESR0'
+      description: ''
+    S3_1_c15_c6_0:
+      name: 'PMESR1'
+      description: ''
+    S3_1_c15_c7_0:
+      name: 'OPMAT0'
+      description: ''
+    S3_1_c15_c8_0:
+      name: 'OPMAT1'
+      description: ''
+    S3_1_c15_c9_0:
+      name: 'OPMSK0'
+      description: ''
+    S3_1_c15_c10_0:
+      name: 'OPMSK1'
+      description: ''
+    S3_1_c15_c13_0:
+      name: 'PMSR'
+      description: ''
+    S3_2_c15_c0_0:
+      name: 'PMC0'
+      description: '48-bit cycles counter'
+    S3_2_c15_c1_0:
+      name: 'PMC1'
+      description: '48-bit instructions counter'
+    S3_2_c15_c2_0:
+      name: 'PMC2'
+      description: ''
+    S3_2_c15_c3_0:
+      name: 'PMC3'
+      description: ''
+    S3_2_c15_c4_0:
+      name: 'PMC4'
+      description: ''
+    S3_2_c15_c5_0:
+      name: 'PMC5'
+      description: ''
+    S3_2_c15_c6_0:
+      name: 'PMC6'
+      description: ''
+    S3_2_c15_c7_0:
+      name: 'PMC7'
+      description: ''
+    S3_2_c15_c9_0:
+      name: 'PMC8'
+      description: ''
+    S3_2_c15_c10_0:
+      name: 'PMC9'
+      description: ''
+    S3_2_c15_c12_0:
+      name: 'PMTRHLD6'
+      description: ''
+    S3_2_c15_c13_0:
+      name: 'PMTRHLD4'
+      description: ''
+    S3_2_c15_c14_0:
+      name: 'PMTRHLD2'
+      description: ''
+    S3_2_c15_c15_0:
+      name: 'PMMMAP'
+      description: ''
+    S3_3_c15_c0_0:
+      name: 'LSU_ERR_STS'
+      description: 'LSU Error Status'
+    S3_3_c15_c1_0:
+      name: 'LSU_ERR_CTL'
+      description: 'LSU Error Control'
+    S3_3_c15_c2_0:
+      name: 'E_LSU_ERR_STS'
+      description: 'LSU Error Status'
+    S3_3_c15_c7_0:
+      name: 'L2_CRAMCONFIG'
+      description: 'LSU Error Status'
+    S3_3_c15_c8_0:
+      name: 'LLC_ERR_STS'
+      description: 'LLC Error Status'
+    S3_3_c15_c8_1:
+      name: 'L2E_ERR_STS'
+      description: ''
+    S3_3_c15_c9_0:
+      name: 'LLC_ERR_ADR'
+      description: 'LLC Error Address'
+    S3_3_c15_c9_1:
+      name: 'L2E_ERR_ADR'
+      description: ''
+    S3_3_c15_c10_0:
+      name: 'LLC_ERR_INF'
+      description: 'LLC Error Information'
+    S3_3_c15_c10_1:
+      name: 'L2E_ERR_INF'
+      description: ''
+    S3_4_c15_c0_0:
+      name: 'FED_ERR_STS'
+      description: 'FED Error Status'
+    S3_4_c15_c0_2:
+      name: 'E_FED_ERR_STS'
+      description: 'FED Error Status'
+    S3_4_c15_c0_4:
+      name: 'APCTL_EL1/MIGSTS'
+      description: ''
+    S3_4_c15_c1_0:
+      name: 'KERNELKEYLO_EL1'
+      description: 'PAC Kernel Key (bits[63:0])'
+    S3_4_c15_c1_1:
+      name: 'KERNELKEYHI_EL1'
+      description: 'PAC Kernel Key (bits[127:64])'
+    S3_4_c15_c1_2:
+      name: 'VMSA_LOCK_EL1'
+      description: 'VMSA Lock'
+    S3_4_c15_c1_6:
+      name: 'CTRR_B_UPR_EL1'
+      description: 'CTRR Upper Range B'
+    S3_4_c15_c1_7:
+      name: 'CTRR_B_LWR_EL1'
+      description: 'CTRR Lower Range B'
+    S3_4_c15_c2_0:
+      name: 'APRR_0'
+      description: 'APRR Register 0'
+    S3_4_c15_c2_1:
+      name: 'APRR_1'
+      description: 'APRR Register 1'
+    S3_4_c15_c2_2:
+      name: 'CTRR_LOCK'
+      description: 'CTRR Lockdown'
+    S3_4_c15_c2_3:
+      name: 'CTRR_A_LWR_EL1'
+      description: 'CTRR Lower Range'
+    S3_4_c15_c2_4:
+      name: 'CTRR_A_UPR_EL1'
+      description: 'CTRR Upper Range'
+    S3_4_c15_c2_5:
+      name: 'CTRR_CTL_EL1'
+      description: 'CTRR Control Register'
+    S3_4_c15_c2_6:
+      name: 'APRR_6'
+      description: 'APRR Register 6'
+    S3_4_c15_c2_7:
+      name: 'APRR_7'
+      description: 'APRR Register 7'
+    S3_4_c15_c11_0:
+      name: 'ACC_CTRR_A_LWR_EL2'
+      description: ''
+    S3_4_c15_c11_1:
+      name: 'ACC_CTRR_A_UPR_EL2'
+      description: ''
+    S3_4_c15_c11_4:
+      name: 'ACC_CTRR_CTL_EL2'
+      description: ''
+    S3_4_c15_c11_5:
+      name: 'ACC_CTRR_LOCK_EL2'
+      description: ''
+    S3_5_c15_c0_0:
+      name: 'IPI_RR_LOCAL'
+      description: ''
+    S3_5_c15_c0_1:
+      name: 'IPI_RR_GLOBAL'
+      description: ''
+    S3_5_c15_c0_5:
+      name: 'DPC_ERR_STS'
+      description: ''
+    S3_5_c15_c1_1:
+      name: 'IPI_SR'
+      description: ''
+    S3_5_c15_c3_1:
+      name: 'IPI_CR'
+      description: ''
+    S3_5_c15_c4_0:
+      name: 'ACC_CFG/CYC_CFG'
+      description: ''
+    S3_5_c15_c5_0:
+      name: 'CYC_OVRD'
+      description: ''
+    S3_5_c15_c6_0:
+      name: 'ACC_OVRD'
+      description: ''
+    S3_5_c15_c6_1:
+      name: 'ACC_EBLK_OVRD'
+      description: ''
+    S3_6_c15_c0_0:
+      name: 'MMU_ERR_STS'
+      description: 'MMU Error Status'
+    S3_6_c15_c2_0:
+      name: 'E_MMU_ERR_STS'
+      description: 'MMU Error Status'
+    S3_6_c15_c12_4:
+      name: 'APSTS_EL1'
+      description: ''
+    S3_7_c15_c0_4:
+      name: 'UPMCR0'
+      description: 'Controls which counters are enabled and how interrupts are generated for overflows'
+    S3_7_c15_c0_5:
+      name: 'UPMC8'
+      description: ''
+    S3_7_c15_c1_4:
+      name: 'UPMESR0'
+      description: 'Event selection register for counters 0-7'
+    S3_7_c15_c1_5:
+      name: 'UPMC9'
+      description: ''
+    S3_7_c15_c2_5:
+      name: 'UPMC10'
+      description: ''
+    S3_7_c15_c3_4:
+      name: 'UPMECM0'
+      description: 'Event core masks for counters 0-3'
+    S3_7_c15_c3_5:
+      name: 'UPMC11'
+      description: ''
+    S3_7_c15_c4_4:
+      name: 'UPMECM1'
+      description: 'Event core masks for counters 4-7'
+    S3_7_c15_c4_5:
+      name: 'UPMC12'
+      description: ''
+    S3_7_c15_c5_4:
+      name: 'UPMPCM'
+      description: ''
+    S3_7_c15_c5_5:
+      name: 'UPMC13'
+      description: ''
+    S3_7_c15_c6_4:
+      name: 'UPMSR'
+      description: ''
+    S3_7_c15_c6_5:
+      name: 'UPMC14'
+      description: ''
+    S3_7_c15_c7_4:
+      name: 'UPMC0'
+      description: ''
+    S3_7_c15_c7_5:
+      name: 'UPMC15'
+      description: ''
+    S3_7_c15_c8_4:
+      name: 'UPMC1'
+      description: ''
+    S3_7_c15_c8_5:
+      name: 'UPMECM2'
+      description: 'Event core masks for counters 8-11'
+    S3_7_c15_c9_4:
+      name: 'UPMC2'
+      description: ''
+    S3_7_c15_c9_5:
+      name: 'UPMECM3'
+      description: 'Event core masks for counters 12-15'
+    S3_7_c15_c10_4:
+      name: 'UPMC3'
+      description: ''
+    S3_7_c15_c11_4:
+      name: 'UPMC4'
+      description: ''
+    S3_7_c15_c11_5:
+      name: 'UPMESR1'
+      description: 'Event selection register for counters 8-15'
+    S3_7_c15_c12_4:
+      name: 'UPMC5'
+      description: ''
+    S3_7_c15_c13_4:
+      name: 'UPMC6'
+      description: ''
+    S3_7_c15_c14_4:
+      name: 'UPMC7'
+      description: ''
