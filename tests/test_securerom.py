@@ -2,8 +2,8 @@ import os.path
 import pathlib
 import pkgutil
 
-import yaml
 import unicorn
+import yaml
 
 T8015_SECURE_ROM = (
     "../ext/roms/resources/APROM/SecureROM for t8015si, iBoot-3332.0.0.1.23"
@@ -19,9 +19,11 @@ class MSRPrinter:
         self.msr_data = yaml.safe_load(self.msr_file)
 
     def friendly_name(self, cp_reg: unicorn.unicorn.uc_arm64_cp_reg) -> str:
-        msr_map = self.msr_data['aarch64']['msr']
-        apple_map = self.msr_data['aarch64']['apple_system_registers']
-        reg_descriptor = f"S{cp_reg.op0}_{cp_reg.op1}_c{cp_reg.crn}_c{cp_reg.crm}_{cp_reg.op2}"
+        msr_map = self.msr_data["aarch64"]["msr"]
+        apple_map = self.msr_data["aarch64"]["apple_system_registers"]
+        reg_descriptor = (
+            f"S{cp_reg.op0}_{cp_reg.op1}_c{cp_reg.crn}_c{cp_reg.crm}_{cp_reg.op2}"
+        )
         if reg_descriptor in msr_map:
             return msr_map[reg_descriptor]
         if reg_descriptor in apple_map:
@@ -104,19 +106,27 @@ def test_boot_securerom():
 
     def hook_mem_invalid(mu: unicorn.Uc, access, address, size, value, user_data):
         if access == unicorn.UC_MEM_FETCH:
-            print(">>> FETCH (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
-                  % (address, size, value))
+            print(
+                ">>> FETCH (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x"
+                % (address, size, value)
+            )
         elif access == unicorn.UC_MEM_READ:
-            print(">>> READ (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
-                  % (address, size, value))
+            print(
+                ">>> READ (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x"
+                % (address, size, value)
+            )
         elif access == unicorn.UC_MEM_WRITE:
-            print(">>> WRITE (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
-                  % (address, size, value))
+            print(
+                ">>> WRITE (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x"
+                % (address, size, value)
+            )
         else:
-            print(">>> UNKNOWN ACCESS [0x%x] (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x" \
-                    % (access, address, size, value))
+            print(
+                ">>> UNKNOWN ACCESS [0x%x] (from hook_mem_invalid) at 0x%x, data size = %u, data value = 0x%x"
+                % (access, address, size, value)
+            )
 
-    mu.hook_add(unicorn.UC_HOOK_BLOCK, hook_block)
+    # mu.hook_add(unicorn.UC_HOOK_BLOCK, hook_block)
     mu.hook_add(unicorn.UC_HOOK_MEM_FETCH_UNMAPPED, hook_mem_invalid)
     mu.hook_add(unicorn.UC_HOOK_MEM_READ_UNMAPPED, hook_mem_invalid)
     mu.hook_add(unicorn.UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_invalid)
