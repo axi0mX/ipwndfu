@@ -53,47 +53,8 @@ class DevicePlatform:
     heap_check_all: int = 0
     gadgets: typing.Dict[str, int] = field(default_factory=dict)
     exploit_configs: typing.Dict[str, dict] = field(default_factory=dict)
-    def __init__(
-        self,
-        cpid: int,
-        cprv: int,
-        scep: int,
-        arch: str,
-        srtg: str,
-        rom_base: int,
-        rom_size: int,
-        rom_sha1: str,
-        sram_base: int,
-        sram_size: int,
-        dram_base: int,
-        nonce_length: int,
-        sep_nonce_length: Optional[int],
-        demotion_reg: int,
-        sigcheck_addr: int,
-        sigcheck_patch: int,
-        heap_state: int,
-        heap_write_hash: int,
-        heap_check_all: int,
-    ) -> None:
-        self.cpid = cpid
-        self.cprv = cprv
-        self.scep = scep
-        self.arch = arch
-        self.srtg = srtg
-        self.rom_base = rom_base
-        self.rom_size = rom_size
-        self.rom_sha1 = rom_sha1
-        self.sram_base = sram_base
-        self.sram_size = sram_size
-        self.dram_base = dram_base
-        self.nonce_length = nonce_length
-        self.sep_nonce_length = sep_nonce_length
-        self.demotion_reg = demotion_reg
-        self.sigcheck_addr = sigcheck_addr
-        self.sigcheck_patch = sigcheck_patch
-        self.heap_state = heap_state
-        self.heap_write_hash = heap_write_hash
-        self.heap_check_all = heap_check_all
+
+    def __post_init__(self):
         if self.cpid in [0x8940, 0x8947]:
             self.dfu_image_base = 0x34000000
             self.dfu_load_base = 0x9FF00000
@@ -165,8 +126,6 @@ class DevicePlatform:
             self.trampoline_offset = 0
             self.page_offset = 0
 
-
-    def __post_init__(self) -> None:
         if isinstance(self.usb, dict):
             self.usb = USBConstants(**self.usb)
 
