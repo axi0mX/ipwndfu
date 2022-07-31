@@ -27,7 +27,7 @@ ipwndfu = "ipwndfu.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-cryptography = "^36"
+cryptography = "^37"
 pyusb = "^1"
 PyYAML = "^6"
 
@@ -54,7 +54,7 @@ pep8-naming = "^0"
 types-cryptography = "^3"
 MonkeyType = "^21"
 types-PyYAML = "^6"
-unicorn = "2.0.0.rc7"
+unicorn = "^2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
