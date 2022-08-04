@@ -1,9 +1,8 @@
 import os.path
 import pathlib
-import pkgutil
 
+import apple_data
 import unicorn
-import yaml
 
 T8015_SECURE_ROM = (
     "../ext/roms/resources/APROM/SecureROM for t8015si, iBoot-3332.0.0.1.23"
@@ -15,8 +14,7 @@ T8015_SRAM_SIZE = 0x200000
 
 class MSRPrinter:
     def __init__(self):
-        self.msr_file = pkgutil.get_data("tests", "registers.yaml")
-        self.msr_data = yaml.safe_load(self.msr_file)
+        self.msr_data = apple_data.load_file("registers")
 
     def friendly_name(self, cp_reg: unicorn.unicorn.uc_arm64_cp_reg) -> str:
         msr_map = self.msr_data["aarch64"]["msr"]
